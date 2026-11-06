@@ -120,7 +120,8 @@
       "ru_store_phone": "removed for user 0 after temporary official-source check",
       "ru_store_tv": "removed for user 0 after temporary official-source check",
       "alice": "not installed",
-      "official_source_attempt": "RuStore TV catalog detail route returned an error; mobile RuStore reports its build is unsuitable for TV. No Alice APK was downloaded or installed."
+      "official_source_attempt": "RuStore TV catalog detail route returned an error; mobile RuStore reports its build is unsuitable for TV. No Alice APK was downloaded or installed.",
+      "official_yandex_behavior": "Официальная справка Яндекса говорит, что Алиса AI не реагирует на голос вне приложения; запуск кнопкой-помощником и автоматический переход в режим слушания пока не испытаны."
     }
   },
   "cold_boot_seconds": null,
@@ -183,7 +184,15 @@
     "zip_integrity": "pass",
     "installed_on_device": false,
     "installation_requires_data_wipe_confirmation": true,
-    "build_log": "pass: 134 lines, 0 critical, 0 errors, 0 warnings; read loops use bounded remaining counters and helper compiled with -Werror"
+    "build_log": "pass: 134 lines, 0 critical, 0 errors, 0 warnings; read loops use bounded remaining counters and helper compiled with -Werror",
+    "release_assets_prepared_locally": [
+      "OTA",
+      "latest-emmc.txt",
+      "SHA256SUMS",
+      "7 APK Panadonik",
+      "signed clean-install archive"
+    ],
+    "github_status": "0 published releases, 0 Actions runs, 0 tags as of 2026-11-06"
   },
   "build_fingerprint_note": "В собранном system/build.prop ro.secure=1 и ro.adb.secure=1, но ro.debuggable=1; boot command line содержит androidboot.selinux=permissive. Аппаратный security review не пройден."
 }
