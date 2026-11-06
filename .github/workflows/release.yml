@@ -34,12 +34,7 @@ jobs:
           mkdir -p release/qa
           bash -n build-sd.sh tools/build-release.sh tools/release-ota.sh tools/package-clean-install.sh apps/*/build.sh
           python3 -m json.tool obtainium-apps.json >/dev/null
-          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then
-            python3 -m unittest discover -s tests -p 'test_iptv_merge.py' -v 2>&1 | tee /tmp/panadonik-tests.log
-            python3 -m unittest discover -s tests -p 'test_release_evidence.py' -v 2>&1 | tee -a /tmp/panadonik-tests.log
-          else
-            python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log
-          fi
+          python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log
           python3 tools/analyze-release-logs.py /tmp/panadonik-tests.log \
             --source "автоматические тесты" --output release/qa/test-log-analysis.md --fail-on-errors
           if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then test_scope="dev: IPTV и функциональный release gate"; else test_scope="stable: полный набор, включая конфигурацию безопасности"; fi

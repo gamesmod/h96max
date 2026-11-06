@@ -50,6 +50,11 @@ class ReleaseSecurityConfigTests(unittest.TestCase):
         workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
         self.assertIn("tools/check-image-wifi-secrets.py build/work/system.img build/work/vendor.img", workflow)
 
+    def test_dev_and_stable_release_workflow_run_full_test_suite(self):
+        workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
+        self.assertIn("python3 -m unittest discover -s tests -v", workflow)
+        self.assertIn("--source \"автоматические тесты\" --output release/qa/test-log-analysis.md --fail-on-errors", workflow)
+
 
 if __name__ == "__main__":
     unittest.main()
