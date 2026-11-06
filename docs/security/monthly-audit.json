@@ -1,0 +1,16 @@
+{
+  "audit_date": "2026-11-06",
+  "device": "Panadonik H96 Max, Android 12",
+  "installed_release": "0.3.9",
+  "logs_reviewed": true,
+  "network_capture_reviewed": true,
+  "capture_duration_seconds": 15,
+  "captured_packets": 5000,
+  "dropped_packets": 0,
+  "unencrypted_protocols": [
+    "IPTV over HTTP"
+  ],
+  "credential_patterns_found": 0,
+  "raw_capture_retained": false,
+  "sanitized_summary": "На установленной 0.3.9 проверены журналы и 15-секундный сетевой захват во время IPTV. Найден незашифрованный IPTV HTTP; шаблоны Authorization/Cookie/Bearer/password/token не обнаружены. PCAP удалён. В журнале остаются известные записи Obtainium EGL и USB FunctionFS; для кандидата 0.4.0 требуется повторный аппаратный аудит."
+}

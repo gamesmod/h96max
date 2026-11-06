@@ -1,5 +1,6 @@
 """Проверки разделения аппаратных gate для dev и stable выпусков."""
 import json
+import datetime
 import pathlib
 import subprocess
 import sys
@@ -21,11 +22,18 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
             "device": "test device",
             "automated_tests": {"status": "pass", "count": 1},
             "cold_boot_seconds": 8,
+            "hot_test": {"network_capture": {
+                "captured_at": datetime.date.today().isoformat(),
+                "duration_seconds": 15,
+                "packets": 100,
+                "auth_cookie_or_token_patterns": 0,
+                "raw_capture_retained": False,
+            }},
             "checks": {
                 name: "pass" for name in (
                     "cold_boot_le_10s", "boot_log_review", "qr_vlc",
                     "wired_network", "wifi_network", "iptv_playback", "torrent_playback",
-                    "graphics_video", "graphics_stress", "swap_disabled",
+                    "graphics_video", "graphics_stress", "swap_disabled", "network_capture_review",
                 )
             },
             "log_analysis": {"reviewed": True, "untriaged_errors": 0, "summary": "test"},
@@ -50,6 +58,21 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         result = self.run_checker("stable")
         self.assertEqual(result.returncode, 1)
         self.assertIn("security_review", result.stderr)
+
+    def test_dev_gate_requires_network_capture_review(self):
+        self.data["checks"]["network_capture_review"] = "pending"
+        result = self.run_checker("dev")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("network_capture_review", result.stderr)
+
+    def test_network_capture_pass_requires_fresh_details_and_deleted_pcap(self):
+        capture = self.data["hot_test"]["network_capture"]
+        capture["captured_at"] = (datetime.date.today() - datetime.timedelta(days=32)).isoformat()
+        capture["raw_capture_retained"] = True
+        result = self.run_checker("dev")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("не старше 31 дня", result.stderr)
+        self.assertIn("сырой PCAP", result.stderr)
 
 
 if __name__ == "__main__":

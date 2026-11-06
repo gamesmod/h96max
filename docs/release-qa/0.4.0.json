@@ -33,12 +33,14 @@
       "repeat_timeout_handling": "16 адресов оставлены после временного таймаута, поскольку прошли полную непосредственную предыдущую проверку; доступность повторно проверить"
     },
     "network_capture": {
+      "captured_at": "2026-11-06",
       "duration_seconds": 15,
       "packets": 5000,
       "dropped": 0,
       "unencrypted_iptv_http": true,
       "auth_cookie_or_token_patterns": 0,
-      "raw_capture_retained": false
+      "raw_capture_retained": false,
+      "scope": "снято на установленной 0.3.9; новый строгий список и кандидат 0.4.0 на приставке не проверялись"
     },
     "security_findings": [
       "ADB listens on TCP 5555 on all interfaces; ro.adb.secure=0, ro.secure=0, and shell access is root",
@@ -160,7 +162,7 @@
   "last_reboot_to_screen_seconds": 75,
   "automated_tests": {
     "status": "pass",
-    "count": 27,
+    "count": 37,
     "command": "python3 -m unittest discover -s tests -v"
   },
   "checks": {
@@ -170,12 +172,13 @@
     "qr_vlc": "fail: launch button opens VLC on the box, but remote endpoint TCP 8080 is not listening",
     "wired_network": "pending: Ethernet interface has no carrier",
     "wifi_network": "pending: Wi-Fi was VALIDATED before the USB gadget diagnostic change; device still answers 2/2 ICMP pings, but ConnectivityService must be rechecked after ADB restoration",
+    "network_capture_review": "pending: ранее захватывался трафик 0.3.9, но после включения строгого списка и пересборки кандидата повторный sanity-захват на приставке не выполнен",
     "iptv_playback": "pending: activity/index pass, but visible video frame and no-lag criterion are unconfirmed",
     "torrent_playback": "pending",
     "graphics_video": "pending",
     "graphics_stress": "pending",
     "swap_disabled": "pass",
-    "ota_build": "pass: eMMC 0.4.0 rebuilt from 39a5db0 with measured-segment-only IPTV quality gate; 27 automated tests; build log 0/0/0; OTA CMS and clean-install detached signatures verified with existing project certificate; ZIP integrity checked; embedded M3U hash verified against measured playlist",
+    "ota_build": "pass: eMMC 0.4.0 rebuilt from 39a5db0 with measured-segment-only IPTV quality gate; 37 automated tests; build log 0/0/0; OTA CMS and clean-install detached signatures verified with existing project certificate; ZIP integrity checked; embedded M3U hash verified against measured playlist",
     "device_update": "pending: новая сборка подготовлена; OTA сценарий в приложении требует очистки данных, отдельного согласия пользователя нет",
     "iptv_activity_launch": "pass",
     "links_activity_launch": "pass",
@@ -187,7 +190,7 @@
   "log_analysis": {
     "reviewed": true,
     "untriaged_errors": 1,
-    "summary": "В полном окне 10003 строк: одна ошибка EGL в Obtainium воспроизводится при запуске, но экран списка приложений отрисовался; оценка плавности остаётся pending. Три строки wl_run_escan LEGACY_SCAN sync ID отнесены к служебным по исходнику Broadcom; фактические Escan set error отсутствуют. Остались предупреждения FunctionFS (751 за 13 минут), RSN cipher (16), modem stats (1). После временного изменения USB gadget профиля ADB перестал отвечать; требуется перезагрузка и повторная диагностика. IPTV на живой 0.3.9: 3008 каналов, 53 русские группы, 184 канала 18+ первыми, индекс 101.5 с. Кадр Full HD и отсутствие лагов не доказаны. Wi-Fi был validated до смены профиля; Ethernet без carrier. QR VLC remote порт 8080 не слушает. eMMC 0.4.0 локально пересобрана из 39a5db0, 27 тестов PASS; встроенный M3U содержит 3007 измеренных потоков 1080p+ и совпал с локально проверенным файлом, сборка/тестовые журналы чистые. Кандидат локальный и не установлен. SELinux permissive/ro.debuggable=1; cold boot, торрент и графический стресс остаются непроверенными.",
+    "summary": "В полном окне 10003 строк: одна ошибка EGL в Obtainium воспроизводится при запуске, но экран списка приложений отрисовался; оценка плавности остаётся pending. Три строки wl_run_escan LEGACY_SCAN sync ID отнесены к служебным по исходнику Broadcom; фактические Escan set error отсутствуют. Остались предупреждения FunctionFS (751 за 13 минут), RSN cipher (16), modem stats (1). После временного изменения USB gadget профиля ADB перестал отвечать; требуется перезагрузка и повторная диагностика. IPTV на живой 0.3.9: 3008 каналов, 53 русские группы, 184 канала 18+ первыми, индекс 101.5 с. Кадр Full HD и отсутствие лагов не доказаны. Wi-Fi был validated до смены профиля; Ethernet без carrier. QR VLC remote порт 8080 не слушает. eMMC 0.4.0 локально пересобрана из 39a5db0, 37 тестов PASS; встроенный M3U содержит 3007 измеренных потоков 1080p+ и совпал с локально проверенным файлом, сборка/тестовые журналы чистые. Кандидат локальный и не установлен. SELinux permissive/ro.debuggable=1; cold boot, торрент и графический стресс остаются непроверенными.",
     "build_log": {
       "lines": 94,
       "critical": 0,
@@ -241,7 +244,16 @@
     "github_status": "0 опубликованных релизов и тегов по последней проверке; релизные Actions запускаются только тегом, gate ещё не пройден",
     "source_commit": "39a5db0",
     "clean_install_size_bytes": 1306725154,
-    "playlist_sha256": "978b7ef5260092a71a9301d4eb8479dcc1422940fc634ac0eafd979aaf65a0af"
+    "playlist_sha256": "978b7ef5260092a71a9301d4eb8479dcc1422940fc634ac0eafd979aaf65a0af",
+    "wifi_credentials_scan": {
+      "status": "pass",
+      "scope": "собранные build/work/system.img и build/work/vendor.img",
+      "configuration_files_checked": 2,
+      "wifi_env_present": false,
+      "saved_ssid_or_key_fields_found": 0,
+      "secret_values_printed": false,
+      "checker": "tools/check-image-wifi-secrets.py"
+    }
   },
   "build_fingerprint_note": "В собранном system/build.prop ro.secure=1 и ro.adb.secure=1, но ro.debuggable=1; boot command line содержит androidboot.selinux=permissive. Аппаратный security review не пройден.",
   "candidate_playlist_validation": {
@@ -276,5 +288,14 @@
       "csv_file": "release/qa/iptv-global-verify.csv (локальный отчёт; исключён из Git)"
     },
     "availability_policy": "17 одиночных временных таймаутов оставлены; исключение требует трёх неудач с интервалом не менее 24 часов"
+  },
+  "monthly_security_audit": {
+    "workflow": ".github/workflows/monthly-security-audit.yml",
+    "schedule": "ежемесячно, cron 17 08 UTC первого числа; ручной запуск также доступен",
+    "evidence_file": "docs/security/monthly-audit.json",
+    "evidence_date": "2026-11-06",
+    "evidence_scope": "установленная 0.3.9; захват 15 секунд, 5000 пакетов, сырые данные удалены",
+    "freshness_check": "pass: 31-дневный предел",
+    "candidate_0_4_0_scope": "новый аппаратный захват после установки 0.4.0 ещё pending"
   }
 }

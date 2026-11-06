@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Проверить протокол аппаратной приёмки перед созданием публичного релиза."""
 import argparse
+import datetime
 import json
 import pathlib
 import sys
@@ -9,7 +10,7 @@ import sys
 FUNCTIONAL_CHECKS = (
     "cold_boot_le_10s", "boot_log_review", "qr_vlc",
     "wired_network", "wifi_network", "iptv_playback", "torrent_playback", "graphics_video",
-    "graphics_stress", "swap_disabled",
+    "graphics_stress", "swap_disabled", "network_capture_review",
 )
 STABLE_SECURITY_CHECKS = ("security_review",)
 
@@ -48,6 +49,26 @@ def main():
     for name in required_checks:
         if checks.get(name) != "pass":
             failures.append(f"проверка {name}: статус должен быть pass")
+    if checks.get("network_capture_review") == "pass":
+        hot_test = data.get("hot_test", {})
+        capture = hot_test.get("network_capture", {}) if isinstance(hot_test, dict) else {}
+        if not isinstance(capture, dict):
+            capture = {}
+        try:
+            captured_at = datetime.date.fromisoformat(capture["captured_at"])
+            age_days = (datetime.date.today() - captured_at).days
+            if age_days < 0 or age_days > 31:
+                failures.append("захват сетевого трафика должен быть не старше 31 дня")
+        except (KeyError, TypeError, ValueError):
+            failures.append("в протоколе нет корректной даты сетевого захвата")
+        if not isinstance(capture.get("duration_seconds"), int) or capture["duration_seconds"] < 1:
+            failures.append("не указана длительность сетевого захвата")
+        if not isinstance(capture.get("packets"), int) or capture["packets"] < 1:
+            failures.append("не указано число пакетов сетевого захвата")
+        if capture.get("raw_capture_retained") is not False:
+            failures.append("сырой PCAP должен быть удалён")
+        if not isinstance(capture.get("auth_cookie_or_token_patterns"), int):
+            failures.append("не задокументирована проверка credentials в сетевом захвате")
     elapsed = data.get("cold_boot_seconds")
     if not isinstance(elapsed, (int, float)) or elapsed > 10:
         failures.append("холодная загрузка не подтверждена в пределах 10 секунд")

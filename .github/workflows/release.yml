@@ -136,6 +136,7 @@ jobs:
             --source "сборка OTA" --output release/qa/build-log-analysis.md --fail-on-errors
           test "$build_status" -eq 0
           test ! -e secrets/wifi.env
+          python3 tools/check-image-wifi-secrets.py build/work/system.img build/work/vendor.img
           mkdir -p release/obtainium
           cp apps/antivirus/out/TvboxAntivirus.apk release/obtainium/Panadonik-antivirus.apk
           cp apps/bootlog/out/TvboxBootLog.apk release/obtainium/Panadonik-bootlog.apk
