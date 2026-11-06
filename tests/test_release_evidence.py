@@ -85,6 +85,12 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.assertIn('Using committed release notes', workflow)
         self.assertIn('release/notes/$version.txt', workflow)
 
+    def test_repository_ci_runs_on_master_and_analyzes_full_test_log(self):
+        workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+        self.assertIn("branches: [master]", workflow)
+        self.assertIn("python3 -m unittest discover -s tests -v", workflow)
+        self.assertIn("--fail-on-errors", workflow)
+
 
 if __name__ == "__main__":
     unittest.main()

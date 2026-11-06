@@ -1,0 +1,38 @@
+name: Repository CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run full test suite and analyze its log
+        run: |
+          set -euo pipefail
+          bash -n build-sd.sh tools/build-release.sh tools/release-ota.sh tools/package-clean-install.sh apps/*/build.sh
+          python3 -m json.tool obtainium-apps.json >/dev/null
+          mkdir -p release/qa
+          python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log
+          python3 tools/analyze-release-logs.py /tmp/panadonik-tests.log \
+            --source "автоматические тесты" --output release/qa/test-log-analysis.md --fail-on-errors
+
+      - name: Upload sanitized test analysis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-ci-${{ github.sha }}
+          path: release/qa/test-log-analysis.md
+          if-no-files-found: ignore
+          retention-days: 30
