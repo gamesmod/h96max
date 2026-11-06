@@ -41,11 +41,12 @@ tools/build-release.sh
 5. Obtainium
 6. Ссылки
 7. Установка
-8. Настройки Android
-9. Производительность
-10. Питание
+8. Журнал загрузки
+9. Настройки Android
+10. Производительность
+11. Питание
 
-На главный экран выносятся самостоятельные функции без дублирования приложений-зависимостей: отдельной плитки VLC нет, его запускают «ТВ-каналы» и TorrServe; плитка Антивируса не показывается, компонент остаётся установлен и доступен в списке приложений. Журнал загрузки находится в списке приложений. После первичной настройки пользователь свободно меняет порядок и состав плиток; следующие загрузки их не сбрасывают. Игры SuperTux и Pixel Wheels удаляются при первичной настройке и не входят в выпуск.
+На главный экран выносятся самостоятельные функции без дублирования приложений-зависимостей: отдельной плитки VLC нет, его запускают «ТВ-каналы» и TorrServe; плитка Антивируса не показывается, компонент остаётся установлен и доступен в списке приложений. Журнал загрузки возвращён на главный экран. Одноразовая миграция добавляет его в существующую раскладку, не переставляя плитки пользователя; после этого пользователь свободно меняет порядок и состав плиток. Игры SuperTux и Pixel Wheels удаляются при первичной настройке и не входят в выпуск.
 
 UI-анимации окон и переходов отключены. При старте показывается живой журнал загрузки на чёрном фоне: текущая запись выделяется и обновляется в списке, сведения о CPU/GPU, разрешении, занятой ОЗУ и температуре размещены справа. Логотип и маркировка 4K убраны. Разрешение HDMI ограничено режимом 1920×1080; аппаратное GPU-ускорение SurfaceFlinger/HWUI сохраняется. Игровые и тестовые видеоматериалы не входят в образ.
 
@@ -97,16 +98,28 @@ USB-приёмник микрофонного пульта определяет�
 
 Собираются из исходников `apps/` скриптом `tools/build-release.sh` и подписываются ключом проекта.
 
-| Приложение | Исходники | Назначение |
+| Приложение | Исходники | Репозиторий | Назначение |
+|---|---|---|---|
+| ТВ-каналы | `apps/iptv` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/iptv) | IPTV-плейлист и запуск каналов во VLC |
+| Установка | `apps/installer` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/installer) | OTA по сети/носителю; установка и резервирование eMMC |
+| Антивирус | `apps/antivirus` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/antivirus) | Hypatia и проверка по запросу |
+| Производительность | `apps/clean` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/clean) | Освобождение памяти, метрики и настройка zRAM |
+| Питание | `apps/power` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/power) | Выключение, сон, перезагрузка и переход в recovery |
+| Журнал загрузки | `apps/bootlog` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/bootlog) | Просмотр журналов загрузки |
+| Ссылки | `apps/links` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/links) | QR TorrServer, запуск VLC и Total Commander; WiFi Transfer TC выдаёт свой QR |
+| tvboxd | `apps/tvboxd` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/tvboxd) | Привилегированный помощник OTA и eMMC |
+
+### Сторонние приложения
+
+| Приложение | Пакет | Проект/репозиторий |
 |---|---|---|
-| ТВ-каналы | `apps/iptv` | IPTV-плейлист и запуск каналов во VLC |
-| Установка | `apps/installer` | OTA по сети/носителю; установка и резервирование eMMC при запуске с SD |
-| Антивирус | `apps/antivirus` | Hypatia и проверка по запросу |
-| Производительность | `apps/clean` | Освобождение памяти, метрики и настройка zRAM |
-| Питание | `apps/power` | Выключение, сон, перезагрузка и переход в recovery |
-| Журнал загрузки | `apps/bootlog` | Просмотр журналов загрузки |
-| Ссылки | `apps/links` | QR TorrServer, запуск VLC и Total Commander; WiFi Transfer TC выдаёт собственный QR и адрес |
-| tvboxd | `apps/tvboxd` | Привилегированный помощник OTA, eMMC и zRAM |
+| VLC | `org.videolan.vlc` | [VideoLAN VLC for Android](https://github.com/videolan/vlc-android) |
+| TorrServe | `ru.yourok.torrserve` | [YouROK/TorrServe](https://github.com/YouROK/TorrServe) |
+| TV Launcher | `com.tvlauncher` | [wiiguy/lightweight_androidtv_launcher](https://github.com/wiiguy/lightweight_androidtv_launcher) |
+| SmartTube | `org.smarttube.stable` | [yuliskov/SmartTube](https://github.com/yuliskov/SmartTube) |
+| Obtainium | `dev.imranr.obtainium` | [ImranR98/Obtainium](https://github.com/ImranR98/Obtainium) |
+| Hypatia | `org.maintainteam.hypatia` | [MaintainTeam/Hypatia](https://github.com/MaintainTeam/Hypatia) |
+| Total Commander | `com.ghisler.android.TotalCommander` | [Страница приложения](https://www.ghisler.com/android.htm); [репозиторий плагинов](https://raw.githubusercontent.com/chrisgch/tca/master/fdroid/repo) |
 
 Плитка **Установка** показывает источник загрузки и состояние eMMC, ищет подписанные OTA на носителе и в сети, редактирует источники и показывает журнал. Во время операции видны строки журнала с временными метками и текущий этап; ход загрузки и сверки тоже записывается с локальным временем. Установка по сети загружает eMMC OTA и передаёт его штатному recovery. SD-обновление использует тот же recovery-пакет с карты.
 
@@ -135,7 +148,7 @@ python3 -I tools/iptv-verify.py overlay/system/etc/tvbox/iptv.m3u --report diagn
 
 ## Стороннее ПО
 
-В образ включены TV Launcher 1.6.2, TorrServer MatriX.143.FOSS, VLC 3.7.2, SmartTube 32.68, Obtainium 1.7.4, Total Commander 3.62d с плагинами LAN/FTP/SFTP/WiFi Transfer и Hypatia 3.18. Obtainium проверяет обновления напрямую в источниках приложений; Flicky удалён. WebView — LineageOS 155.0.8059.39. TorrServer работает на порту 8090.
+В образ включены TV Launcher 1.6.2, TorrServer MatriX.143.FOSS, VLC 3.7.2, SmartTube 32.68, Obtainium 1.7.4, Total Commander 3.62d с плагинами LAN/FTP/SFTP/WiFi Transfer и Hypatia 3.18. Ссылки на страницы проектов приведены в таблице выше. Obtainium проверяет обновления напрямую в источниках приложений; Flicky удалён. WebView — LineageOS 155.0.8059.39. TorrServer работает на порту 8090.
 
 Для регистрации приложений откройте Obtainium → **Import/Export** → **Obtainium import** и выберите `/sdcard/tvbox/obtainium-apps.json`. Файл содержит источники VLC, TorrServe, TV Launcher, Obtainium, SmartTube, Hypatia, Алисы и все семь собираемых APK Panadonik. CI прикладывает эти APK к каждому GitHub Release; Obtainium выбирает нужный файл по package ID и фильтру имени. Приложение `tvboxd` и загрузочный экран остаются в подписанном OTA, поскольку это системные JAR, а не APK. Для Total Commander и его плагинов используйте репозиторий разработчика, описанный в [`apps-sources.md`](apps-sources.md), и выберите тип источника **F-Droid Third Party Repo**. Android может запросить подтверждение установки APK-обновления.
 

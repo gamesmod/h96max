@@ -135,16 +135,16 @@ L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
 if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initialized" ]; then
     # Атомарно записать настройки до остановки HOME; особенности запуска описаны в HANDOFF.md.
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
-    ALLOWED="org.tvbox.iptv ru.yourok.torrserve org.smarttube.stable com.ghisler.android.TotalCommander dev.imranr.obtainium org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.power"
+    ALLOWED="org.tvbox.iptv ru.yourok.torrserve org.smarttube.stable com.ghisler.android.TotalCommander dev.imranr.obtainium org.tvbox.links org.tvbox.installer org.tvbox.bootlog com.android.tv.settings org.tvbox.clean org.tvbox.power"
     T=""; EXTRA=""; N=0
     # Сохранить установленные функции и их порядок; удалить дубли, игры и устаревшие плитки.
     for p in $(printf '%s' "$OLD" | sed 's/\&\#30;/ /g'); do
-        case "$p" in com.agateau.tinywheels.android|org.supertux.supertux2|org.tvbox.bootlog) continue;; esac
+        case "$p" in com.agateau.tinywheels.android|org.supertux.supertux2) continue;; esac
         pm path "$p" >/dev/null 2>&1 || continue
         case " $T $EXTRA " in *" $p "*) continue;; esac
         case " $ALLOWED " in *" $p "*) T="${T:+$T&#30;}$p"; N=$((N+1));; *) EXTRA="${EXTRA:+$EXTRA }$p";; esac
     done
-    # Добавить отсутствующие штатные плитки в описанном порядке (по умолчанию 10; лаунчер поддерживает 14).
+    # Добавить отсутствующие штатные плитки в описанном порядке (по умолчанию 11; лаунчер поддерживает 14).
     for p in $ALLOWED; do
         pm path "$p" >/dev/null 2>&1 || continue
         case " $T " in *" $p "*) ;; *)
@@ -173,6 +173,30 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initializ
         am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
     fi
     touch "$D/launcher-tiles.initialized"
+fi
+
+# Однократно вернуть журнал загрузки в существующую раскладку, не меняя порядок пользователя.
+if pm path com.tvlauncher >/dev/null 2>&1 && pm path org.tvbox.bootlog >/dev/null 2>&1 &&
+        [ ! -e "$D/launcher-bootlog-tile-added" ] && [ -f "$L" ]; then
+    OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
+    OLD_SPACED=$(printf '%s' "$OLD" | sed 's/\&#30;/ /g')
+    case " $OLD_SPACED " in *" org.tvbox.bootlog "*) touch "$D/launcher-bootlog-tile-added";;
+        *)
+            N=$(printf '%s' "$OLD" | sed 's/\&#30;/ /g' | wc -w)
+            if [ "$N" -lt 14 ]; then
+                T="${OLD:+$OLD&#30;}org.tvbox.bootlog"
+                REPL=$(printf '%s' "$T" | sed 's/\&/\\\&/g')
+                sed "s|<string name=\"apps_order\">[^<]*</string>|<string name=\"apps_order\">$REPL</string>|" "$L" > "$L.new"
+                u=$(stat -c %u /data/data/com.tvlauncher)
+                chown "$u:$u" "$L.new"; chmod 660 "$L.new"; mv "$L.new" "$L"; restorecon "$L"
+                am force-stop com.tvlauncher
+                am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
+                echo "tvlauncher: added boot log tile without changing user order"
+            else
+                echo "tvlauncher: full tile row; boot log tile not added"
+            fi
+            touch "$D/launcher-bootlog-tile-added";;
+    esac
 fi
 # При переходе с Flicky на Obtainium заменить только старый пакет плитки и сохранить её позицию.
 L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
