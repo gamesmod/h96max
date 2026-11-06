@@ -82,6 +82,10 @@ class IptvCategoryTests(unittest.TestCase):
     def test_sport_variants_and_subcategories_are_russian(self):
         self.assertEqual(MERGE.normalize_group("Sports"), "Спорт")
         self.assertEqual(MERGE.normalize_group("Football"), "Спорт · Футбол")
+        self.assertEqual(MERGE.normalize_group("Futbol"), "Спорт · Футбол")
+        self.assertEqual(MERGE.normalize_group("Sports", "Football HD"), "Спорт · Футбол")
+        self.assertEqual(MERGE.normalize_group("Спорт", "Хоккей 1"), "Спорт · Хоккей")
+        self.assertEqual(MERGE.normalize_group("Sports", "Match TV"), "Спорт")
         self.assertEqual(MERGE.normalize_group("Футбол"), "Спорт · Футбол")
         self.assertEqual(MERGE.normalize_group("World News"), "Новости · Мир")
         self.assertEqual(MERGE.normalize_group("General"), "Общие")

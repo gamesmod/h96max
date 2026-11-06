@@ -55,7 +55,7 @@ def normalize_group(group, channel_name=""):
     rules = (
         (r"18\+|xxx|adult|эрот|взросл|playboy|brazzers|hustler|private|redlight|sex|секс", "Для взрослых"),
         (r"kid|child|cartoon|дет|мульт", "Детские"),
-        (r"football|soccer|футбол", "Спорт · Футбол"),
+        (r"football|futbol|soccer|футбол", "Спорт · Футбол"),
         (r"hockey|хоккей", "Спорт · Хоккей"),
         (r"tennis|теннис", "Спорт · Теннис"),
         (r"basketball|баскетбол", "Спорт · Баскетбол"),
@@ -85,6 +85,19 @@ def normalize_group(group, channel_name=""):
     )
     for pattern, title in rules:
         if value and re.search(pattern, value):
+            # Общая категория «Спорт» уточняется по названию канала, если оно явно задаёт дисциплину.
+            if title == "Спорт" and channel_name:
+                sport_name_rules = (
+                    (r"football|futbol|soccer|футбол", "Спорт · Футбол"),
+                    (r"hockey|хоккей", "Спорт · Хоккей"),
+                    (r"tennis|теннис", "Спорт · Теннис"),
+                    (r"basketball|баскетбол", "Спорт · Баскетбол"),
+                    (r"racing|motorsport|автоспорт|гонк", "Спорт · Автоспорт"),
+                )
+                name = channel_name.lower().replace("ё", "е")
+                for name_pattern, subtype in sport_name_rules:
+                    if re.search(name_pattern, name):
+                        return subtype
             return title
 
     # Региональные группы получают русское название и флаг страны; топонимы областей и штатов сохраняются.
@@ -185,7 +198,7 @@ def normalize_group(group, channel_name=""):
     title = re.sub(r"\[[^\]]*\]|\([^)]*\)", " ", (channel_name or "").lower())
     inferred = (
         (r"18\+|xxx|adult|эрот|взросл|porn|sex|секс", "Для взрослых"),
-        (r"football|soccer|футбол", "Спорт · Футбол"),
+        (r"football|futbol|soccer|футбол", "Спорт · Футбол"),
         (r"hockey|хоккей", "Спорт · Хоккей"),
         (r"sport|sports|спорт|матч", "Спорт"),
         (r"news|новост|24\s*час", "Новости"),

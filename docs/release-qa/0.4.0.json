@@ -5,25 +5,28 @@
   "hot_test": {
     "tested_installed_version": "0.3.9",
     "iptv_channel": "Sochi24 (720p)",
-    "vlc_playback": "pass: VLC media session reported playing and the video frame was visible during a 20-second check; frame-drop counters were not available",
-    "playlist_version": "pass: подтверждён минимум 1080 вертикальных строк; финальный список на горячей приставке после индексации schema 4 содержит 3008 каналов, 48 нормализованных групп, 54 категории M3U и 184 канала 18+ первыми; детских каналов и дублей по Android-ключу нет.",
+    "vlc_playback": "pending: VLC reported playing during the prior 20-second check, but the current recorded ADB screenshot is black and visible video is unconfirmed; the latest channel tested live was 720p, below the new 1080p playlist minimum",
+    "playlist_version": "pass: финальный список на горячей приставке после индексации schema 4 содержит 3008 каналов, 53 русские группы интерфейса и 59 нормализованных категорий M3U; названия спортивных дисциплин вынесены в подкатегории, «Для взрослых» первая; ниже 1080p и неизвестное качество не допускаются.",
     "iptv_playlist_override": {
       "app_updated_on_live_device": true,
-      "playlist_bytes": 630964,
-      "playlist_sha256": "60438409e7f73b4577b6f288113f375468dcbd602604fafbe4facdf8f182d3b1",
+      "playlist_bytes": 631232,
+      "playlist_sha256": "73f56b348b8eaa06d0f1afc977ce9ef4757e71c198c3a2ce6880d7f7ace429aa",
       "index_complete": true,
       "index_schema": 4,
       "channels": 3008,
-      "normalized_groups_on_live_device": 48,
+      "normalized_groups_on_live_device": 53,
       "adult_group_channels": 184,
       "adult_group_first_in_ui": true,
       "child_channels_detected": 0,
       "duplicate_names_reported_by_index": 0,
-      "index_elapsed_ms": 103514,
+      "index_elapsed_ms": 101485,
       "quality_minimum": "1080p",
       "quality_measurement": "проверка HLS master resolution и ffprobe для MPEG-TS сегмента; неизвестное или ниже 1080p исключается",
       "global_url_credential_check": "pass: 6029 адресов проверено, credentials не найдены",
-      "m3u_categories": 54,
+      "m3u_categories": 59,
+      "category_policy": "все подписи M3U русские; Sports/Спорт сведены вместе; явные футбольные, хоккейные, теннисные, баскетбольные и автомобильные дисциплины вынесены в подкатегории",
+      "subcategories_confirmed_on_device": true,
+      "latin_category_names": 0,
       "unique_stream_urls_in_final_playlist": 3008,
       "stream_urls_confirmed_in_latest_repeat_pass": 2992,
       "channels_retained_after_recent_prior_success_despite_transient_repeat_timeout": 16,
@@ -100,7 +103,8 @@
       "vlc_media_session_state": "playing",
       "visible_picture_confirmed": false,
       "adb_screenshot": "чёрный кадр; VLC сообщает playing, но видимый кадр не подтверждён",
-      "release_gate": "pending"
+      "release_gate": "pending: video frame and smooth playback not verified by viewer",
+      "quality_gate_scope": "разрешение потока подтверждается по HLS master/сегменту; недостаточно одного значения метаданных VLC"
     },
     "fresh_apk_hot_install": {
       "iptv_apk_install": "pass: adb install -r returned Success",
@@ -122,6 +126,16 @@
       "alice": "not installed",
       "official_source_attempt": "RuStore TV catalog detail route returned an error; mobile RuStore reports its build is unsuitable for TV. No Alice APK was downloaded or installed.",
       "official_yandex_behavior": "Официальная справка Яндекса говорит, что Алиса AI не реагирует на голос вне приложения; запуск кнопкой-помощником и автоматический переход в режим слушания пока не испытаны."
+    },
+    "selinux_enforcing_smoke": {
+      "mode_during": "Enforcing",
+      "mode_restored": "Permissive",
+      "iptv_activity": "pass, 229 ms",
+      "links_activity": "pass, 182 ms",
+      "wifi_validated": true,
+      "avc_denials_in_marked_test_window": 2,
+      "avc_summary": "оба отказа — read от hal_memtrack_default к debugfs; отказов IPTV/Links в отмеченном интервале не найдено",
+      "scope_limit": "проверена текущая 0.3.9 при временном setenforce; это не аппаратная проверка собранного 0.4.0"
     }
   },
   "cold_boot_seconds": null,
@@ -167,6 +181,10 @@
       "android_runtime_crashes": 0,
       "scope": "1500 most recent logcat rows filtered to AndroidRuntime, TvboxIptv and TvboxLinks; apps launched successfully",
       "vlc_button": "VLC foreground activity observed after pressing the selected-service launch button"
+    },
+    "enforcing_smoke": {
+      "avc_denials": 2,
+      "summary": "Только hal_memtrack_default read к debugfs; IPTV/Links без AVC в маркированном интервале."
     }
   },
   "candidate_build": {
