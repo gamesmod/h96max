@@ -27,6 +27,28 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Preflight required Actions secrets
+        env:
+          INPUTS_URL: ${{ secrets.RELEASE_INPUTS_ARCHIVE_URL }}
+          INPUTS_SHA256: ${{ secrets.RELEASE_INPUTS_SHA256 }}
+          TVBOX_KEY: ${{ secrets.TVBOX_SIGNING_KEY }}
+          TVBOX_CERT: ${{ secrets.TVBOX_SIGNING_CERT }}
+          OTA_KEY: ${{ secrets.OTA_SIGNING_KEY }}
+          OTA_CERT: ${{ secrets.OTA_SIGNING_CERT }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [[ -n "$INPUTS_URL" ]] || missing+=(RELEASE_INPUTS_ARCHIVE_URL)
+          [[ -n "$INPUTS_SHA256" ]] || missing+=(RELEASE_INPUTS_SHA256)
+          [[ -n "$TVBOX_KEY" ]] || missing+=(TVBOX_SIGNING_KEY)
+          [[ -n "$TVBOX_CERT" ]] || missing+=(TVBOX_SIGNING_CERT)
+          [[ -n "$OTA_KEY" ]] || missing+=(OTA_SIGNING_KEY)
+          [[ -n "$OTA_CERT" ]] || missing+=(OTA_SIGNING_CERT)
+          if ((${#missing[@]})); then
+            printf 'Required repository Actions secrets are missing: %s\n' "${missing[*]}" >&2
+            exit 1
+          fi
+
       - name: Install build dependencies
         run: |
           sudo apt-get update
@@ -44,7 +66,7 @@ jobs:
           python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log
           python3 tools/analyze-release-logs.py /tmp/panadonik-tests.log \
             --source "автоматические тесты" --output release/qa/test-log-analysis.md --fail-on-errors
-          if [[ "$GITHUB_REF" != refs/tags/* ]]; then test_scope="candidate: автоматические проверки перед аппаратной приёмкой"; elif [[ "$GITHUB_REF_NAME" == dev-v* ]]; then test_scope="dev: IPTV и функциональный release gate"; else test_scope="stable: полный набор, включая конфигурацию безопасности"; fi
+          if [[ "$GITHUB_EVENT_NAME" != push || "$GITHUB_REF" != refs/tags/* ]]; then test_scope="candidate: автоматические проверки перед аппаратной приёмкой"; elif [[ "$GITHUB_REF_NAME" == dev-v* ]]; then test_scope="dev: IPTV и функциональный release gate"; else test_scope="stable: полный набор, включая конфигурацию безопасности"; fi
           cat > release/qa/automated-tests.md <<EOF
           # Автоматические проверки выпуска
 
@@ -68,7 +90,7 @@ jobs:
         run: |
           set -euo pipefail
           version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
-          if [[ "$GITHUB_REF" != refs/tags/* ]]; then tag_version="$version"; elif [[ "$GITHUB_REF_NAME" == dev-v* ]]; then tag_version="${GITHUB_REF_NAME#dev-v}"; else tag_version="${GITHUB_REF_NAME#v}"; fi
+          if [[ "$GITHUB_EVENT_NAME" != push || "$GITHUB_REF" != refs/tags/* ]]; then tag_version="$version"; elif [[ "$GITHUB_REF_NAME" == dev-v* ]]; then tag_version="${GITHUB_REF_NAME#dev-v}"; else tag_version="${GITHUB_REF_NAME#v}"; fi
           test "$tag_version" = "$version" || { echo "Tag does not match firmware version" >&2; exit 1; }
           test -n "$INPUTS_URL" && test -n "$INPUTS_SHA256" || { echo "Configure RELEASE_INPUTS_ARCHIVE_URL and RELEASE_INPUTS_SHA256 repository secrets" >&2; exit 1; }
           echo "::add-mask::$INPUTS_URL"
@@ -155,7 +177,7 @@ jobs:
           sha256sum "tvbox-update-$version-emmc.zip" latest-emmc.txt > SHA256SUMS
 
       - name: Require target-device release evidence
-        if: startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         run: |
           set -euo pipefail
           version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
@@ -164,7 +186,7 @@ jobs:
           python3 tools/check-release-evidence.py --file "docs/release-qa/$version.json" --version "$version" --channel "$channel"
 
       - name: Record candidate-only status (non-tag build)
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        if: ${{ github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/') }}
         run: |
           set -euo pipefail
           version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
@@ -181,7 +203,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: panadonik-release-qa-${{ github.ref_name }}
+          name: panadonik-release-qa-${{ github.sha }}
           path: |
             release/qa/*.md
             release/qa/device-evidence.json
@@ -189,7 +211,7 @@ jobs:
           retention-days: 90
 
       - name: Upload signed build candidate (nightly/manual run)
-        if: ${{ !startsWith(github.ref, 'refs/tags/') && success() }}
+        if: ${{ (github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')) && success() }}
         uses: actions/upload-artifact@v4
         with:
           name: panadonik-candidate-${{ github.sha }}
@@ -210,7 +232,7 @@ jobs:
           retention-days: 3
 
       - name: Publish GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
