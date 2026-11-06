@@ -29,9 +29,10 @@ import java.util.List;
 
 /** Показывает один QR-код за раз с выбором службы и сетевого интерфейса. */
 public class MainActivity extends Activity {
+    // Последние два поля: пакет приложения на приставке и его короткое имя.
     static final String[][] SERVICES = {
-        {"TorrServer", "8090", ""},
-        {"VLC — удалённый доступ", "8080", "org.videolan.vlc"}
+        {"TorrServer", "8090", "", ""},
+        {"VLC — удалённый доступ", "8080", "org.videolan.vlc", "VLC"}
     };
     final List<String[]> addresses = new ArrayList<>(), services = new ArrayList<>();
     Spinner network, service;
@@ -115,8 +116,9 @@ public class MainActivity extends Activity {
         if(n<0 || n>=addresses.size() || s<0 || s>=services.size()) return;
         final String host=addresses.get(n)[1], port=services.get(s)[1];
         final String pkg=services.get(s)[2];
+        final String appName=services.get(s)[3];
         launch.setVisibility(pkg.isEmpty() ? View.GONE : View.VISIBLE);
-        launch.setText("Запустить VLC на приставке");
+        if (!pkg.isEmpty()) launch.setText("Запустить " + appName + " на приставке");
         if (port.isEmpty()) {
             url.setText("У службы нет сетевого адреса");
             image.setImageDrawable(null);
@@ -150,17 +152,16 @@ public class MainActivity extends Activity {
         int s = service.getSelectedItemPosition();
         if (s < 0 || s >= services.size()) return;
         String pkg = services.get(s)[2];
+        String appName = services.get(s)[3];
         if (pkg.isEmpty()) return;
         try {
             Intent intent = getPackageManager().getLaunchIntentForPackage(pkg);
             if (intent == null) throw new IllegalStateException("no launch activity");
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-            hint.setText(pkg.equals("org.videolan.vlc")
-                    ? "VLC запущен на приставке. QR ведёт к удалённому интерфейсу VLC; он должен быть включён в настройках VLC."
-                    : "Приложение не удалось запустить.");
+            hint.setText("Запущено приложение для выбранной службы: " + appName + ". QR ведёт к её сетевому адресу.");
         } catch (Exception e) {
-            Toast.makeText(this, "Приложение не установлено: " + pkg, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Не удалось запустить " + appName + " (" + pkg + ")", Toast.LENGTH_LONG).show();
         }
     }
 
