@@ -159,6 +159,20 @@ jobs:
           cp "docs/release-qa/$version.json" release/qa/device-evidence.json
           python3 tools/check-release-evidence.py --file "docs/release-qa/$version.json" --version "$version" --channel "$channel"
 
+      - name: Record candidate-only status (manual run)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
+          cat > release/qa/candidate-status.md <<EOF
+          # Panadonik $version — build candidate
+
+          - Source commit: `$GITHUB_SHA`.
+          - Automated tests and package build completed in GitHub Actions.
+          - This manual build has not passed the target-device release gate. Boot time, logs, network capture, IPTV, QR, torrent playback, and graphics remain unverified by this workflow.
+          - Do not treat this artifact as a public release. Before installing, complete hardware checks and obtain explicit user confirmation for any operation that wipes data.
+          EOF
+
       - name: Upload QA reports, including failed release attempts
         if: always()
         uses: actions/upload-artifact@v4
@@ -187,6 +201,7 @@ jobs:
             release/qa/automated-tests.md
             release/qa/test-log-analysis.md
             release/qa/build-log-analysis.md
+            release/qa/candidate-status.md
           if-no-files-found: error
           retention-days: 14
 
