@@ -15,6 +15,8 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.text.Normalizer;
@@ -29,23 +31,35 @@ public class IndexOnBootService extends Service {
     static final int NOTIFICATION_ID = 4318;
     static final String CHANNEL_ID = "iptv_index";
     volatile boolean stopped;
+    Thread worker;
 
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
+        // Сразу переводим службу в foreground: Android 12 завершает её, если уведомление запаздывает.
+        startForeground(NOTIFICATION_ID, notification("Подготавливаю список ТВ-каналов", 0, 1, 0));
+        if (worker != null && worker.isAlive()) return START_NOT_STICKY;
         final File playlist = new File(MainActivity.BUNDLED);
         final long size = playlist.length(), modified = playlist.lastModified();
         final android.content.SharedPreferences prefs = getSharedPreferences("iptv_index", MODE_PRIVATE);
-        if (!playlist.isFile() || size == 0) { stopSelf(startId); return START_NOT_STICKY; }
-        if (prefs.getBoolean("complete", false) && prefs.getLong("size", -1) == size &&
-                prefs.getLong("modified", -1) == modified) {
+        if (!playlist.isFile() || size == 0) {
+            prefs.edit().putBoolean("running", false).putBoolean("complete", false).putString("error", "нет плейлиста").apply();
+            stopForeground(true);
+            stopSelf(startId);
+            return START_NOT_STICKY;
+        }
+        if (prefs.getBoolean("complete", false) && prefs.getInt("schema", 0) == MainActivity.INDEX_SCHEMA &&
+                prefs.getLong("size", -1) == size &&
+                prefs.getLong("modified", -1) == modified &&
+                new File(getFilesDir(), "iptv-index.ser").isFile()) {
+            stopForeground(true);
             stopSelf(startId);
             return START_NOT_STICKY;
         }
 
-        startForeground(NOTIFICATION_ID, notification("Подготавливаю список ТВ-каналов", 0, 1, 0));
         prefs.edit().putBoolean("running", true).putBoolean("shown", false).putInt("done", 0).apply();
-        new Thread(new Runnable() {
+        worker = new Thread(new Runnable() {
             public void run() { index(playlist, size, modified, prefs); }
-        }, "iptv-index").start();
+        }, "iptv-index");
+        worker.start();
         return START_NOT_STICKY;
     }
 
@@ -91,6 +105,18 @@ public class IndexOnBootService extends Service {
             r.close();
             if (!stopped) {
                 long elapsed = android.os.SystemClock.elapsedRealtime() - started;
+                // Сортируем группы перед сохранением индекса: 18+ показываем первой даже в старом M3U.
+                List<String> orderedGroups = new ArrayList<>(index.keySet());
+                Collections.sort(orderedGroups, new Comparator<String>() {
+                    @Override public int compare(String left, String right) {
+                        if (left.equals("Для взрослых")) return right.equals("Для взрослых") ? 0 : -1;
+                        if (right.equals("Для взрослых")) return 1;
+                        return left.compareToIgnoreCase(right);
+                    }
+                });
+                Map<String, List<String[]>> orderedIndex = new LinkedHashMap<>();
+                for (String key : orderedGroups) orderedIndex.put(key, index.get(key));
+                index = orderedIndex;
                 // Записываем готовый разбор атомарно, чтобы приложение не разбирало M3U повторно при каждом запуске.
                 File cache = new File(getFilesDir(), "iptv-index.ser");
                 File temp = new File(getFilesDir(), "iptv-index.tmp");

@@ -59,21 +59,81 @@ def normalize_group(group):
         (r"music|музык", "Музыка"),
         (r"document|science|education|познав|документ|науч|образоват", "Познавательные"),
         (r"radio|радио", "Радио"),
-        (r"regional|local|регион|местн", "Региональные"),
         (r"entertain|развлек", "Развлекательные"),
     )
     for pattern, title in rules:
         if re.search(pattern, value):
             return title
+
+    # Региональные группы получают русское название и флаг страны; топонимы областей и штатов сохраняются.
+    regions = (
+        ("🇷🇺 Россия", "Москва", r"москва|moscow|moskva"),
+        ("🇷🇺 Россия", "Московская область", r"московская область|moscow oblast|moscow region"),
+        ("🇷🇺 Россия", "Санкт-Петербург", r"санкт петербург|st petersburg|saint petersburg|spb"),
+        ("🇷🇺 Россия", "Ленинградская область", r"ленинградская область|leningrad oblast|leningrad region"),
+        ("🇷🇺 Россия", "Татарстан", r"татарстан|tatarstan"),
+        ("🇷🇺 Россия", "Краснодарский край", r"краснодарский край|krasnodar krai|krasnodar"),
+        ("🇷🇺 Россия", "Свердловская область", r"свердловская область|sverdlovsk oblast|yekaterinburg"),
+        ("🇷🇺 Россия", "Новосибирская область", r"новосибирская область|novosibirsk oblast|novosibirsk"),
+        ("🇷🇺 Россия", "Башкортостан", r"башкортостан|bashkortostan|bashkiria"),
+        ("🇷🇺 Россия", "Чечня", r"чечня|chechnya"),
+        ("🇺🇸 США", "Алабама", r"alabama"), ("🇺🇸 США", "Аляска", r"alaska"),
+        ("🇺🇸 США", "Аризона", r"arizona"), ("🇺🇸 США", "Арканзас", r"arkansas"),
+        ("🇺🇸 США", "Калифорния", r"california"), ("🇺🇸 США", "Колорадо", r"colorado"),
+        ("🇺🇸 США", "Коннектикут", r"connecticut"), ("🇺🇸 США", "Делавэр", r"delaware"),
+        ("🇺🇸 США", "Флорида", r"florida"), ("🇺🇸 США", "Джорджия", r"georgia"),
+        ("🇺🇸 США", "Гавайи", r"hawaii"), ("🇺🇸 США", "Айдахо", r"idaho"),
+        ("🇺🇸 США", "Иллинойс", r"illinois"), ("🇺🇸 США", "Индиана", r"indiana"),
+        ("🇺🇸 США", "Айова", r"iowa"), ("🇺🇸 США", "Канзас", r"kansas"),
+        ("🇺🇸 США", "Кентукки", r"kentucky"), ("🇺🇸 США", "Луизиана", r"louisiana"),
+        ("🇺🇸 США", "Мэн", r"maine"), ("🇺🇸 США", "Мэриленд", r"maryland"),
+        ("🇺🇸 США", "Массачусетс", r"massachusetts"), ("🇺🇸 США", "Мичиган", r"michigan"),
+        ("🇺🇸 США", "Миннесота", r"minnesota"), ("🇺🇸 США", "Миссисипи", r"mississippi"),
+        ("🇺🇸 США", "Миссури", r"missouri"), ("🇺🇸 США", "Монтана", r"montana"),
+        ("🇺🇸 США", "Небраска", r"nebraska"), ("🇺🇸 США", "Невада", r"nevada"),
+        ("🇺🇸 США", "Нью-Гэмпшир", r"new hampshire"), ("🇺🇸 США", "Нью-Джерси", r"new jersey"),
+        ("🇺🇸 США", "Нью-Мексико", r"new mexico"), ("🇺🇸 США", "Нью-Йорк", r"new york"),
+        ("🇺🇸 США", "Северная Каролина", r"north carolina"), ("🇺🇸 США", "Северная Дакота", r"north dakota"),
+        ("🇺🇸 США", "Огайо", r"ohio"), ("🇺🇸 США", "Оклахома", r"oklahoma"),
+        ("🇺🇸 США", "Орегон", r"oregon"), ("🇺🇸 США", "Пенсильвания", r"pennsylvania"),
+        ("🇺🇸 США", "Род-Айленд", r"rhode island"), ("🇺🇸 США", "Южная Каролина", r"south carolina"),
+        ("🇺🇸 США", "Южная Дакота", r"south dakota"), ("🇺🇸 США", "Теннесси", r"tennessee"),
+        ("🇺🇸 США", "Техас", r"texas"), ("🇺🇸 США", "Юта", r"utah"),
+        ("🇺🇸 США", "Вермонт", r"vermont"), ("🇺🇸 США", "Вирджиния", r"virginia"),
+        ("🇺🇸 США", "Вашингтон", r"washington"), ("🇺🇸 США", "Западная Вирджиния", r"west virginia"),
+        ("🇺🇸 США", "Висконсин", r"wisconsin"), ("🇺🇸 США", "Вайоминг", r"wyoming"),
+        ("🇨🇦 Канада", "Британская Колумбия", r"british columbia"),
+        ("🇨🇦 Канада", "Онтарио", r"ontario"), ("🇨🇦 Канада", "Квебек", r"quebec|квебек"),
+    )
+    if value == "georgia":
+        return "🇬🇪 Грузия"
+    for country, region, pattern in regions:
+        if re.search(r"(?:^| )(" + pattern + r")(?: |$)", value):
+            return country + " · " + region
+
     countries = (
-        (r"^(?:ru|russia|russian|россия|российские|русские)$", "Россия"),
-        (r"^(?:by|belarus|belarussian|беларусь|белоруссия)$", "Беларусь"),
-        (r"^(?:ua|ukraine|ukrainian|украина)$", "Украина"),
-        (r"^(?:kz|kazakhstan|казахстан)$", "Казахстан"),
+        (r"^(?:ru|russia|russian|россия|российские|русские)$", "🇷🇺 Россия"),
+        (r"^(?:by|belarus|belarussian|беларусь|белоруссия)$", "🇧🇾 Беларусь"),
+        (r"^(?:ua|ukraine|ukrainian|украина)$", "🇺🇦 Украина"),
+        (r"^(?:kz|kazakhstan|казахстан)$", "🇰🇿 Казахстан"),
+        (r"^(?:us|usa|united states|america|сша|соединенные штаты)$", "🇺🇸 США"),
+        (r"^(?:gb|uk|united kingdom|great britain|британия|великобритания)$", "🇬🇧 Великобритания"),
+        (r"^(?:ca|canada|канада)$", "🇨🇦 Канада"),
+        (r"^(?:de|germany|german|германия)$", "🇩🇪 Германия"),
+        (r"^(?:fr|france|франция)$", "🇫🇷 Франция"),
+        (r"^(?:tr|turkey|turkiye|турция)$", "🇹🇷 Турция"),
+        (r"^(?:kg|kyrgyzstan|кыргызстан|киргизия)$", "🇰🇬 Кыргызстан"),
+        (r"^(?:uz|uzbekistan|узбекистан)$", "🇺🇿 Узбекистан"),
+        (r"^(?:am|armenia|армения)$", "🇦🇲 Армения"),
+        (r"^(?:az|azerbaijan|азербайджан)$", "🇦🇿 Азербайджан"),
+        (r"^(?:ge|georgia|грузия)$", "🇬🇪 Грузия"),
+        (r"^(?:md|moldova|молдова)$", "🇲🇩 Молдова"),
     )
     for pattern, title in countries:
         if re.fullmatch(pattern, value):
             return title
+    if re.search(r"regional|local|регион|местн", value):
+        return "Региональные"
     return "Прочее"
 
 TR = str.maketrans({"а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ж": "zh", "з": "z", "и": "i", "й": "y",
@@ -178,7 +238,9 @@ def main():
         best = next((e for e in v if logo_res[e["attrs"]["tvg-logo"]] and stream_res.get(e["url"])), None)
         if best: out.append(best)
     out = dedupe(out)
-    out.sort(key=lambda e: (e["attrs"].get("group-title", "") or "яяя", e["name"].lower()))
+    # Категорию 18+ ставим первой, остальные группы и каналы упорядочиваем по-русски.
+    out.sort(key=lambda e: (0 if e["attrs"].get("group-title") == "Для взрослых" else 1,
+                            e["attrs"].get("group-title", "") or "яяя", e["name"].lower()))
     write(out, a.out)
     print(f"written {len(out)} channels -> {a.out}", file=sys.stderr)
 

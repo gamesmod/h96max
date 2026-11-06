@@ -36,12 +36,6 @@
     "name": "Hypatia"
   },
   {
-    "id": "com.yandex.aliceapp",
-    "url": "https://www.rustore.ru/catalog/app/com.yandex.aliceapp",
-    "author": "Яндекс",
-    "name": "Алиса AI"
-  },
-  {
     "id": "org.tvbox.antivirus",
     "url": "https://github.com/gamesmod/h96max",
     "author": "gamesmod",

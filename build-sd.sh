@@ -111,7 +111,11 @@ sudo mkdir -p $MNT/app/TvLauncher
 sudo install -m 0644 $R/dl/apk/com.tvlauncher.apk $MNT/app/TvLauncher/TvLauncher.apk
 sudo chmod 0755 $MNT/app/webview $MNT/app/TvLauncher $MNT/tvbox $MNT/tvbox/apk
 lbl u:object_r:system_file:s0 $MNT/app/webview $MNT/app/webview/webview.apk $MNT/app/TvLauncher $MNT/app/TvLauncher/TvLauncher.apk \
-    $MNT/tvbox $MNT/tvbox/apk $MNT/tvbox/apk/*.apk $MNT/tvbox/obtainium-apps.json
+    $MNT/tvbox $MNT/tvbox/apk $MNT/tvbox/obtainium-apps.json
+# Некоторые внешние APK удалены из сборки; не передавать setfattr пустую маску файлов.
+for a in $MNT/tvbox/apk/*.apk; do
+    [ -e "$a" ] && lbl u:object_r:system_file:s0 "$a"
+done
 sudo tee -a $MNT/etc/build.prop >/dev/null <<'EOF'
 
 # tvbox (rk3318-android)

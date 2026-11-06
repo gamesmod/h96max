@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
     static final String BUNDLED = "/system/etc/tvbox/iptv.m3u";
     static final String PLAYLIST = "https://ngrch.github.io/iptv/ru.m3u";
     static final String VLC = "org.videolan.vlc";
-    static final int INDEX_SCHEMA = 2;
+    static final int INDEX_SCHEMA = 3;
 
     ListView lv;
     final Map<String, List<String[]>> groups = new LinkedHashMap<>();
@@ -63,14 +63,14 @@ public class MainActivity extends Activity {
         public void run() {
             android.content.SharedPreferences p = getSharedPreferences("iptv_index", MODE_PRIVATE);
             if (!p.getBoolean("running", false)) {
-                if (!p.getBoolean("complete", false) && p.getString("error", "").isEmpty()) {
+                File bundled = new File(BUNDLED);
+                if (!indexCurrent(bundled, p) && p.getString("error", "").isEmpty()) {
                     indexUi.postDelayed(this, 250);
                     return;
                 }
                 if (indexDialog != null && indexDialog.isShowing()) indexDialog.dismiss();
                 int count = p.getInt("channels", 0);
                 if (groups.isEmpty()) {
-                    File bundled = new File(BUNDLED);
                     if (!loadCachedIndex(bundled) && bundled.length() > 0) parse(read(bundled));
                     showGroups();
                 }
@@ -122,7 +122,7 @@ public class MainActivity extends Activity {
         ensureIndexService();
         showBootIndexStatus();
         android.content.SharedPreferences indexState = getSharedPreferences("iptv_index", MODE_PRIVATE);
-        if (!indexState.getBoolean("complete", false)) {
+        if (!indexCurrent(bundled, indexState) && indexState.getString("error", "").isEmpty()) {
             setTitle("Подготовка списка ТВ-каналов…");
             return;
         }
@@ -165,7 +165,7 @@ public class MainActivity extends Activity {
 
     void showBootIndexStatus() {
         android.content.SharedPreferences p = getSharedPreferences("iptv_index", MODE_PRIVATE);
-        if (p.getBoolean("running", false) || !p.getBoolean("complete", false)) {
+        if (p.getBoolean("running", false) || !indexCurrent(new File(BUNDLED), p)) {
             indexDialog = new ProgressDialog(this);
             indexDialog.setTitle("Подготовка ТВ-каналов");
             indexDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -178,10 +178,16 @@ public class MainActivity extends Activity {
         }
     }
 
+    boolean indexCurrent(File playlist, android.content.SharedPreferences p) {
+        return p.getBoolean("complete", false) && p.getInt("schema", 0) == INDEX_SCHEMA &&
+                p.getLong("size", -1) == playlist.length() &&
+                p.getLong("modified", -1) == playlist.lastModified() &&
+                new File(getFilesDir(), "iptv-index.ser").isFile();
+    }
+
     void ensureIndexService() {
         File playlist = new File(BUNDLED);
         android.content.SharedPreferences p = getSharedPreferences("iptv_index", MODE_PRIVATE);
-        if (p.getBoolean("running", false)) return;
         if (p.getBoolean("complete", false) && p.getInt("schema", 0) == INDEX_SCHEMA &&
                 p.getLong("size", -1) == playlist.length() &&
                 p.getLong("modified", -1) == playlist.lastModified() &&
@@ -205,6 +211,7 @@ public class MainActivity extends Activity {
 
     static String groupIcon(String group) {
         String s = canonicalGroup(group);
+        if (s.contains(" · ")) return "📍";
         if (s.equals("Для взрослых")) return "🔞";
         if (s.equals("Спорт")) return "⚽";
         if (s.equals("Новости")) return "📰";
@@ -223,6 +230,8 @@ public class MainActivity extends Activity {
     }
 
     static String canonicalGroup(String group) {
+        // Сохраняем нормализованное название региона вместе с флагом из итогового M3U.
+        if (group != null && group.contains(" · ") && group.matches(".*\\p{So}.*")) return group.trim();
         String s = group == null ? "" : group.toLowerCase(java.util.Locale.ROOT).replace('ё', 'е')
                 .replaceAll("[^a-zа-я0-9+]+", " ").trim();
         if (s.length() == 0) return "Прочее";
@@ -234,12 +243,32 @@ public class MainActivity extends Activity {
         if (s.matches(".*(music|музык).*")) return "Музыка";
         if (s.matches(".*(document|science|education|познав|документ|науч|образоват).*")) return "Познавательные";
         if (s.matches(".*(radio|радио).*")) return "Радио";
+        if (s.matches(".*(moscow oblast|moscow region|московская область).*")) return "🇷🇺 Россия · Московская область";
+        if (s.matches(".*(moscow|moskva|москва).*")) return "🇷🇺 Россия · Москва";
+        if (s.matches(".*(st petersburg|saint petersburg|spb|санкт петербург).*")) return "🇷🇺 Россия · Санкт-Петербург";
+        if (s.matches(".*(leningrad oblast|ленинградская область).*")) return "🇷🇺 Россия · Ленинградская область";
+        if (s.matches(".*(tatarstan|татарстан).*")) return "🇷🇺 Россия · Татарстан";
+        if (s.matches(".*(krasnodar krai|краснодарский край|krasnodar).*")) return "🇷🇺 Россия · Краснодарский край";
+        if (s.matches(".*(sverdlovsk oblast|yekaterinburg|свердловская область).*")) return "🇷🇺 Россия · Свердловская область";
+        if (s.matches(".*(novosibirsk oblast|новосибирская область).*")) return "🇷🇺 Россия · Новосибирская область";
+        if (s.matches(".*(bashkortostan|bashkiria|башкортостан).*")) return "🇷🇺 Россия · Башкортостан";
+        if (s.matches(".*(california).*")) return "🇺🇸 США · Калифорния";
+        if (s.matches(".*(new york).*")) return "🇺🇸 США · Нью-Йорк";
+        if (s.matches(".*(texas).*")) return "🇺🇸 США · Техас";
+        if (s.matches(".*(florida).*")) return "🇺🇸 США · Флорида";
+        if (s.matches(".*(washington).*")) return "🇺🇸 США · Вашингтон";
+        if (s.matches(".*(british columbia|британская колумбия).*")) return "🇨🇦 Канада · Британская Колумбия";
+        if (s.matches(".*(ontario|онтарио).*")) return "🇨🇦 Канада · Онтарио";
+        if (s.matches(".*(quebec|квебек).*")) return "🇨🇦 Канада · Квебек";
         if (s.matches(".*(regional|local|регион|местн).*")) return "Региональные";
         if (s.matches(".*(entertain|развлек).*")) return "Развлекательные";
-        if (s.matches("(ru|russia|russian|россия|российские|русские)")) return "Россия";
-        if (s.matches("(by|belarus|belarussian|беларусь|белоруссия)")) return "Беларусь";
-        if (s.matches("(ua|ukraine|ukrainian|украина)")) return "Украина";
-        if (s.matches("(kz|kazakhstan|казахстан)")) return "Казахстан";
+        if (s.matches("(ru|russia|russian|россия|российские|русские)")) return "🇷🇺 Россия";
+        if (s.matches("(by|belarus|belarussian|беларусь|белоруссия)")) return "🇧🇾 Беларусь";
+        if (s.matches("(ua|ukraine|ukrainian|украина)")) return "🇺🇦 Украина";
+        if (s.matches("(kz|kazakhstan|казахстан)")) return "🇰🇿 Казахстан";
+        if (s.matches("(us|usa|united states|america|сша|соединенные штаты)")) return "🇺🇸 США";
+        if (s.matches("(gb|uk|united kingdom|great britain|британия|великобритания)")) return "🇬🇧 Великобритания";
+        if (s.matches("(ca|canada|канада)")) return "🇨🇦 Канада";
         return "Прочее";
     }
 
