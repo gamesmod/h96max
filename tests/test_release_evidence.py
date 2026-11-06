@@ -85,6 +85,19 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.assertIn('Using committed release notes', workflow)
         self.assertIn('release/notes/$version.txt', workflow)
 
+    def test_nightly_candidates_never_publish_and_tag_runs_require_hardware_gate(self):
+        workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
+        self.assertIn("workflow_dispatch:", workflow)
+        self.assertIn("schedule:", workflow)
+        self.assertIn("- cron: '20 3 * * *'", workflow)
+        self.assertIn("- 'candidate/**'", workflow)
+        tag_only = "if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')"
+        self.assertEqual(workflow.count(tag_only), 2)
+        self.assertIn("Upload signed build candidate (nightly/manual run)", workflow)
+        self.assertIn("github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')", workflow)
+        self.assertIn("retention-days: 3", workflow)
+        self.assertIn("Preflight required Actions secrets", workflow)
+
     def test_repository_ci_runs_on_master_and_analyzes_full_test_log(self):
         workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
         self.assertIn("branches: [master]", workflow)
