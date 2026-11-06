@@ -12,6 +12,7 @@
  */
 #define _FILE_OFFSET_BITS 64
 #include <fcntl.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,6 +67,13 @@ static void md5_hex(md5_t *m, char out[33]) {
 }
 
 static char buf[1 << 20];
+
+/* Ограничиваем входной размер до реальной ёмкости буфера перед системным вызовом. */
+__attribute__((noinline))
+static ssize_t read_payload(int fd, char *dst, size_t count) {
+    if (count > (1U << 20)) { errno = EINVAL; return -1; }
+    return read(fd, dst, count);
+}
 
 /* capacity of a block device (BLKGETSIZE64) or of a regular file (tests) */
 static int capacity(int fd, uint64_t *cap) {
@@ -185,12 +193,20 @@ int main(int argc, char **argv) {
     uint64_t cap = 0;
     if (capacity(fd, &cap) || cap < size) { fprintf(stderr, "%s too small: %llu < %llu\n", dev, (unsigned long long)cap, (unsigned long long)size); return 1; }
     uint64_t done = 0, step = size / 50 + 1, next = step;
-    while (done < size) {
-        size_t want_n = size - done < sizeof buf ? (size_t)(size - done) : sizeof buf, got = 0;
-        while (got < want_n) { ssize_t r = read(0, buf + got, want_n - got); if (r <= 0) break; got += r; }
+    uint64_t input_remaining = size;
+    while (input_remaining > 0) {
+        size_t want_n = input_remaining >= sizeof buf ? sizeof buf : (size_t)input_remaining;
+        size_t got = 0;
+        while (got < want_n) {
+            size_t request = want_n - got;
+            ssize_t r = read_payload(0, buf + got, request);
+            if (r <= 0) break;
+            if ((size_t)r > request) { fprintf(stderr, "invalid input length\n"); return 1; }
+            got += (size_t)r;
+        }
         if (got == 0) break;
-        for (size_t off = 0; off < got; ) { ssize_t w = write(fd, buf + off, got - off); if (w <= 0) { perror("write"); return 1; } off += w; }
-        done += got;
+        for (size_t off = 0; off < got; ) { ssize_t w = write(fd, buf + off, got - off); if (w <= 0) { perror("write"); return 1; } off += (size_t)w; }
+        done += (uint64_t)got; input_remaining -= (uint64_t)got;
         if (done >= next) { printf("progress %.3f\n", (double)done / size * 0.5); fflush(stdout); next += step; }
     }
     if (done != size) { fprintf(stderr, "short input: %llu of %llu\n", (unsigned long long)done, (unsigned long long)size); return 1; }
@@ -199,11 +215,13 @@ int main(int argc, char **argv) {
     int dc = open("/proc/sys/vm/drop_caches", O_WRONLY); if (dc >= 0) { if (write(dc, "3", 1) != 1) { /* best effort */ } close(dc); }
     fd = open(dev, O_RDONLY);
     md5_t m; md5_init(&m); done = 0; next = step;
-    while (done < size) {
-        size_t n = size - done < sizeof buf ? (size_t)(size - done) : sizeof buf;
+    uint64_t remaining = size;
+    while (remaining > 0) {
+        size_t n = remaining >= sizeof buf ? sizeof buf : (size_t)remaining;
         ssize_t r = read(fd, buf, n);
         if (r <= 0) { fprintf(stderr, "readback failed at %llu\n", (unsigned long long)done); return 1; }
-        md5_update(&m, (uint8_t *)buf, r); done += r;
+        if ((uint64_t)r > remaining) { fprintf(stderr, "invalid readback length\n"); return 1; }
+        md5_update(&m, (uint8_t *)buf, (size_t)r); done += (uint64_t)r; remaining -= (uint64_t)r;
         if (done >= next) { printf("progress %.3f\n", 0.5 + (double)done / size * 0.5); fflush(stdout); next += step; }
     }
     close(fd);

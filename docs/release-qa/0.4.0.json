@@ -22,9 +22,12 @@
       "index_elapsed_ms": 103514,
       "quality_minimum": "1080p",
       "quality_measurement": "проверка HLS master resolution и ffprobe для MPEG-TS сегмента; неизвестное или ниже 1080p исключается",
-      "globally_verified_unique_streams_before_duplicate_removal": 2992,
       "global_url_credential_check": "pass: 6029 адресов проверено, credentials не найдены",
-      "m3u_categories": 54
+      "m3u_categories": 54,
+      "unique_stream_urls_in_final_playlist": 3008,
+      "stream_urls_confirmed_in_latest_repeat_pass": 2992,
+      "channels_retained_after_recent_prior_success_despite_transient_repeat_timeout": 16,
+      "repeat_timeout_handling": "16 адресов оставлены после временного таймаута, поскольку прошли полную непосредственную предыдущую проверку; доступность повторно проверить"
     },
     "network_capture": {
       "duration_seconds": 15,
@@ -76,17 +79,20 @@
       "installed": false,
       "sha256_verified": true,
       "ota_cms_signature_verified": true,
-      "adult_playlist_local_check": "предыдущий подписанный OTA содержит старый список; проверенный 1080p+ плейлист установлен только как горячий override и ещё требует пересборки OTA"
+      "adult_playlist_local_check": "предыдущий подписанный OTA содержит старый список; проверенный 1080p+ плейлист установлен только как горячий override и ещё требует пересборки OTA",
+      "note": "Это ранее собранный ночной архив, он не соответствует текущему пересобранному OTA. Актуальные локальные хеши находятся в candidate_build."
     },
     "iptv_quality_verification": {
       "minimum_vertical_pixels": 1080,
       "transport_stream_probe": "ffprobe 8.0.1",
       "hls_variant_resolution_checked": true,
       "unknown_or_lower_quality_rejected": true,
-      "globally_verified_stream_urls": 2992,
       "channels_after_deduplication": 3008,
       "adult_channels_first": 184,
-      "credentials_found": false
+      "credentials_found": false,
+      "unique_stream_urls_in_final_playlist": 3008,
+      "stream_urls_confirmed_in_latest_repeat_pass": 2992,
+      "temporarily_unconfirmed_but_recently_confirmed": 16
     },
     "iptv_full_hd_live_attempt": {
       "channel_title": "Первый",
@@ -95,6 +101,24 @@
       "visible_picture_confirmed": false,
       "adb_screenshot": "чёрный кадр; VLC сообщает playing, но видимый кадр не подтверждён",
       "release_gate": "pending"
+    },
+    "fresh_apk_hot_install": {
+      "iptv_apk_install": "pass: adb install -r returned Success",
+      "links_apk_install": "pass: adb install -r returned Success",
+      "iptv_activity_launch": "pass: ActivityManager completed launch in 1.14 seconds; category «Для взрослых» is first in UI",
+      "links_activity_launch": "pass: ActivityManager completed launch in 0.50 seconds; TorrServer address UI reported service available",
+      "crash_log_after_launch": "pass: no AndroidRuntime/TvboxIptv/TvboxLinks error rows in the sampled post-launch logcat window",
+      "vlc_remote_endpoint": "fail: TCP 8080 is not listening; VLC QR remote service is unavailable"
+    },
+    "network_live": {
+      "wifi": "pass: Android ConnectivityService reports VALIDATED; gateway ICMP 2/2, 0% loss",
+      "ethernet": "not_tested: eth0 reports NO-CARRIER/DOWN",
+      "addresses_or_credentials_recorded": false
+    },
+    "temporary_store_cleanup": {
+      "ru_store_phone": "removed for user 0",
+      "ru_store_tv": "removed for user 0",
+      "alice": "not installed"
     }
   },
   "cold_boot_seconds": null,
@@ -108,18 +132,53 @@
     "cold_boot_le_10s": "pending",
     "boot_log_review": "pending",
     "security_review": "fail",
-    "qr_vlc": "pending",
-    "wired_network": "pending",
-    "wifi_network": "pending",
-    "iptv_playback": "pending",
+    "qr_vlc": "fail: VLC remote endpoint 8080 is not listening; button launch must still be confirmed in the UI",
+    "wired_network": "pending: Ethernet interface has no carrier",
+    "wifi_network": "pass: validated Wi-Fi connection and gateway ping 2/2",
+    "iptv_playback": "pending: activity/index pass, but visible video frame and no-lag criterion are unconfirmed",
     "torrent_playback": "pending",
     "graphics_video": "pending",
     "graphics_stress": "pending",
-    "swap_disabled": "pass"
+    "swap_disabled": "pass",
+    "ota_build": "pass: fresh clean build, OTA CMS signature, clean-install detached signature, both ZIP integrity checks, 24 unit tests",
+    "device_update": "pending: OTA is not installed; installation clears user data and needs separate confirmation",
+    "iptv_activity_launch": "pass",
+    "links_activity_launch": "pass",
+    "ru_store_absent": "pass: both temporary packages uninstalled for user 0",
+    "alice_voice": "pending"
   },
   "log_analysis": {
     "reviewed": true,
     "untriaged_errors": 4,
-    "summary": "Проверены 42 088 строк доступного logcat и 11 485 строк после исправления IPTV; остаются 4 неразобранные группы: USB gadget/FunctionFS, vendor Wi-Fi/boot, hwcomposer/EGL, VLC/MediaCodec. На живой версии 0.3.9 подтверждено воспроизведение Sochi24 (720p) во VLC. Захват 5 000 пакетов/15 секунд без потерь: IPTV использовал незашифрованный HTTP, шаблоны Authorization/Cookie/token не найдены, сырой PCAP удалён. Подтверждена критичная открытая поверхность: сетевой ADB слушает все интерфейсы на TCP 5555 без авторизации (ro.secure=0, ro.adb.secure=0), shell работает от root; SELinux Permissive, build type userdebug. Установленный список IPTV старый, без категории 18+ первой. Аппаратные проверки относятся к 0.3.9 и не подтверждают локального кандидата 0.4.0. Последующая горячая проверка обновлённой IPTV-плитки завершила индексацию нового списка: 3008 каналов, 48 групп, категория 18+ первой; детских групп на экране нет. Горячая перепроверка IPTV после этого: схема 4, 3008 каналов, 48 групп, 184 взрослых первыми, 0 дублей, индексирование 103.5 секунды; адреса URL глобально проверены, качество не ниже 1080p подтверждено. Визуальная проверка Full HD во VLC на приставке не подтверждена: медиасессия в состоянии playing, но ADB screenshot чёрный; iptv_playback остаётся pending. Финальная горячая индексация schema 4: 3008 каналов, 48 групп, 184 канала 18+ первыми, 0 дублей, 103.5 секунды; M3U содержит 54 категории, SHA-256 60438409e7f73b4577b6f288113f375468dcbd602604fafbe4facdf8f182d3b1. VLC сообщает playing для «Первый», метаданные показывают 1920 вертикальных пикселей, но ADB screenshot чёрный и видимый кадр не подтверждён."
-  }
+    "summary": "На живой версии 0.3.9 сохранены прежние риски безопасности: сетевой ADB без авторизации, root shell и SELinux Permissive. Обновлённый IPTV APK и Links APK установлены горячим способом; IPTV-активность запускается, группа «Для взрослых» первая. Финальный список содержит 3008 уникальных URL и 184 канала 18+; 2992 URL подтвердились при повторном глобальном прогоне, ещё 16 оставлены после кратковременного таймаута из-за непосредственного предыдущего успеха и требуют повторной проверки. Индексация на приставке: schema 4, 48 групп, 103.5 секунды. VLC сообщает playing для теста Full HD, но кадр на ТВ не подтверждён снимком ADB; отсутствие лагов не доказано. Wi-Fi validated и проверен ping шлюза 2/2; Ethernet без carrier. QR VLC remote не работает, поскольку порт 8080 не слушает. Свежая eMMC-сборка 0.4.0 прошла без build errors/warnings; 24 автотеста прошли. Кандидат не установлен. В образе ro.secure=1 и ro.adb.secure=1, но ro.debuggable=1 и androidboot.selinux=permissive; аппаратный security review не пройден. Остаются неразобранными ошибки старых logcat для FunctionFS, vendor Wi-Fi/boot, hwcomposer/EGL и VLC/MediaCodec.",
+    "build_log": {
+      "lines": 134,
+      "critical": 0,
+      "errors": 0,
+      "warnings": 0,
+      "summary": "Окончательная сборка прошла без предупреждений и ошибок; помощник tvbox-flash компилируется с -Werror."
+    },
+    "post_hot_apk_launch": {
+      "android_runtime_crashes": 0,
+      "scope": "1500 most recent logcat rows filtered to AndroidRuntime, TvboxIptv and TvboxLinks; apps launched successfully"
+    }
+  },
+  "candidate_build": {
+    "built_at": "2026-11-06T18:51:52Z",
+    "version": "0.4.0",
+    "medium": "eMMC",
+    "ota_file": "tvbox-update-0.4.0-emmc.zip",
+    "ota_sha256": "715a1ee6280ef4fb0880837614eb54d138489c08bd3ddf18700de70be3ee5854",
+    "ota_size_bytes": 1303487007,
+    "clean_install_file": "Panadonik-0.4.0-emmc-clean-install.zip",
+    "clean_install_sha256": "87ed2fe047f0f84abd2b088fbe311a2754632e8d2e35af0d183be838714d5243",
+    "ota_signing_certificate_sha256": "906ea1f4a463757434aade51e7f469e7fd49030812e1db40cf74b55c2a7843c0",
+    "ota_signature": "pass: CMS Verification successful",
+    "clean_install_signature": "pass: detached SHA-256 signature verified against the same OTA certificate",
+    "zip_integrity": "pass",
+    "installed_on_device": false,
+    "installation_requires_data_wipe_confirmation": true,
+    "build_log": "pass: 134 lines, 0 critical, 0 errors, 0 warnings; read loops use bounded remaining counters and helper compiled with -Werror"
+  },
+  "build_fingerprint_note": "В собранном system/build.prop ro.secure=1 и ro.adb.secure=1, но ro.debuggable=1; boot command line содержит androidboot.selinux=permissive. Аппаратный security review не пройден."
 }
