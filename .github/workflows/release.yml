@@ -5,9 +5,11 @@ on:
     tags:
       - 'v*'
       - 'dev-v*'
-  # Ручной запуск собирает проверяемый кандидат как Actions artifact,
-  # но не создаёт тег и не публикует GitHub Release.
+  # Ночные и ручные запуски создают кандидат как Actions artifact,
+  # но не создают тег и не публикуют GitHub Release.
   workflow_dispatch:
+  schedule:
+    - cron: '20 3 * * *'
 
 permissions:
   contents: write
@@ -40,7 +42,7 @@ jobs:
           python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log
           python3 tools/analyze-release-logs.py /tmp/panadonik-tests.log \
             --source "автоматические тесты" --output release/qa/test-log-analysis.md --fail-on-errors
-          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then test_scope="candidate: автоматические проверки перед аппаратной приёмкой"; elif [[ "$GITHUB_REF_NAME" == dev-v* ]]; then test_scope="dev: IPTV и функциональный release gate"; else test_scope="stable: полный набор, включая конфигурацию безопасности"; fi
+          if [[ "$GITHUB_EVENT_NAME" != push ]]; then test_scope="candidate: автоматические проверки перед аппаратной приёмкой"; elif [[ "$GITHUB_REF_NAME" == dev-v* ]]; then test_scope="dev: IPTV и функциональный release gate"; else test_scope="stable: полный набор, включая конфигурацию безопасности"; fi
           cat > release/qa/automated-tests.md <<EOF
           # Автоматические проверки выпуска
 
@@ -64,7 +66,7 @@ jobs:
         run: |
           set -euo pipefail
           version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
-          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then tag_version="$version"; elif [[ "$GITHUB_REF_NAME" == dev-v* ]]; then tag_version="${GITHUB_REF_NAME#dev-v}"; else tag_version="${GITHUB_REF_NAME#v}"; fi
+          if [[ "$GITHUB_EVENT_NAME" != push ]]; then tag_version="$version"; elif [[ "$GITHUB_REF_NAME" == dev-v* ]]; then tag_version="${GITHUB_REF_NAME#dev-v}"; else tag_version="${GITHUB_REF_NAME#v}"; fi
           test "$tag_version" = "$version" || { echo "Tag does not match firmware version" >&2; exit 1; }
           test -n "$INPUTS_URL" && test -n "$INPUTS_SHA256" || { echo "Configure RELEASE_INPUTS_ARCHIVE_URL and RELEASE_INPUTS_SHA256 repository secrets" >&2; exit 1; }
           echo "::add-mask::$INPUTS_URL"
@@ -159,8 +161,8 @@ jobs:
           cp "docs/release-qa/$version.json" release/qa/device-evidence.json
           python3 tools/check-release-evidence.py --file "docs/release-qa/$version.json" --version "$version" --channel "$channel"
 
-      - name: Record candidate-only status (manual run)
-        if: github.event_name == 'workflow_dispatch'
+      - name: Record candidate-only status (non-tag build)
+        if: github.event_name != 'push'
         run: |
           set -euo pipefail
           version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
@@ -184,8 +186,8 @@ jobs:
           if-no-files-found: ignore
           retention-days: 90
 
-      - name: Upload signed build candidate (manual run only)
-        if: github.event_name == 'workflow_dispatch' && success()
+      - name: Upload signed build candidate (nightly/manual run)
+        if: github.event_name != 'push' && success()
         uses: actions/upload-artifact@v4
         with:
           name: panadonik-candidate-${{ github.sha }}
@@ -203,7 +205,7 @@ jobs:
             release/qa/build-log-analysis.md
             release/qa/candidate-status.md
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 3
 
       - name: Publish GitHub Release
         if: github.event_name == 'push'
