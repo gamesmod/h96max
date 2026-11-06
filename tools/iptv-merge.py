@@ -54,8 +54,8 @@ def normalize_group(group):
         (r"18\+|xxx|adult|эрот|взросл|playboy|brazzers|hustler|private|redlight|sex|секс", "Для взрослых"),
         (r"sport|спорт", "Спорт"),
         (r"news|новост|информац", "Новости"),
-        (r"movie|film|cinema|кино|фильм", "Фильмы"),
         (r"kid|child|cartoon|дет|мульт", "Детские"),
+        (r"movie|film|cinema|кино|фильм", "Фильмы"),
         (r"music|музык", "Музыка"),
         (r"document|science|education|познав|документ|науч|образоват", "Познавательные"),
         (r"radio|радио", "Радио"),
@@ -67,8 +67,8 @@ def normalize_group(group):
 
     # Региональные группы получают русское название и флаг страны; топонимы областей и штатов сохраняются.
     regions = (
-        ("🇷🇺 Россия", "Москва", r"москва|moscow|moskva"),
         ("🇷🇺 Россия", "Московская область", r"московская область|moscow oblast|moscow region"),
+        ("🇷🇺 Россия", "Москва", r"москва|moscow|moskva"),
         ("🇷🇺 Россия", "Санкт-Петербург", r"санкт петербург|st petersburg|saint petersburg|spb"),
         ("🇷🇺 Россия", "Ленинградская область", r"ленинградская область|leningrad oblast|leningrad region"),
         ("🇷🇺 Россия", "Татарстан", r"татарстан|tatarstan"),

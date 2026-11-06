@@ -239,8 +239,8 @@ public class MainActivity extends Activity {
         if (s.matches(".*(18\\+|xxx|adult|эрот|взросл|playboy|brazzers|hustler|private|redlight|sex|секс).*")) return "Для взрослых";
         if (s.matches(".*(sport|спорт).*")) return "Спорт";
         if (s.matches(".*(news|новост|информац).*")) return "Новости";
-        if (s.matches(".*(movie|film|cinema|кино|фильм).*")) return "Фильмы";
         if (s.matches(".*(kid|child|cartoon|дет|мульт).*")) return "Детские";
+        if (s.matches(".*(movie|film|cinema|кино|фильм).*")) return "Фильмы";
         if (s.matches(".*(music|музык).*")) return "Музыка";
         if (s.matches(".*(document|science|education|познав|документ|науч|образоват).*")) return "Познавательные";
         if (s.matches(".*(radio|радио).*")) return "Радио";

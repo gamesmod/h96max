@@ -1,0 +1,31 @@
+{
+  "version": "0.4.0",
+  "device": "Panadonik H96 Max, Android 12",
+  "reviewed_at": "2026-11-06",
+  "cold_boot_seconds": null,
+  "last_reboot_to_screen_seconds": 75,
+  "automated_tests": {
+    "status": "pass",
+    "count": 7,
+    "command": "python3 -m unittest discover -s tests -v"
+  },
+  "checks": {
+    "cold_boot_le_10s": "pending",
+    "boot_log_review": "pending",
+    "security_review": "pending",
+    "qr_vlc": "pending",
+    "qr_total_commander": "pending",
+    "wired_network": "pending",
+    "wifi_network": "pending",
+    "iptv_playback": "pending",
+    "torrent_playback": "pending",
+    "graphics_video": "pending",
+    "graphics_stress": "pending",
+    "swap_disabled": "pass"
+  },
+  "log_analysis": {
+    "reviewed": true,
+    "untriaged_errors": 4,
+    "summary": "Проверены 42 088 строк доступного logcat и 11 485 строк после установки исправления IPTV. Два сбоя FGS и ANR IPTV случились до исправления проверки schema/старого running-флага; после исправления индекс schema=3 завершился, новых критических исключений в последующей выборке нет. Остаются 4 неразобранные группы: USB gadget/FunctionFS (частые тайм-ауты), vendor Wi-Fi/boot сообщения, hwcomposer/EGL и VLC/MediaCodec при просмотре. Эти аппаратные проверки не пройдены."
+  }
+}

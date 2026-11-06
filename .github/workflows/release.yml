@@ -27,6 +27,21 @@ jobs:
           sudo apt-get clean
           df -h /
 
+      - name: Run automated release tests
+        run: |
+          set -euo pipefail
+          mkdir -p release/qa
+          bash -n build-sd.sh tools/build-release.sh tools/release-ota.sh apps/*/build.sh
+          python3 -m json.tool obtainium-apps.json >/dev/null
+          python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log
+          python3 tools/analyze-release-logs.py /tmp/panadonik-tests.log \
+            --source "автоматические тесты" --output release/qa/test-log-analysis.md --fail-on-errors
+          cat > release/qa/automated-tests.md <<'EOF'
+          # Автоматические проверки выпуска
+
+          Результат: PASS. В CI выполнены `bash -n`, проверка JSON Obtainium и `python3 -m unittest discover -s tests -v`.
+          EOF
+
       - name: Check runner disk space
         run: |
           set -euo pipefail
@@ -106,7 +121,13 @@ jobs:
         run: |
           set -euo pipefail
           tools/setup-sdk.sh
-          tools/build-release.sh
+          set +e
+          tools/build-release.sh 2>&1 | tee /tmp/panadonik-build.log
+          build_status=${PIPESTATUS[0]}
+          set -e
+          python3 tools/analyze-release-logs.py /tmp/panadonik-build.log \
+            --source "сборка OTA" --output release/qa/build-log-analysis.md --fail-on-errors
+          test "$build_status" -eq 0
           test ! -e secrets/wifi.env
           mkdir -p release/obtainium
           cp apps/antivirus/out/TvboxAntivirus.apk release/obtainium/Panadonik-antivirus.apk
@@ -120,6 +141,24 @@ jobs:
           cd release/updates/emmc
           sha256sum "tvbox-update-${GITHUB_REF_NAME#v}-emmc.zip" latest-emmc.txt > SHA256SUMS
 
+      - name: Require target-device release evidence
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          cp "docs/release-qa/$version.json" release/qa/device-evidence.json
+          python3 tools/check-release-evidence.py --file "docs/release-qa/$version.json" --version "$version"
+
+      - name: Upload QA reports, including failed release attempts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: panadonik-release-qa-${{ github.ref_name }}
+          path: |
+            release/qa/*.md
+            release/qa/device-evidence.json
+          if-no-files-found: ignore
+          retention-days: 90
+
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -131,5 +170,9 @@ jobs:
             release/updates/emmc/latest-emmc.txt \
             release/updates/emmc/SHA256SUMS \
             release/obtainium/*.apk \
+            release/qa/automated-tests.md \
+            release/qa/test-log-analysis.md \
+            release/qa/build-log-analysis.md \
+            release/qa/device-evidence.json \
             --title "Panadonik $version" \
             --generate-notes
