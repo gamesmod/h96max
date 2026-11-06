@@ -82,20 +82,27 @@
       "installed": false,
       "sha256_verified": true,
       "ota_cms_signature_verified": true,
-      "adult_playlist_local_check": "предыдущий подписанный OTA содержит старый список; проверенный 1080p+ плейлист установлен только как горячий override и ещё требует пересборки OTA",
-      "note": "Это ранее собранный ночной архив, он не соответствует текущему пересобранному OTA. Актуальные локальные хеши находятся в candidate_build."
+      "adult_playlist_local_check": "Свежий локальный кандидат содержит строгий список 1080p+; на установленной 0.3.9 остался ранее проверенный override, так как ADB отключился до установки нового списка.",
+      "note": "Исторический ночной ZIP относится к старому состоянию и сейчас не существует в каталоге. Актуальные неподтверждённые на устройстве локальные артефакты перечислены в candidate_build."
     },
     "iptv_quality_verification": {
       "minimum_vertical_pixels": 1080,
       "transport_stream_probe": "ffprobe 8.0.1",
       "hls_variant_resolution_checked": true,
       "unknown_or_lower_quality_rejected": true,
-      "channels_after_deduplication": 3008,
+      "channels_after_deduplication": 3007,
       "adult_channels_first": 184,
       "credentials_found": false,
-      "unique_stream_urls_in_final_playlist": 3008,
-      "stream_urls_confirmed_in_latest_repeat_pass": 2992,
-      "temporarily_unconfirmed_but_recently_confirmed": 16
+      "unique_stream_urls_in_final_playlist": 3007,
+      "stream_urls_confirmed_in_latest_repeat_pass": 3007,
+      "temporarily_unconfirmed_but_recently_confirmed": 0,
+      "measurement_policy": "только измерение видеокадра из HLS/TS сегмента через ffprobe; метки имени, URL и манифеста без измеренного кадра недостаточны",
+      "latin_category_names": 0,
+      "m3u_categories": 58,
+      "duplicate_names": 0,
+      "duplicate_urls": 0,
+      "global_url_credential_check": "pass: 6027 адресов проверено, credentials не найдены",
+      "playlist_sha256": "978b7ef5260092a71a9301d4eb8479dcc1422940fc634ac0eafd979aaf65a0af"
     },
     "iptv_full_hd_live_attempt": {
       "channel_title": "Первый",
@@ -149,7 +156,7 @@
   "last_reboot_to_screen_seconds": 75,
   "automated_tests": {
     "status": "pass",
-    "count": 24,
+    "count": 26,
     "command": "python3 -m unittest discover -s tests -v"
   },
   "checks": {
@@ -164,7 +171,7 @@
     "graphics_video": "pending",
     "graphics_stress": "pending",
     "swap_disabled": "pass",
-    "ota_build": "pass: актуальная сборка из acbb589, 24 автотеста, анализ сборки 0/0/0; OTA CMS и clean-install подпись проверены прежним сертификатом; ZIP целы; встроенный M3U совпадает с проверенным SHA-256",
+    "ota_build": "pass: eMMC 0.4.0 rebuilt from 39a5db0 with measured-segment-only IPTV quality gate; 26 automated tests; build log 0/0/0; OTA CMS and clean-install detached signatures verified with existing project certificate; ZIP integrity checked; embedded M3U hash verified against measured playlist",
     "device_update": "pending: новая сборка подготовлена; OTA сценарий в приложении требует очистки данных, отдельного согласия пользователя нет",
     "iptv_activity_launch": "pass",
     "links_activity_launch": "pass",
@@ -176,13 +183,13 @@
   "log_analysis": {
     "reviewed": true,
     "untriaged_errors": 1,
-    "summary": "В полном окне 10003 строк: одна ошибка EGL в Obtainium воспроизводится при запуске, но экран списка приложений отрисовался; оценка плавности остаётся pending. Три строки wl_run_escan LEGACY_SCAN sync ID отнесены к служебным по исходнику Broadcom; фактические Escan set error отсутствуют. Остались предупреждения FunctionFS (751 за 13 минут), RSN cipher (16), modem stats (1). После временного изменения USB gadget профиля ADB перестал отвечать; требуется перезагрузка и повторная диагностика. IPTV на живой 0.3.9: 3008 каналов, 53 русские группы, 184 канала 18+ первыми, индекс 101.5 с. Кадр Full HD и отсутствие лагов не доказаны. Wi-Fi был validated до смены профиля; Ethernet без carrier. QR VLC remote порт 8080 не слушает. eMMC 0.4.0 собрана из acbb589, 24 теста PASS, сборка/тестовые журналы чистые. Кандидат локальный и не установлен. SELinux permissive/ro.debuggable=1; cold boot, торрент и графический стресс остаются непроверенными.",
+    "summary": "В полном окне 10003 строк: одна ошибка EGL в Obtainium воспроизводится при запуске, но экран списка приложений отрисовался; оценка плавности остаётся pending. Три строки wl_run_escan LEGACY_SCAN sync ID отнесены к служебным по исходнику Broadcom; фактические Escan set error отсутствуют. Остались предупреждения FunctionFS (751 за 13 минут), RSN cipher (16), modem stats (1). После временного изменения USB gadget профиля ADB перестал отвечать; требуется перезагрузка и повторная диагностика. IPTV на живой 0.3.9: 3008 каналов, 53 русские группы, 184 канала 18+ первыми, индекс 101.5 с. Кадр Full HD и отсутствие лагов не доказаны. Wi-Fi был validated до смены профиля; Ethernet без carrier. QR VLC remote порт 8080 не слушает. eMMC 0.4.0 локально пересобрана из 39a5db0, 26 тестов PASS; встроенный M3U содержит 3007 измеренных потоков 1080p+ и совпал с локально проверенным файлом, сборка/тестовые журналы чистые. Кандидат локальный и не установлен. SELinux permissive/ro.debuggable=1; cold boot, торрент и графический стресс остаются непроверенными.",
     "build_log": {
-      "lines": 134,
+      "lines": 94,
       "critical": 0,
       "errors": 0,
       "warnings": 0,
-      "summary": "Полная eMMC сборка из актуальных исходников прошла без ошибок/предупреждений; отдельная компиляция OTA helper с -Werror ранее прошла."
+      "summary": "Полная eMMC сборка из исходников 39a5db0 с измеренным IPTV списком завершилась без ошибок и предупреждений."
     },
     "post_hot_apk_launch": {
       "android_runtime_crashes": 0,
@@ -204,21 +211,21 @@
     }
   },
   "candidate_build": {
-    "built_at": "2026-11-06T19:30:13Z",
+    "built_at": "2026-11-06T20:17:48Z",
     "version": "0.4.0",
     "medium": "eMMC",
     "ota_file": "tvbox-update-0.4.0-emmc.zip",
-    "ota_sha256": "927724719830df75c7e4726c0b8d64e31a5082037c475b53ce8897879923372d",
-    "ota_size_bytes": 1303483614,
+    "ota_sha256": "8c904da87d0a1842b8af3514456bf42ceba82b4b0a12a30ce012c61727f1f7de",
+    "ota_size_bytes": 1303486242,
     "clean_install_file": "Panadonik-0.4.0-emmc-clean-install.zip",
-    "clean_install_sha256": "02a22655f03f81350b4511527342cf09f63e2b82bbe0c4347708f598038f87a6",
+    "clean_install_sha256": "988e3ad8c2623866ee12c1e1e03e62110fc89ec167aa8db525a314c7e0abb975",
     "ota_signing_certificate_sha256": "906ea1f4a463757434aade51e7f469e7fd49030812e1db40cf74b55c2a7843c0",
     "ota_signature": "pass: CMS Verification successful with the existing project OTA certificate",
     "clean_install_signature": "pass: detached SHA-256 signature verified against the existing project OTA certificate",
     "zip_integrity": "pass",
     "installed_on_device": false,
     "installation_requires_data_wipe_confirmation": true,
-    "build_log": "pass: 134 lines, 0 critical, 0 errors, 0 warnings; OTA helper source unchanged from prior -Werror compile",
+    "build_log": "pass: 94 строки, 0 критических, 0 ошибок, 0 предупреждений; сборка из исходника 39a5db0",
     "release_assets_prepared_locally": [
       "OTA with updated changelog",
       "latest-emmc.txt",
@@ -227,10 +234,28 @@
       "signed clean-install archive",
       "automated test and build-log reports"
     ],
-    "github_status": "0 published releases, 0 Actions runs, 0 tags as of 2026-11-06",
-    "source_commit": "acbb589 (firmware sources); later commits update QA analyzer/docs only",
-    "clean_install_size_bytes": 1306722650,
-    "playlist_sha256": "73f56b348b8eaa06d0f1afc977ce9ef4757e71c198c3a2ce6880d7f7ace429aa"
+    "github_status": "0 опубликованных релизов и тегов по последней проверке; релизные Actions запускаются только тегом, gate ещё не пройден",
+    "source_commit": "39a5db0",
+    "clean_install_size_bytes": 1306725154,
+    "playlist_sha256": "978b7ef5260092a71a9301d4eb8479dcc1422940fc634ac0eafd979aaf65a0af"
   },
-  "build_fingerprint_note": "В собранном system/build.prop ro.secure=1 и ro.adb.secure=1, но ro.debuggable=1; boot command line содержит androidboot.selinux=permissive. Аппаратный security review не пройден."
+  "build_fingerprint_note": "В собранном system/build.prop ro.secure=1 и ro.adb.secure=1, но ro.debuggable=1; boot command line содержит androidboot.selinux=permissive. Аппаратный security review не пройден.",
+  "candidate_playlist_validation": {
+    "status": "pass_local_not_hot_installed",
+    "channels": 3007,
+    "adult_channels": 184,
+    "adult_category_first": true,
+    "m3u_groups": 58,
+    "all_categories_russian": true,
+    "duplicate_names": 0,
+    "duplicate_urls": 0,
+    "minimum_measured_vertical_pixels": 1080,
+    "unknown_resolution_rejected": true,
+    "resolution_source": "ffprobe decoded video stream from segment; HLS/URL/name metadata alone does not pass",
+    "credential_urls_found": 0,
+    "source_urls_checked_for_secrets": 6027,
+    "playlist_sha256": "978b7ef5260092a71a9301d4eb8479dcc1422940fc634ac0eafd979aaf65a0af",
+    "playlist_bytes": 630860,
+    "hot_installed_on_device": false
+  }
 }
