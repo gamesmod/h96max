@@ -39,9 +39,42 @@ def parse(text, only_group=None):
         elif line and not line.startswith("#") and cur is not None:
             cur["url"], cur["opts"] = line, opts
             if not only_group or cur["attrs"].get("group-title", "") == only_group:
+                cur["attrs"]["group-title"] = normalize_group(cur["attrs"].get("group-title", ""))
                 out.append(cur)
             cur = None
     return out
+
+def normalize_group(group):
+    """Свести варианты категорий к единому русскому названию."""
+    value = re.sub(r"[^a-zа-яё0-9+]+", " ", (group or "").lower()).strip()
+    value = value.replace("ё", "е")
+    if not value:
+        return "Прочее"
+    rules = (
+        (r"18\+|xxx|adult|эрот|взросл|playboy|brazzers|hustler|private|redlight|sex|секс", "Для взрослых"),
+        (r"sport|спорт", "Спорт"),
+        (r"news|новост|информац", "Новости"),
+        (r"movie|film|cinema|кино|фильм", "Фильмы"),
+        (r"kid|child|cartoon|дет|мульт", "Детские"),
+        (r"music|музык", "Музыка"),
+        (r"document|science|education|познав|документ|науч|образоват", "Познавательные"),
+        (r"radio|радио", "Радио"),
+        (r"regional|local|регион|местн", "Региональные"),
+        (r"entertain|развлек", "Развлекательные"),
+    )
+    for pattern, title in rules:
+        if re.search(pattern, value):
+            return title
+    countries = (
+        (r"^(?:ru|russia|russian|россия|российские|русские)$", "Россия"),
+        (r"^(?:by|belarus|belarussian|беларусь|белоруссия)$", "Беларусь"),
+        (r"^(?:ua|ukraine|ukrainian|украина)$", "Украина"),
+        (r"^(?:kz|kazakhstan|казахстан)$", "Казахстан"),
+    )
+    for pattern, title in countries:
+        if re.fullmatch(pattern, value):
+            return title
+    return "Прочее"
 
 TR = str.maketrans({"а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ж": "zh", "з": "z", "и": "i", "й": "y",
                     "к": "k", "л": "l", "м": "m", "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",

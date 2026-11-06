@@ -67,8 +67,7 @@ public class IndexOnBootService extends Service {
                 if (line.startsWith("#EXTINF")) {
                     int comma = line.lastIndexOf(',');
                     name = comma >= 0 ? line.substring(comma + 1).trim() : "?";
-                    group = attr(line, "group-title");
-                    if (group.isEmpty()) group = "Без группы";
+                    group = MainActivity.canonicalGroup(attr(line, "group-title"));
                     logo = attr(line, "tvg-logo");
                     channelId = attr(line, "tvg-id");
                     tvgName = attr(line, "tvg-name");
@@ -100,7 +99,8 @@ public class IndexOnBootService extends Service {
                 out.close();
                 if (cache.exists() && !cache.delete()) throw new java.io.IOException("не удалось удалить старый кэш индекса");
                 if (!temp.renameTo(cache)) throw new java.io.IOException("не удалось сохранить кэш индекса");
-                prefs.edit().putBoolean("complete", true).putBoolean("running", false).putLong("size", size)
+                prefs.edit().putBoolean("complete", true).putBoolean("running", false)
+                        .putInt("schema", MainActivity.INDEX_SCHEMA).putLong("size", size)
                         .putLong("modified", modified).putInt("channels", channels).putInt("groups", groups.size())
                         .putInt("duplicates", channels - names.size()).putInt("done", total).putInt("left_seconds", 0)
                         .putLong("elapsed_ms", elapsed).apply();

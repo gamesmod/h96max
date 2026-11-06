@@ -48,6 +48,7 @@ public class MainActivity extends Activity {
     static final String BUNDLED = "/system/etc/tvbox/iptv.m3u";
     static final String PLAYLIST = "https://ngrch.github.io/iptv/ru.m3u";
     static final String VLC = "org.videolan.vlc";
+    static final int INDEX_SCHEMA = 2;
 
     ListView lv;
     final Map<String, List<String[]>> groups = new LinkedHashMap<>();
@@ -143,7 +144,8 @@ public class MainActivity extends Activity {
     @SuppressWarnings("unchecked")
     boolean loadCachedIndex(File playlist) {
         android.content.SharedPreferences p = getSharedPreferences("iptv_index", MODE_PRIVATE);
-        if (!p.getBoolean("complete", false) || p.getLong("size", -1) != playlist.length() ||
+        if (!p.getBoolean("complete", false) || p.getInt("schema", 0) != INDEX_SCHEMA ||
+                p.getLong("size", -1) != playlist.length() ||
                 p.getLong("modified", -1) != playlist.lastModified()) return false;
         File cache = new File(getFilesDir(), "iptv-index.ser");
         try {
@@ -180,7 +182,8 @@ public class MainActivity extends Activity {
         File playlist = new File(BUNDLED);
         android.content.SharedPreferences p = getSharedPreferences("iptv_index", MODE_PRIVATE);
         if (p.getBoolean("running", false)) return;
-        if (p.getBoolean("complete", false) && p.getLong("size", -1) == playlist.length() &&
+        if (p.getBoolean("complete", false) && p.getInt("schema", 0) == INDEX_SCHEMA &&
+                p.getLong("size", -1) == playlist.length() &&
                 p.getLong("modified", -1) == playlist.lastModified() &&
                 new File(getFilesDir(), "iptv-index.ser").isFile()) return;
         Intent service = new Intent(this, IndexOnBootService.class);
@@ -201,18 +204,43 @@ public class MainActivity extends Activity {
     }
 
     static String groupIcon(String group) {
-        String s = group.toLowerCase();
-        if (s.contains("спорт") || s.contains("sport")) return "⚽";
-        if (s.contains("кино") || s.contains("фильм") || s.contains("movie")) return "🎬";
-        if (s.contains("дет") || s.contains("kid")) return "🧸";
-        if (s.contains("музык") || s.contains("music")) return "🎵";
-        if (s.contains("новост") || s.contains("news")) return "📰";
-        if (s.contains("познав") || s.contains("документ") || s.contains("science")) return "🔭";
-        if (s.contains("взросл") || s.contains("adult") || s.contains("18+")) return "🔞";
-        if (s.contains("радио") || s.contains("radio")) return "📻";
-        if (s.contains("регион") || s.contains("regional")) return "📍";
-        if (s.contains("страна") || s.contains("country")) return "🌍";
+        String s = canonicalGroup(group);
+        if (s.equals("Для взрослых")) return "🔞";
+        if (s.equals("Спорт")) return "⚽";
+        if (s.equals("Новости")) return "📰";
+        if (s.equals("Фильмы")) return "🎬";
+        if (s.equals("Детские")) return "🧸";
+        if (s.equals("Музыка")) return "🎵";
+        if (s.equals("Познавательные")) return "🔭";
+        if (s.equals("Радио")) return "📻";
+        if (s.equals("Региональные")) return "📍";
+        if (s.equals("Развлекательные")) return "🎭";
+        if (s.equals("Россия")) return "🇷🇺";
+        if (s.equals("Беларусь")) return "🇧🇾";
+        if (s.equals("Украина")) return "🇺🇦";
+        if (s.equals("Казахстан")) return "🇰🇿";
         return "📺";
+    }
+
+    static String canonicalGroup(String group) {
+        String s = group == null ? "" : group.toLowerCase(java.util.Locale.ROOT).replace('ё', 'е')
+                .replaceAll("[^a-zа-я0-9+]+", " ").trim();
+        if (s.length() == 0) return "Прочее";
+        if (s.matches(".*(18\\+|xxx|adult|эрот|взросл|playboy|brazzers|hustler|private|redlight|sex|секс).*")) return "Для взрослых";
+        if (s.matches(".*(sport|спорт).*")) return "Спорт";
+        if (s.matches(".*(news|новост|информац).*")) return "Новости";
+        if (s.matches(".*(movie|film|cinema|кино|фильм).*")) return "Фильмы";
+        if (s.matches(".*(kid|child|cartoon|дет|мульт).*")) return "Детские";
+        if (s.matches(".*(music|музык).*")) return "Музыка";
+        if (s.matches(".*(document|science|education|познав|документ|науч|образоват).*")) return "Познавательные";
+        if (s.matches(".*(radio|радио).*")) return "Радио";
+        if (s.matches(".*(regional|local|регион|местн).*")) return "Региональные";
+        if (s.matches(".*(entertain|развлек).*")) return "Развлекательные";
+        if (s.matches("(ru|russia|russian|россия|российские|русские)")) return "Россия";
+        if (s.matches("(by|belarus|belarussian|беларусь|белоруссия)")) return "Беларусь";
+        if (s.matches("(ua|ukraine|ukrainian|украина)")) return "Украина";
+        if (s.matches("(kz|kazakhstan|казахстан)")) return "Казахстан";
+        return "Прочее";
     }
 
     void refresh(final File cache) {
@@ -254,8 +282,7 @@ public class MainActivity extends Activity {
             if (line.startsWith("#EXTINF")) {
                 int comma = line.lastIndexOf(',');
                 name = comma >= 0 ? line.substring(comma + 1).trim() : "?";
-                group = m3uAttr(line, "group-title");
-                if (group.length() == 0) group = "Без группы";
+                group = canonicalGroup(m3uAttr(line, "group-title"));
                 logo = m3uAttr(line, "tvg-logo");
                 channelId = m3uAttr(line, "tvg-id");
                 tvgName = m3uAttr(line, "tvg-name");

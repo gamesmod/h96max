@@ -83,11 +83,15 @@ jobs:
           set -euo pipefail
           version="${GITHUB_REF_NAME#v}"
           mkdir -p release/notes
-          previous="$(git describe --tags --abbrev=0 "${GITHUB_SHA}^" 2>/dev/null || true)"
-          if [ -n "$previous" ]; then
-            git log --no-merges --pretty=format:'- %s (%h)' "$previous..$GITHUB_SHA" > "release/notes/$version.txt"
+          if [ -s "docs/release-notes/$version.md" ]; then
+            cp "docs/release-notes/$version.md" "release/notes/$version.txt"
           else
-            git log --no-merges --pretty=format:'- %s (%h)' -20 "$GITHUB_SHA" > "release/notes/$version.txt"
+            previous="$(git describe --tags --abbrev=0 "${GITHUB_SHA}^" 2>/dev/null || true)"
+            if [ -n "$previous" ]; then
+              git log --no-merges --pretty=format:'- %s (%h)' "$previous..$GITHUB_SHA" > "release/notes/$version.txt"
+            else
+              git log --no-merges --pretty=format:'- %s (%h)' -20 "$GITHUB_SHA" > "release/notes/$version.txt"
+            fi
           fi
           test -s "release/notes/$version.txt"
 
