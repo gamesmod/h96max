@@ -74,6 +74,17 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.assertIn("не старше 31 дня", result.stderr)
         self.assertIn("сырой PCAP", result.stderr)
 
+    def test_local_release_builder_refreshes_metadata_and_obtainium_apks(self):
+        script = (ROOT / "tools/build-release.sh").read_text(encoding="utf-8")
+        self.assertIn('cp release/updates/emmc/latest.txt release/updates/emmc/latest-emmc.txt', script)
+        self.assertIn('sha256sum "tvbox-update-$V-emmc.zip" latest-emmc.txt > SHA256SUMS', script)
+        self.assertIn('cp apps/iptv/out/TvboxIptv.apk release/obtainium/Panadonik-iptv.apk', script)
+
+    def test_github_release_uses_committed_version_notes(self):
+        workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
+        self.assertIn('Using committed release notes', workflow)
+        self.assertIn('release/notes/$version.txt', workflow)
+
 
 if __name__ == "__main__":
     unittest.main()

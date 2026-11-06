@@ -38,4 +38,15 @@ cp -r $O/manifest.txt $O/release.txt $O/regions $D/
 (cd $D && find . -type f ! -name SHA256SUMS | sort | xargs sha256sum > SHA256SUMS)
 tools/release-ota.sh $V $NOTES
 tools/package-clean-install.sh "$V"
+step "release metadata and Obtainium APKs"
+cp release/updates/emmc/latest.txt release/updates/emmc/latest-emmc.txt
+(cd release/updates/emmc && sha256sum "tvbox-update-$V-emmc.zip" latest-emmc.txt > SHA256SUMS)
+mkdir -p release/obtainium
+cp apps/antivirus/out/TvboxAntivirus.apk release/obtainium/Panadonik-antivirus.apk
+cp apps/bootlog/out/TvboxBootLog.apk release/obtainium/Panadonik-bootlog.apk
+cp apps/clean/out/TvboxClean.apk release/obtainium/Panadonik-performance.apk
+cp apps/installer/out/TvboxInstaller.apk release/obtainium/Panadonik-installer.apk
+cp apps/iptv/out/TvboxIptv.apk release/obtainium/Panadonik-iptv.apk
+cp apps/links/out/TvboxLinks.apk release/obtainium/Panadonik-links.apk
+cp apps/power/out/TvboxPower.apk release/obtainium/Panadonik-power.apk
 step "done: release/$V, release/updates"

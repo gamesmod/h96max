@@ -1,0 +1,107 @@
+{
+  "version": "0.4.1",
+  "device": "Panadonik H96 Max, Android 12",
+  "reviewed_at": "2026-11-06",
+  "cold_boot_seconds": null,
+  "last_reboot_to_screen_seconds": 75,
+  "hot_test": {
+    "tested_installed_version": "0.3.9",
+    "candidate_installed": false,
+    "network_capture": {
+      "captured_at": "2026-11-06",
+      "duration_seconds": 15,
+      "packets": 5000,
+      "dropped": 0,
+      "unencrypted_iptv_http": true,
+      "auth_cookie_or_token_patterns": 0,
+      "raw_capture_retained": false,
+      "scope": "снято на 0.3.9; после установки 0.4.1 нужен новый sanity-захват"
+    },
+    "adb": "приставка отвечает на ping, TCP 5555 отклоняет соединение; установка и аппаратные тесты невозможны до восстановления ADB"
+  },
+  "automated_tests": {
+    "status": "pass",
+    "count": 40,
+    "command": "python3 -m unittest discover -s tests -v"
+  },
+  "automated_test_log_analysis": {
+    "status": "pass",
+    "lines": 45,
+    "critical": 0,
+    "errors": 0,
+    "warnings": 0,
+    "report": "release/qa/test-log-analysis-0.4.1.md"
+  },
+  "checks": {
+    "cold_boot_le_10s": "pending",
+    "boot_log_review": "pending: сборочный процесс завершился успешно, журнал сборки полностью не сохранён; разбор журналов приставки остаётся незавершённым",
+    "security_review": "fail: предыдущая версия на устройстве имела сетевой ADB и SELinux permissive; состояние 0.4.1 на устройстве не проверено",
+    "qr_vlc": "pending: кандидат не установлен",
+    "wired_network": "pending",
+    "wifi_network": "pending",
+    "iptv_playback": "pending: M3U в образе проверен локально, воспроизведение на приставке не проверено",
+    "torrent_playback": "pending",
+    "graphics_video": "pending",
+    "graphics_stress": "pending",
+    "swap_disabled": "pass: /proc/swaps пуст",
+    "network_capture_review": "pending: захват относится к установленной 0.3.9, после установки кандидата повторить",
+    "device_update": "pending: OTA очищает пользовательские данные; отдельное подтверждение на очистку не получено",
+    "alice_voice": "pending: Алиса не установлена"
+  },
+  "log_analysis": {
+    "reviewed": true,
+    "untriaged_errors": 1,
+    "summary": "Последний журнал установленной 0.3.9 содержит одну ошибку Obtainium EGL и повторные предупреждения FunctionFS; их повторная проверка и разбор после загрузки кандидата ожидаются."
+  },
+  "candidate_build": {
+    "built_at": "2026-11-06T21:03:25Z",
+    "version": "0.4.1",
+    "medium": "eMMC",
+    "source_commit": "2fe0051",
+    "ota_file": "tvbox-update-0.4.1-emmc.zip",
+    "ota_sha256": "a6a9ac179d68f8ee267c9d822544cb0cb17e8b4b6367d57d7587af2c19ff19bf",
+    "ota_size_bytes": 1303493263,
+    "clean_install_file": "Panadonik-0.4.1-emmc-clean-install.zip",
+    "clean_install_sha256": "a3553ab919e7d2fed0a738dfb5adaf47065becee88bb6ab8c068d1c9ff143edf",
+    "ota_signing_certificate_sha256": "906ea1f4a463757434aade51e7f469e7fd49030812e1db40cf74b55c2a7843c0",
+    "ota_signature": "pass: CMS Verification successful with existing project certificate",
+    "clean_install_signature": "pass: detached SHA-256 signature verified with existing project certificate",
+    "zip_integrity": "pass",
+    "installed_on_device": false,
+    "installation_requires_data_wipe_confirmation": true,
+    "build_log": "build-release.sh завершился с кодом 0; полный журнал не сохранён",
+    "release_metadata": "latest-emmc.txt, SHA256SUMS и семь Obtainium APK обновлены для 0.4.1",
+    "wifi_credentials_scan": {
+      "status": "pass",
+      "scope": "build/work/system.img и build/work/vendor.img",
+      "configuration_files_checked": 2,
+      "wifi_env_present": false,
+      "saved_ssid_or_key_fields_found": 0,
+      "secret_values_printed": false,
+      "checker": "tools/check-image-wifi-secrets.py"
+    }
+  },
+  "candidate_playlist_validation": {
+    "status": "pass_local_not_hot_installed",
+    "channels": 3003,
+    "adult_channels": 184,
+    "adult_category_first": true,
+    "m3u_groups": 58,
+    "all_categories_russian": true,
+    "duplicate_names": 0,
+    "duplicate_urls": 0,
+    "child_channels": 0,
+    "minimum_measured_vertical_pixels": 1080,
+    "unknown_resolution_rejected": true,
+    "transient_timeout_retained_only_with_recent_measured_1080p": true,
+    "hot_installed_on_device": false,
+    "playlist_sha256": "0f23e0aa63a22897a0291fd2d03e169fa503fd21cfbafa6e37bd4d84bfab8dae",
+    "playlist_bytes": 630007,
+    "global_recheck_at": "2026-11-06T20:55:56Z",
+    "global_recheck_ok": 2994,
+    "global_recheck_temporary_timeouts": 13,
+    "retained_with_recent_full_hd_history": 9,
+    "excluded_without_confirmed_quality": 4,
+    "global_history_rows": 6014
+  }
+}

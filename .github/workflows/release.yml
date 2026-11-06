@@ -105,7 +105,9 @@ jobs:
           set -euo pipefail
           if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then version="${GITHUB_REF_NAME#dev-v}"; else version="${GITHUB_REF_NAME#v}"; fi
           mkdir -p release/notes
-          if [ -s "docs/release-notes/$version.md" ]; then
+          if [ -s "release/notes/$version.txt" ]; then
+            echo "Using committed release notes"
+          elif [ -s "docs/release-notes/$version.md" ]; then
             cp "docs/release-notes/$version.md" "release/notes/$version.txt"
           else
             previous="$(git describe --tags --abbrev=0 "${GITHUB_SHA}^" 2>/dev/null || true)"
