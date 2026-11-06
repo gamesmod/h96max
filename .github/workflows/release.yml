@@ -104,6 +104,14 @@ jobs:
           tools/setup-sdk.sh
           tools/build-release.sh
           test ! -e secrets/wifi.env
+          mkdir -p release/obtainium
+          cp apps/antivirus/out/TvboxAntivirus.apk release/obtainium/Panadonik-antivirus.apk
+          cp apps/bootlog/out/TvboxBootLog.apk release/obtainium/Panadonik-bootlog.apk
+          cp apps/clean/out/TvboxClean.apk release/obtainium/Panadonik-performance.apk
+          cp apps/installer/out/TvboxInstaller.apk release/obtainium/Panadonik-installer.apk
+          cp apps/iptv/out/TvboxIptv.apk release/obtainium/Panadonik-iptv.apk
+          cp apps/links/out/TvboxLinks.apk release/obtainium/Panadonik-links.apk
+          cp apps/power/out/TvboxPower.apk release/obtainium/Panadonik-power.apk
           cp release/updates/emmc/latest.txt release/updates/emmc/latest-emmc.txt
           cd release/updates/emmc
           sha256sum "tvbox-update-${GITHUB_REF_NAME#v}-emmc.zip" latest-emmc.txt > SHA256SUMS
@@ -118,5 +126,6 @@ jobs:
             "release/updates/emmc/tvbox-update-$version-emmc.zip" \
             release/updates/emmc/latest-emmc.txt \
             release/updates/emmc/SHA256SUMS \
+            release/obtainium/*.apk \
             --title "Panadonik $version" \
             --generate-notes
