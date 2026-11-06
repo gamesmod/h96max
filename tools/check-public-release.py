@@ -3,6 +3,7 @@
 import argparse
 import importlib.util
 import pathlib
+import re
 import sys
 import urllib.parse
 
@@ -22,6 +23,35 @@ def safe_url(url):
     return True
 
 
+def validate_playlist(entries, min_adult=20):
+    """Проверить публичные инварианты итогового M3U перед упаковкой образа."""
+    issues = []
+    groups = list(dict.fromkeys(entry.get("attrs", {}).get("group-title", "") for entry in entries))
+    if not entries or not groups or groups[0] != "Для взрослых":
+        issues.append("категория «Для взрослых» должна быть первой")
+    adult_count = sum(entry.get("attrs", {}).get("group-title") == "Для взрослых" for entry in entries)
+    if adult_count < min_adult:
+        issues.append(f"каналов 18+ {adult_count}, требуется минимум {min_adult}")
+    if any(any("a" <= ch.lower() <= "z" for ch in group) for group in groups):
+        issues.append("найдены категории с латинскими буквами")
+    if any(MERGE.is_child_channel(entry) for entry in entries):
+        issues.append("найдены детские каналы")
+    if len(MERGE.dedupe(entries)) != len(entries):
+        issues.append("найдены дубли каналов или варианты качества одного канала")
+    for entry in entries:
+        name = entry.get("name", "")
+        height = 0
+        match = re.search(r"\((\d{3,4})p\)$", name, re.IGNORECASE)
+        if match:
+            height = int(match.group(1))
+        elif re.search(r"\(4k\)$", name, re.IGNORECASE):
+            height = 2160
+        if height < 1080:
+            issues.append("есть канал без итоговой метки измеренного качества 1080p или выше")
+            break
+    return issues
+
+
 def main():
     parser = argparse.ArgumentParser(description="Ищет приватные URL-параметры перед сборкой публичного OTA.")
     parser.add_argument("--sources", default="tools/iptv-sources.txt")
@@ -35,20 +65,20 @@ def main():
             urls.append(fields[0])
     if args.playlist:
         entries = MERGE.parse(pathlib.Path(args.playlist).read_text(encoding="utf-8", errors="replace"))
-        groups = list(dict.fromkeys(entry["attrs"].get("group-title", "") for entry in entries))
-        if groups and groups[0] != "Для взрослых":
-            print("Ошибка: категория «Для взрослых» должна быть первой в общем плейлисте", file=sys.stderr)
+        issues = validate_playlist(entries, args.min_adult)
+        if issues:
+            for issue in issues:
+                print(f"Ошибка: {issue}", file=sys.stderr)
             return 1
         for entry in entries:
             urls.extend((entry["url"], entry["attrs"].get("tvg-logo", "")))
-        adult_count = sum(entry["attrs"].get("group-title") == "Для взрослых" for entry in entries)
-        if adult_count < args.min_adult:
-            print(f"Ошибка: доступных каналов 18+ {adult_count}, требуется минимум {args.min_adult}", file=sys.stderr)
-            return 1
     if any(url and not safe_url(url) for url in urls):
         print("Ошибка: URL с учётными данными запрещён в публичном релизе", file=sys.stderr)
         return 1
-    print(f"Проверено URL: {len(urls)}; учётные данные не обнаружены")
+    if args.playlist:
+        print(f"Плейлист проверен: каналов {len(entries)}, категорий 100% русских, дублей и детских каналов нет, качество от 1080p; URL проверено {len(urls)}")
+    else:
+        print(f"Проверено URL: {len(urls)}; учётные данные не обнаружены")
     return 0
 
 

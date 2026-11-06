@@ -260,6 +260,26 @@ class PublicReleaseSecurityTests(unittest.TestCase):
         self.assertFalse(PUBLIC_CHECK.safe_url("https://user:pass@example.invalid/live"))
         self.assertFalse(PUBLIC_CHECK.safe_url("https://example.invalid/live?token=secret"))
 
+    def test_public_playlist_accepts_russian_unique_full_hd_channels(self):
+        entries = [
+            {"name": "Adult One (1080p)", "url": "https://example.invalid/a", "attrs": {"group-title": "Для взрослых"}, "opts": []},
+            {"name": "Sport One (4K)", "url": "https://example.invalid/b", "attrs": {"group-title": "Спорт · Футбол"}, "opts": []},
+        ]
+        self.assertEqual(PUBLIC_CHECK.validate_playlist(entries, min_adult=1), [])
+
+    def test_public_playlist_rejects_children_duplicates_latin_groups_and_low_quality(self):
+        entries = [
+            {"name": "Adult One (1080p)", "url": "https://example.invalid/a", "attrs": {"group-title": "Для взрослых"}, "opts": []},
+            {"name": "Sport One (720p)", "url": "https://example.invalid/b", "attrs": {"group-title": "Sport"}, "opts": []},
+            {"name": "Cartoon (1080p)", "url": "https://example.invalid/c", "attrs": {"group-title": "Детские"}, "opts": []},
+            {"name": "Adult One (1080p)", "url": "https://example.invalid/d", "attrs": {"group-title": "Для взрослых"}, "opts": []},
+        ]
+        issues = PUBLIC_CHECK.validate_playlist(entries, min_adult=1)
+        self.assertTrue(any("латинскими" in issue for issue in issues))
+        self.assertTrue(any("детские" in issue for issue in issues))
+        self.assertTrue(any("дубли" in issue for issue in issues))
+        self.assertTrue(any("1080p" in issue for issue in issues))
+
 
 if __name__ == "__main__":
     unittest.main()
