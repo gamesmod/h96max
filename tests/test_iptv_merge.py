@@ -96,6 +96,10 @@ class IptvCategoryTests(unittest.TestCase):
         self.assertEqual(MERGE.normalize_group("Auto"), "Авто")
         self.assertEqual(MERGE.normalize_group("", "Match! Football"), "Спорт · Футбол")
 
+    def test_explicit_adult_rating_in_channel_name_overrides_generic_group(self):
+        self.assertEqual(MERGE.normalize_group("Entertainment", "VF Юмор 18+"), "Для взрослых")
+        self.assertEqual(MERGE.normalize_group("Movies", "Секс в большом городе"), "Фильмы")
+
     def test_unconfirmed_and_sub_1080_quality_are_rejected(self):
         for label, expected in (("1080p", False), ("FHD", False), ("720p", False), ("", False)):
             entry = {"name": "Channel " + label, "attrs": {}, "url": "https://example.invalid/a", "opts": []}
@@ -204,6 +208,12 @@ class IptvAvailabilityHistoryTests(unittest.TestCase):
         self.assertFalse(IPTV_VERIFY.has_recent_full_hd("unknown", events, "global", now=now))
         stale = [{**events[0], "checked_at": "2025-11-01T00:00:00+00:00"}]
         self.assertFalse(IPTV_VERIFY.has_recent_full_hd("abc", stale, "global", now=now))
+        downgraded = [
+            {**events[0], "checked_at": "2026-01-01T00:00:00+00:00", "stream_height": 1080},
+            {**events[0], "checked_at": "2026-01-02T00:00:00+00:00", "stream_height": 720},
+            events[1],
+        ]
+        self.assertFalse(IPTV_VERIFY.has_recent_full_hd("abc", downgraded, "global", now=now))
 
     def test_history_does_not_store_stream_url(self):
         with tempfile.TemporaryDirectory() as temp:

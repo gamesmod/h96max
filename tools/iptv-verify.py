@@ -91,21 +91,21 @@ def availability_rating(channel_key_value, events, scope, days=30, now=None):
 
 
 def has_recent_full_hd(channel_key_value, events, scope, days=30, now=None):
-    """Разрешить переждать таймаут только при недавнем подтверждённом замере 1080 строк."""
+    """Разрешить переждать таймаут, если последнее успешное измерение за 30 дней было Full HD."""
     now = now or datetime.datetime.now(datetime.timezone.utc)
     cutoff = now - datetime.timedelta(days=days)
+    latest_success = None
     for event in events:
         if event.get("channel_key") != channel_key_value or event.get("scope") != scope:
-            continue
-        if event.get("stream_height", 0) < 1080:
             continue
         try:
             checked = datetime.datetime.fromisoformat(event["checked_at"])
         except (KeyError, TypeError, ValueError):
             continue
-        if cutoff <= checked <= now:
-            return True
-    return False
+        height = event.get("stream_height", 0)
+        if cutoff <= checked <= now and height > 0 and (latest_success is None or checked > latest_success[0]):
+            latest_success = (checked, height)
+    return latest_success is not None and latest_success[1] >= 1080
 
 
 def main():

@@ -16,6 +16,7 @@ import argparse, concurrent.futures as cf, re, shlex, shutil, subprocess, sys, u
 
 UA = "VLC/3.0.20 LibVLC/3.0.20"
 ADULT = re.compile(r"18\+|xxx|adult|эрот|взросл|для взрослых|playboy|brazzers|hustler|private|redlight|blue hustler|секс|sex", re.I)
+ADULT_NAME_TAG = re.compile(r"18\+|xxx|adult|эрот|взросл|porn|порн|playboy|brazzers|hustler|private|redlight|blue hustler", re.I)
 CHILD_CHANNEL = re.compile(r"\b(?:kids?|children?|cartoons?|animation|boomerang|nick(?:elodeon)?|junior|baby|disney)\b|дет(?:ские|ский|ям)|мульт(?:фильм|иман|ик)|теленян|мультиланд|дисней", re.I)
 QUAL = re.compile(r"(?<![\w])(?:hd|fhd|uhd|4k|sd|hq|orig(?:inal)?|50\s?fps|60\s?fps|\d{3,4}p|h\.?265|hevc|backup|резерв)(?![\w])", re.I)
 RESOLUTION = re.compile(r"(?<!\d)(\d{3,4})\s*p?(?!\d)", re.I)
@@ -48,6 +49,10 @@ def parse(text, only_group=None):
 
 def normalize_group(group, channel_name=""):
     """Свести варианты категорий к единому русскому названию."""
+    # Явную маркировку 18+ в названии не теряем из-за общей темы источника.
+    # Слова «секс/sex» отдельно не используем: они дают ложные совпадения на названиях сериалов.
+    if channel_name and ADULT_NAME_TAG.search(channel_name):
+        return "Для взрослых"
     value = re.sub(r"[^a-zа-яё0-9+]+", " ", (group or "").lower()).strip()
     value = value.replace("ё", "е")
     if not value:
