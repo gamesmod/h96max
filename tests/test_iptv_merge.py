@@ -185,8 +185,11 @@ class ReleaseLogAnalysisTests(unittest.TestCase):
             "W/Activity: slow start",
             "E/AndroidRuntime: ForegroundServiceDidNotStartInTimeException: startup timeout",
             "build: warning: deprecated option",
+            "E/dhd-wlan0: firmware status -54",
+            "E/[dhd-wlan0] firmware status -55",
+            "E/[dhd-wlan0] wl_run_escan(    0): LEGACY_SCAN sync ID: 93, bssidx: 0",
         ])
-        self.assertEqual(counts, {"critical": 1, "error": 0, "warning": 2})
+        self.assertEqual(counts, {"critical": 1, "error": 2, "warning": 2, "known_informational": 1})
         self.assertEqual(findings[1][0], "Критично")
 
     def test_report_sanitizer_hides_urls_addresses_and_secrets(self):

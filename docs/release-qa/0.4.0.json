@@ -6,7 +6,7 @@
     "tested_installed_version": "0.3.9",
     "iptv_channel": "Sochi24 (720p)",
     "vlc_playback": "pending: VLC reported playing during the prior 20-second check, but the current recorded ADB screenshot is black and visible video is unconfirmed; the latest channel tested live was 720p, below the new 1080p playlist minimum",
-    "playlist_version": "pass: финальный список на горячей приставке после индексации schema 4 содержит 3008 каналов, 53 русские группы интерфейса и 59 нормализованных категорий M3U; названия спортивных дисциплин вынесены в подкатегории, «Для взрослых» первая; ниже 1080p и неизвестное качество не допускаются.",
+    "playlist_version": "pass: список 3008 каналов 1080p+ проверен на живой 0.3.9; 59 русских категорий M3U сведены приложением в 53 группы, включая спортивные подкатегории; 184 канала 18+ первые, детские группы и дубли отсутствуют.",
     "iptv_playlist_override": {
       "app_updated_on_live_device": true,
       "playlist_bytes": 631232,
@@ -116,7 +116,7 @@
       "vlc_qr_button": "pass: selecting VLC in Links reveals the button; pressing it brings org.videolan.vlc/org.videolan.television.ui.MainTvActivity to the foreground"
     },
     "network_live": {
-      "wifi": "pass: Android ConnectivityService reports VALIDATED; gateway ICMP 2/2, 0% loss",
+      "wifi": "pending after diagnostic USB-profile change: 10.12.54.40 still answers 2/2 ICMP pings; Android VALIDATED state must be confirmed again after ADB recovery",
       "ethernet": "not_tested: eth0 reports NO-CARRIER/DOWN",
       "addresses_or_credentials_recorded": false
     },
@@ -136,6 +136,13 @@
       "avc_denials_in_marked_test_window": 2,
       "avc_summary": "оба отказа — read от hal_memtrack_default к debugfs; отказов IPTV/Links в отмеченном интервале не найдено",
       "scope_limit": "проверена текущая 0.3.9 при временном setenforce; это не аппаратная проверка собранного 0.4.0"
+    },
+    "adb_recovery_after_usb_profile": {
+      "runtime_property_changed": "sys.usb.config=none (non-persistent)",
+      "persist_property_changed": false,
+      "adb_state": "offline; TCP 5555 connection refused",
+      "device_ping": "2/2 replies; address withheld",
+      "required_recovery": "reboot from remote or power, then reconnect ADB; user was prompted"
     }
   },
   "cold_boot_seconds": null,
@@ -147,18 +154,18 @@
   },
   "checks": {
     "cold_boot_le_10s": "pending",
-    "boot_log_review": "pending",
+    "boot_log_review": "pending: log sample analyzed; 751 repeated FUNCTIONFS_BIND warnings remain and ADB must be restored to reproduce after reboot",
     "security_review": "fail",
     "qr_vlc": "fail: launch button opens VLC on the box, but remote endpoint TCP 8080 is not listening",
     "wired_network": "pending: Ethernet interface has no carrier",
-    "wifi_network": "pass: validated Wi-Fi connection and gateway ping 2/2",
+    "wifi_network": "pending: Wi-Fi was VALIDATED before the USB gadget diagnostic change; device still answers 2/2 ICMP pings, but ConnectivityService must be rechecked after ADB restoration",
     "iptv_playback": "pending: activity/index pass, but visible video frame and no-lag criterion are unconfirmed",
     "torrent_playback": "pending",
     "graphics_video": "pending",
     "graphics_stress": "pending",
     "swap_disabled": "pass",
-    "ota_build": "pass: fresh clean build, OTA CMS signature, clean-install detached signature, both ZIP integrity checks, 24 unit tests",
-    "device_update": "pending: OTA is not installed; installation clears user data and needs separate confirmation",
+    "ota_build": "pass: актуальная сборка из acbb589, 24 автотеста, анализ сборки 0/0/0; OTA CMS и clean-install подпись проверены прежним сертификатом; ZIP целы; встроенный M3U совпадает с проверенным SHA-256",
+    "device_update": "pending: новая сборка подготовлена; OTA сценарий в приложении требует очистки данных, отдельного согласия пользователя нет",
     "iptv_activity_launch": "pass",
     "links_activity_launch": "pass",
     "ru_store_absent": "pass: both temporary RuStore packages removed for user 0 after lookup",
@@ -168,14 +175,14 @@
   },
   "log_analysis": {
     "reviewed": true,
-    "untriaged_errors": 4,
-    "summary": "На живой версии 0.3.9 сохранены прежние риски безопасности: сетевой ADB без авторизации, root shell и SELinux Permissive. Обновлённый IPTV APK и Links APK установлены горячим способом; IPTV-активность запускается, группа «Для взрослых» первая. Финальный список содержит 3008 уникальных URL и 184 канала 18+; 2992 URL подтвердились при повторном глобальном прогоне, ещё 16 оставлены после кратковременного таймаута из-за непосредственного предыдущего успеха и требуют повторной проверки. Индексация на приставке: schema 4, 48 групп, 103.5 секунды. VLC сообщает playing для теста Full HD, но кадр на ТВ не подтверждён снимком ADB; отсутствие лагов не доказано. Wi-Fi validated и проверен ping шлюза 2/2; Ethernet без carrier. QR VLC remote не работает, поскольку порт 8080 не слушает. Свежая eMMC-сборка 0.4.0 прошла без build errors/warnings; 24 автотеста прошли. Кандидат не установлен. В образе ro.secure=1 и ro.adb.secure=1, но ro.debuggable=1 и androidboot.selinux=permissive; аппаратный security review не пройден. Остаются неразобранными ошибки старых logcat для FunctionFS, vendor Wi-Fi/boot, hwcomposer/EGL и VLC/MediaCodec.",
+    "untriaged_errors": 1,
+    "summary": "В полном окне 10003 строк: одна ошибка EGL в Obtainium воспроизводится при запуске, но экран списка приложений отрисовался; оценка плавности остаётся pending. Три строки wl_run_escan LEGACY_SCAN sync ID отнесены к служебным по исходнику Broadcom; фактические Escan set error отсутствуют. Остались предупреждения FunctionFS (751 за 13 минут), RSN cipher (16), modem stats (1). После временного изменения USB gadget профиля ADB перестал отвечать; требуется перезагрузка и повторная диагностика. IPTV на живой 0.3.9: 3008 каналов, 53 русские группы, 184 канала 18+ первыми, индекс 101.5 с. Кадр Full HD и отсутствие лагов не доказаны. Wi-Fi был validated до смены профиля; Ethernet без carrier. QR VLC remote порт 8080 не слушает. eMMC 0.4.0 собрана из acbb589, 24 теста PASS, сборка/тестовые журналы чистые. Кандидат локальный и не установлен. SELinux permissive/ro.debuggable=1; cold boot, торрент и графический стресс остаются непроверенными.",
     "build_log": {
       "lines": 134,
       "critical": 0,
       "errors": 0,
       "warnings": 0,
-      "summary": "Окончательная сборка прошла без предупреждений и ошибок; помощник tvbox-flash компилируется с -Werror."
+      "summary": "Полная eMMC сборка из актуальных исходников прошла без ошибок/предупреждений; отдельная компиляция OTA helper с -Werror ранее прошла."
     },
     "post_hot_apk_launch": {
       "android_runtime_crashes": 0,
@@ -185,32 +192,45 @@
     "enforcing_smoke": {
       "avc_denials": 2,
       "summary": "Только hal_memtrack_default read к debugfs; IPTV/Links без AVC в маркированном интервале."
+    },
+    "triaged_error_count": 1,
+    "current_device_log": {
+      "lines": 10003,
+      "critical": 0,
+      "errors": 1,
+      "warnings": 768,
+      "known_informational_wifi_scan_lines": 3,
+      "triage": "one non-crashing Obtainium EGL issue recorded; repeated FUNCTIONFS_BIND warning remains open; see release/qa/device-log-analysis.md"
     }
   },
   "candidate_build": {
-    "built_at": "2026-11-06T18:51:52Z",
+    "built_at": "2026-11-06T19:30:13Z",
     "version": "0.4.0",
     "medium": "eMMC",
     "ota_file": "tvbox-update-0.4.0-emmc.zip",
-    "ota_sha256": "715a1ee6280ef4fb0880837614eb54d138489c08bd3ddf18700de70be3ee5854",
-    "ota_size_bytes": 1303487007,
+    "ota_sha256": "927724719830df75c7e4726c0b8d64e31a5082037c475b53ce8897879923372d",
+    "ota_size_bytes": 1303483614,
     "clean_install_file": "Panadonik-0.4.0-emmc-clean-install.zip",
-    "clean_install_sha256": "87ed2fe047f0f84abd2b088fbe311a2754632e8d2e35af0d183be838714d5243",
+    "clean_install_sha256": "02a22655f03f81350b4511527342cf09f63e2b82bbe0c4347708f598038f87a6",
     "ota_signing_certificate_sha256": "906ea1f4a463757434aade51e7f469e7fd49030812e1db40cf74b55c2a7843c0",
-    "ota_signature": "pass: CMS Verification successful",
-    "clean_install_signature": "pass: detached SHA-256 signature verified against the same OTA certificate",
+    "ota_signature": "pass: CMS Verification successful with the existing project OTA certificate",
+    "clean_install_signature": "pass: detached SHA-256 signature verified against the existing project OTA certificate",
     "zip_integrity": "pass",
     "installed_on_device": false,
     "installation_requires_data_wipe_confirmation": true,
-    "build_log": "pass: 134 lines, 0 critical, 0 errors, 0 warnings; read loops use bounded remaining counters and helper compiled with -Werror",
+    "build_log": "pass: 134 lines, 0 critical, 0 errors, 0 warnings; OTA helper source unchanged from prior -Werror compile",
     "release_assets_prepared_locally": [
-      "OTA",
+      "OTA with updated changelog",
       "latest-emmc.txt",
       "SHA256SUMS",
-      "7 APK Panadonik",
-      "signed clean-install archive"
+      "7 rebuilt APK Panadonik",
+      "signed clean-install archive",
+      "automated test and build-log reports"
     ],
-    "github_status": "0 published releases, 0 Actions runs, 0 tags as of 2026-11-06"
+    "github_status": "0 published releases, 0 Actions runs, 0 tags as of 2026-11-06",
+    "source_commit": "acbb589 (firmware sources); later commits update QA analyzer/docs only",
+    "clean_install_size_bytes": 1306722650,
+    "playlist_sha256": "73f56b348b8eaa06d0f1afc977ce9ef4757e71c198c3a2ce6880d7f7ace429aa"
   },
   "build_fingerprint_note": "В собранном system/build.prop ro.secure=1 и ro.adb.secure=1, но ro.debuggable=1; boot command line содержит androidboot.selinux=permissive. Аппаратный security review не пройден."
 }

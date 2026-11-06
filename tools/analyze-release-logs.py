@@ -12,9 +12,10 @@ CRITICAL = re.compile(
     re.I,
 )
 ERROR = re.compile(
-    r"\bE/[\w.]+|\sE\s[\w.-]+\s*:|\bERROR:|\[ERROR(?:\]|:)|\berror:|"
+    r"\bE/(?:\[[\w.-]+\]|[\w.-]+)|\sE\s[\w.-]+\s*:|\bERROR:|\[ERROR(?:\]|:)|\berror:|"
     r"init\s*:\s*Command .* (?:failed|error):|\bFAIL(?:ED)? \((?:errors|failures)=\d+\)", re.I)
-WARNING = re.compile(r"\bW/[\w.]+|\sW\s[\w.-]+\s*:|\bWARN(?:ING)?\b|\bwarning:", re.I)
+WARNING = re.compile(r"\bW/(?:\[[\w.-]+\]|[\w.-]+)|\sW\s[\w.-]+\s*:|\bWARN(?:ING)?\b|\bwarning:", re.I)
+KNOWN_INFO = re.compile(r"\bwl_run_escan\s*\([^)]*\):\s*LEGACY_SCAN sync ID:\s*\d+,\s*bssidx:\s*\d+", re.I)
 URL = re.compile(r"https?://[^\s\]>)\"']+", re.I)
 SECRET = re.compile(r"(?i)\b(password|passwd|token|api[_-]?key|authorization|secret)=([^&\s,;]+)")
 IPV4 = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
@@ -31,8 +32,12 @@ def sanitize(line):
 def analyze(lines):
     grouped = {}
     findings = []
-    counts = {"critical": 0, "error": 0, "warning": 0}
+    counts = {"critical": 0, "error": 0, "warning": 0, "known_informational": 0}
     for number, line in enumerate(lines, 1):
+        # Драйвер Broadcom пишет служебный ID сканирования уровнем E; реальные сбои идут отдельной строкой Escan set error.
+        if KNOWN_INFO.search(line):
+            counts["known_informational"] += 1
+            continue
         if CRITICAL.search(line):
             level = "Критично"
             counts["critical"] += 1
@@ -72,7 +77,8 @@ def main():
     with out.open("w", encoding="utf-8") as report:
         report.write(f"# Анализ журналов: {args.source}\n\n")
         report.write(f"Строк просмотрено: {len(lines)}. Критично: {counts['critical']}; "
-                     f"ошибок: {counts['error']}; предупреждений: {counts['warning']}.\n\n")
+                     f"ошибок: {counts['error']}; предупреждений: {counts['warning']}; "
+                     f"известных служебных строк драйвера: {counts['known_informational']}.\n\n")
         if not findings:
             report.write("Совпадений с критическими ошибками, ошибками или предупреждениями не найдено.\n")
         else:
