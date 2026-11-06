@@ -1,9 +1,10 @@
-name: Build and publish eMMC OTA
+name: Build and publish eMMC OTA (stable/dev)
 
 on:
   push:
     tags:
       - 'v*'
+      - 'dev-v*'
 
 permissions:
   contents: write
@@ -33,13 +34,19 @@ jobs:
           mkdir -p release/qa
           bash -n build-sd.sh tools/build-release.sh tools/release-ota.sh tools/package-clean-install.sh apps/*/build.sh
           python3 -m json.tool obtainium-apps.json >/dev/null
-          python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log
+          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then
+            python3 -m unittest discover -s tests -p 'test_iptv_merge.py' -v 2>&1 | tee /tmp/panadonik-tests.log
+            python3 -m unittest discover -s tests -p 'test_release_evidence.py' -v 2>&1 | tee -a /tmp/panadonik-tests.log
+          else
+            python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log
+          fi
           python3 tools/analyze-release-logs.py /tmp/panadonik-tests.log \
             --source "автоматические тесты" --output release/qa/test-log-analysis.md --fail-on-errors
-          cat > release/qa/automated-tests.md <<'EOF'
+          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then test_scope="dev: IPTV и функциональный release gate"; else test_scope="stable: полный набор, включая конфигурацию безопасности"; fi
+          cat > release/qa/automated-tests.md <<EOF
           # Автоматические проверки выпуска
 
-          Результат: PASS. В CI выполнены `bash -n`, проверка JSON Obtainium и `python3 -m unittest discover -s tests -v`.
+          Результат: PASS ($test_scope). В CI выполнены проверка shell-синтаксиса, JSON Obtainium и выбранный набор unittest.
           EOF
 
       - name: Check runner disk space
@@ -59,7 +66,7 @@ jobs:
         run: |
           set -euo pipefail
           version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
-          tag_version="${GITHUB_REF_NAME#v}"
+          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then tag_version="${GITHUB_REF_NAME#dev-v}"; else tag_version="${GITHUB_REF_NAME#v}"; fi
           test "$tag_version" = "$version" || { echo "Tag does not match firmware version" >&2; exit 1; }
           test -n "$INPUTS_URL" && test -n "$INPUTS_SHA256" || { echo "Configure RELEASE_INPUTS_ARCHIVE_URL and RELEASE_INPUTS_SHA256 repository secrets" >&2; exit 1; }
           echo "::add-mask::$INPUTS_URL"
@@ -96,7 +103,7 @@ jobs:
       - name: Generate notes for the installer
         run: |
           set -euo pipefail
-          version="${GITHUB_REF_NAME#v}"
+          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then version="${GITHUB_REF_NAME#dev-v}"; else version="${GITHUB_REF_NAME#v}"; fi
           mkdir -p release/notes
           if [ -s "docs/release-notes/$version.md" ]; then
             cp "docs/release-notes/$version.md" "release/notes/$version.txt"
@@ -137,16 +144,17 @@ jobs:
           cp apps/iptv/out/TvboxIptv.apk release/obtainium/Panadonik-iptv.apk
           cp apps/links/out/TvboxLinks.apk release/obtainium/Panadonik-links.apk
           cp apps/power/out/TvboxPower.apk release/obtainium/Panadonik-power.apk
+          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then version="${GITHUB_REF_NAME#dev-v}"; else version="${GITHUB_REF_NAME#v}"; fi
           cp release/updates/emmc/latest.txt release/updates/emmc/latest-emmc.txt
           cd release/updates/emmc
-          sha256sum "tvbox-update-${GITHUB_REF_NAME#v}-emmc.zip" latest-emmc.txt > SHA256SUMS
+          sha256sum "tvbox-update-$version-emmc.zip" latest-emmc.txt > SHA256SUMS
 
       - name: Require target-device release evidence
         run: |
           set -euo pipefail
-          version="${GITHUB_REF_NAME#v}"
+          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then version="${GITHUB_REF_NAME#dev-v}"; channel=dev; else version="${GITHUB_REF_NAME#v}"; channel=stable; fi
           cp "docs/release-qa/$version.json" release/qa/device-evidence.json
-          python3 tools/check-release-evidence.py --file "docs/release-qa/$version.json" --version "$version"
+          python3 tools/check-release-evidence.py --file "docs/release-qa/$version.json" --version "$version" --channel "$channel"
 
       - name: Upload QA reports, including failed release attempts
         if: always()
@@ -164,7 +172,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          version="${GITHUB_REF_NAME#v}"
+          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then version="${GITHUB_REF_NAME#dev-v}"; channel=dev; else version="${GITHUB_REF_NAME#v}"; channel=stable; fi
+          title="Panadonik $version"
+          release_args=()
+          if [[ "$channel" == dev ]]; then title+=" (dev)"; release_args+=(--prerelease); fi
           gh release create "$GITHUB_REF_NAME" \
             "release/updates/emmc/tvbox-update-$version-emmc.zip" \
             release/updates/emmc/latest-emmc.txt \
@@ -178,5 +189,5 @@ jobs:
             release/qa/test-log-analysis.md \
             release/qa/build-log-analysis.md \
             release/qa/device-evidence.json \
-            --title "Panadonik $version" \
-            --generate-notes
+            --title "$title" \
+            --generate-notes "${release_args[@]}"

@@ -6,17 +6,20 @@ import pathlib
 import sys
 
 
-REQUIRED_CHECKS = (
-    "cold_boot_le_10s", "boot_log_review", "security_review", "qr_vlc", "qr_total_commander",
+FUNCTIONAL_CHECKS = (
+    "cold_boot_le_10s", "boot_log_review", "qr_vlc", "qr_total_commander",
     "wired_network", "wifi_network", "iptv_playback", "torrent_playback", "graphics_video",
     "graphics_stress", "swap_disabled",
 )
+STABLE_SECURITY_CHECKS = ("security_review",)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Проверить аппаратный протокол выпуска.")
     parser.add_argument("--file", required=True, help="JSON с результатами аппаратной приёмки")
     parser.add_argument("--version", required=True, help="ожидаемая версия выпуска")
+    parser.add_argument("--channel", choices=("dev", "stable"), default="stable",
+                        help="для dev security_review публикуется как известный риск, но не блокирует выпуск")
     args = parser.parse_args()
     path = pathlib.Path(args.file)
     if not path.is_file():
@@ -37,7 +40,12 @@ def main():
     if tests.get("status") != "pass" or not isinstance(tests.get("count"), int) or tests["count"] < 1:
         failures.append("автоматические тесты не отмечены как пройденные")
     checks = data.get("checks", {})
-    for name in REQUIRED_CHECKS:
+    if args.channel == "dev" and checks.get("security_review") != "pass":
+        print("Примечание: security_review не блокирует dev-релиз; известные проблемы должны остаться в prerelease notes.")
+    required_checks = FUNCTIONAL_CHECKS
+    if args.channel == "stable":
+        required_checks += STABLE_SECURITY_CHECKS
+    for name in required_checks:
         if checks.get(name) != "pass":
             failures.append(f"проверка {name}: статус должен быть pass")
     elapsed = data.get("cold_boot_seconds")
@@ -56,7 +64,7 @@ def main():
         for failure in failures:
             print(f"- {failure}", file=sys.stderr)
         return 1
-    print(f"Аппаратный протокол {args.version}: все проверки пройдены")
+    print(f"Аппаратный протокол {args.version} ({args.channel}): все обязательные проверки пройдены")
     return 0
 
 
