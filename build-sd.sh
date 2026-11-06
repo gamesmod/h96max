@@ -119,7 +119,6 @@ done
 sudo tee -a $MNT/etc/build.prop >/dev/null <<'EOF'
 
 # tvbox (rk3318-android)
-ro.adb.secure=0
 ro.setupwizard.mode=DISABLED
 persist.sys.timezone=Europe/Moscow
 persist.sys.locale=ru-RU
@@ -145,6 +144,25 @@ umnt
 log "debloat: system"
 mnt system
 sudo rm -f $MNT/usr/Aging_Test_Video.mp4
+# Системные ro-свойства загружаются раньше product и должны быть исправлены в system/build.prop.
+if sudo grep -q '^ro.secure=' "$MNT/system/build.prop"; then
+    sudo sed -i 's/^ro.secure=.*/ro.secure=1/' "$MNT/system/build.prop"
+else
+    echo 'ro.secure=1' | sudo tee -a "$MNT/system/build.prop" >/dev/null
+fi
+if sudo grep -q '^ro.adb.secure=' "$MNT/system/build.prop"; then
+    sudo sed -i 's/^ro.adb.secure=.*/ro.adb.secure=1/' "$MNT/system/build.prop"
+else
+    echo 'ro.adb.secure=1' | sudo tee -a "$MNT/system/build.prop" >/dev/null
+fi
+# Ограничиваем root-suid: доступ к su оставляем только root и группе shell для доверенной отладки.
+if [ -f "$MNT/system/xbin/su" ]; then
+    sudo chown 0:2000 "$MNT/system/xbin/su"
+    sudo chmod 4750 "$MNT/system/xbin/su"
+else
+    echo "Не найден $MNT/system/xbin/su — невозможно применить ограничение su" >&2
+    exit 1
+fi
 # vendor "preinstall" bundle (TikTok, Netflix, Prime, Aptoide, APKPure, AirScreen, KDMC, store) installed at first boot
 [ -d $MNT/system/preinstall ] && sudo rm -rf $MNT/system/preinstall
 # power menu tile (apps/power, privileged: REBOOT/SHUTDOWN/DEVICE_POWER)

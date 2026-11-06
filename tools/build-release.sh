@@ -37,4 +37,5 @@ D=release/$V/emmc; mkdir -p $D
 cp -r $O/manifest.txt $O/release.txt $O/regions $D/
 (cd $D && find . -type f ! -name SHA256SUMS | sort | xargs sha256sum > SHA256SUMS)
 tools/release-ota.sh $V $NOTES
+tools/package-clean-install.sh "$V"
 step "done: release/$V, release/updates"

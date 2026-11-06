@@ -22,7 +22,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y aapt attr curl e2fsprogs gcc-aarch64-linux-gnu gdisk git-lfs python3 python3-pil zstd
+          sudo apt-get install -y aapt attr curl e2fsprogs gcc-aarch64-linux-gnu gdisk git-lfs openssl python3 python3-pil unzip zip zstd
           if [ -n "${ANDROID_HOME:-}" ]; then sudo rm -rf "$ANDROID_HOME"; fi
           sudo apt-get clean
           df -h /
@@ -31,7 +31,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p release/qa
-          bash -n build-sd.sh tools/build-release.sh tools/release-ota.sh apps/*/build.sh
+          bash -n build-sd.sh tools/build-release.sh tools/release-ota.sh tools/package-clean-install.sh apps/*/build.sh
           python3 -m json.tool obtainium-apps.json >/dev/null
           python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log
           python3 tools/analyze-release-logs.py /tmp/panadonik-tests.log \
@@ -169,6 +169,10 @@ jobs:
             "release/updates/emmc/tvbox-update-$version-emmc.zip" \
             release/updates/emmc/latest-emmc.txt \
             release/updates/emmc/SHA256SUMS \
+            release/Panadonik-$version-emmc-clean-install.zip \
+            release/Panadonik-$version-emmc-clean-install.zip.sha256 \
+            release/Panadonik-$version-emmc-clean-install.zip.sig \
+            release/Panadonik-$version-ota-cert.pem \
             release/obtainium/*.apk \
             release/qa/automated-tests.md \
             release/qa/test-log-analysis.md \

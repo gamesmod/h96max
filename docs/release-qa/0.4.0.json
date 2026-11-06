@@ -2,17 +2,64 @@
   "version": "0.4.0",
   "device": "Panadonik H96 Max, Android 12",
   "reviewed_at": "2026-11-06",
+  "hot_test": {
+    "tested_installed_version": "0.3.9",
+    "iptv_channel": "Sochi24 (720p)",
+    "vlc_playback": "pass: VLC media session reported playing and the video frame was visible during a 20-second check; frame-drop counters were not available",
+    "playlist_version": "fail: the installed list starts with Детские and has no first-position Для взрослых category; this is the older installed playlist, not the local 0.4.0 candidate",
+    "network_capture": {
+      "duration_seconds": 15,
+      "packets": 5000,
+      "dropped": 0,
+      "unencrypted_iptv_http": true,
+      "auth_cookie_or_token_patterns": 0,
+      "raw_capture_retained": false
+    },
+    "security_findings": [
+      "ADB listens on TCP 5555 on all interfaces; ro.adb.secure=0, ro.secure=0, and shell access is root",
+      "SELinux is Permissive and build type is userdebug"
+    ],
+    "swap_entries": 0,
+    "thermal_zone_max_c": 77.31,
+    "live_recheck": {
+      "installed_version": "0.3.9",
+      "ro_secure": "0",
+      "ro_adb_secure": "0",
+      "adb_tcp_5555_listening_on_all_interfaces": true,
+      "selinux": "Permissive",
+      "su_mode": "6755",
+      "swap_entries": 0,
+      "thermal_zone_c": 77.31,
+      "alice_package_installed": false
+    },
+    "live_logcat_sample": {
+      "lines": 10541,
+      "critical": 0,
+      "errors": 525,
+      "warnings": 413,
+      "raw_log_removed": true,
+      "triage_complete": false,
+      "summary": "Повторяются сообщения индексации VLC, Fontconfig, NativeWindow/FrameEvents/Codec2; встречаются buffer deadlock prevented и задержанные аудиобуферы. Нужны разбор и воспроизведение."
+    },
+    "nightly_candidate": {
+      "file": "Panadonik-0.4.0-nightly-20261106-8399a56-emmc.zip",
+      "installed": false,
+      "sha256_verified": true,
+      "ota_cms_signature_verified": true,
+      "adult_playlist_local_check": "pass; 20+ channels, first category is 18+; not yet checked on device"
+    }
+  },
   "cold_boot_seconds": null,
   "last_reboot_to_screen_seconds": 75,
   "automated_tests": {
     "status": "pass",
-    "count": 7,
+    "count": 10,
     "command": "python3 -m unittest discover -s tests -v"
   },
   "checks": {
     "cold_boot_le_10s": "pending",
     "boot_log_review": "pending",
-    "security_review": "pending",
+    "security_review": "fail",
     "qr_vlc": "pending",
     "qr_total_commander": "pending",
     "wired_network": "pending",
@@ -26,6 +73,6 @@
   "log_analysis": {
     "reviewed": true,
     "untriaged_errors": 4,
-    "summary": "Проверены 42 088 строк доступного logcat и 11 485 строк после установки исправления IPTV. Два сбоя FGS и ANR IPTV случились до исправления проверки schema/старого running-флага; после исправления индекс schema=3 завершился, новых критических исключений в последующей выборке нет. Остаются 4 неразобранные группы: USB gadget/FunctionFS (частые тайм-ауты), vendor Wi-Fi/boot сообщения, hwcomposer/EGL и VLC/MediaCodec при просмотре. Эти аппаратные проверки не пройдены."
+    "summary": "Проверены 42 088 строк доступного logcat и 11 485 строк после исправления IPTV; остаются 4 неразобранные группы: USB gadget/FunctionFS, vendor Wi-Fi/boot, hwcomposer/EGL, VLC/MediaCodec. На живой версии 0.3.9 подтверждено воспроизведение Sochi24 (720p) во VLC. Захват 5 000 пакетов/15 секунд без потерь: IPTV использовал незашифрованный HTTP, шаблоны Authorization/Cookie/token не найдены, сырой PCAP удалён. Подтверждена критичная открытая поверхность: сетевой ADB слушает все интерфейсы на TCP 5555 без авторизации (ro.secure=0, ro.adb.secure=0), shell работает от root; SELinux Permissive, build type userdebug. Установленный список IPTV старый, без категории 18+ первой. Аппаратные проверки относятся к 0.3.9 и не подтверждают локального кандидата 0.4.0."
   }
 }
