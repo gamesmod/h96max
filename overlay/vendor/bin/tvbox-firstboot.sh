@@ -25,7 +25,8 @@ cmd uimode night yes
 # Для побитового HDMI-звука выставить максимальную громкость Android; уровень меняется на ТВ через CEC.
 cmd media_session volume --stream 3 --set 15 >/dev/null 2>&1
 
-if [ ! -f $D/wifi.done ] && [ -f /vendor/etc/tvbox/wifi.env ]; then
+# TVBOX_SKIP_WIFI=1 позволяет повторно применить настройки приложений, не трогая уже сохранённую сеть.
+if [ "${TVBOX_SKIP_WIFI:-0}" != 1 ] && [ ! -f $D/wifi.done ] && [ -f /vendor/etc/tvbox/wifi.env ]; then
     . /vendor/etc/tvbox/wifi.env
     cmd wifi set-wifi-enabled enabled
     sleep 8
@@ -41,6 +42,8 @@ fi
 for apk in /product/tvbox/apk/*.apk; do
     [ -f "$apk" ] || continue
     pkg=$(basename "$apk" .apk)
+    # Flicky и игры удалены из выпуска: не ставить старый APK с /product перед его удалением ниже.
+    case "$pkg" in app.flicky|com.agateau.tinywheels.android|org.supertux.supertux2) continue;; esac
     if ! pm path "$pkg" >/dev/null 2>&1; then
         echo "install $pkg: $(pm install -r "$apk" 2>&1)"
     fi
@@ -197,6 +200,25 @@ if pm path com.tvlauncher >/dev/null 2>&1 && pm path org.tvbox.bootlog >/dev/nul
             fi
             touch "$D/launcher-bootlog-tile-added";;
     esac
+fi
+# Удалить отдельную плитку VLC из прежних раскладок: VLC остаётся плеером для IPTV и TorrServe.
+if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-vlc-tile-removed" ] && [ -f "$L" ]; then
+    OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
+    T=""; CHANGED=0
+    for p in $(printf '%s' "$OLD" | sed 's/\&#30;/ /g'); do
+        if [ "$p" = org.videolan.vlc ]; then CHANGED=1; continue; fi
+        T="${T:+$T&#30;}$p"
+    done
+    if [ "$CHANGED" = 1 ]; then
+        REPL=$(printf '%s' "$T" | sed 's/\&/\\\&/g')
+        sed "s|<string name=\"apps_order\">[^<]*</string>|<string name=\"apps_order\">$REPL</string>|" "$L" > "$L.new"
+        u=$(stat -c %u /data/data/com.tvlauncher)
+        chown "$u:$u" "$L.new"; chmod 660 "$L.new"; mv "$L.new" "$L"; restorecon "$L"
+        am force-stop com.tvlauncher
+        am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
+        echo "tvlauncher: removed the separate VLC tile"
+    fi
+    touch "$D/launcher-vlc-tile-removed"
 fi
 # При переходе с Flicky на Obtainium заменить только старый пакет плитки и сохранить её позицию.
 L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
