@@ -90,6 +90,24 @@ def availability_rating(channel_key_value, events, scope, days=30, now=None):
     return round(100 * sum(e.get("stream_height", 0) > 0 for e in recent) / len(recent))
 
 
+def has_recent_full_hd(channel_key_value, events, scope, days=30, now=None):
+    """Разрешить переждать таймаут только при недавнем подтверждённом замере 1080 строк."""
+    now = now or datetime.datetime.now(datetime.timezone.utc)
+    cutoff = now - datetime.timedelta(days=days)
+    for event in events:
+        if event.get("channel_key") != channel_key_value or event.get("scope") != scope:
+            continue
+        if event.get("stream_height", 0) < 1080:
+            continue
+        try:
+            checked = datetime.datetime.fromisoformat(event["checked_at"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if cutoff <= checked <= now:
+            return True
+    return False
+
+
 def main():
     parser = argparse.ArgumentParser(description="Проверить M3U, схлопнуть варианты качества и сохранить отчёт.")
     parser.add_argument("playlist", help="входной M3U")
@@ -163,7 +181,10 @@ def main():
                      "разрешение_строк": height, "рейтинг_30д": availability_rating(key, current_history, args.scope),
                      "узел_лого": urllib.parse.urlsplit(logo).hostname or "",
                      "узел_потока": urllib.parse.urlsplit(entry["url"]).hostname or ""})
-        if status == "OK" or (status == "ВРЕМЕННЫЙ СБОЙ" and not excluded):
+        # Краткий таймаут не стирает недавно измеренное Full HD качество,
+        # но неизвестный поток не должен просочиться в итоговый список.
+        previously_full_hd = has_recent_full_hd(key, current_history, args.scope)
+        if status == "OK" or (status == "ВРЕМЕННЫЙ СБОЙ" and not excluded and previously_full_hd):
             available.append(entry)
 
     append_history(args.history, new_events)

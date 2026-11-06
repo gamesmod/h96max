@@ -124,7 +124,7 @@ ro.setupwizard.mode=DISABLED
 persist.sys.timezone=Europe/Moscow
 persist.sys.locale=ru-RU
 persist.sys.usb.config=adb
-ro.tvbox.release=0.4.0
+ro.tvbox.release=0.4.1
 EOF
 echo "ro.tvbox.build_date=$(date +%F)" | sudo tee -a $MNT/etc/build.prop >/dev/null
 umnt

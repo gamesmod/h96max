@@ -191,6 +191,20 @@ class IptvAvailabilityHistoryTests(unittest.TestCase):
         self.assertEqual(IPTV_VERIFY.availability_rating("abc", events, "device", now=now), 100)
         self.assertFalse(IPTV_VERIFY.exclusion_status("abc", events, "device"))
 
+    def test_transient_failure_is_retained_only_with_recent_measured_full_hd(self):
+        now = datetime.datetime(2026, 1, 3, tzinfo=datetime.timezone.utc)
+        events = [
+            {"channel_key": "abc", "scope": "global", "checked_at": "2026-01-02T00:00:00+00:00",
+             "stream_height": 1080},
+            {"channel_key": "abc", "scope": "global", "checked_at": "2026-01-03T00:00:00+00:00",
+             "stream_height": 0},
+        ]
+        self.assertTrue(IPTV_VERIFY.has_recent_full_hd("abc", events, "global", now=now))
+        self.assertFalse(IPTV_VERIFY.has_recent_full_hd("abc", events, "device", now=now))
+        self.assertFalse(IPTV_VERIFY.has_recent_full_hd("unknown", events, "global", now=now))
+        stale = [{**events[0], "checked_at": "2025-11-01T00:00:00+00:00"}]
+        self.assertFalse(IPTV_VERIFY.has_recent_full_hd("abc", stale, "global", now=now))
+
     def test_history_does_not_store_stream_url(self):
         with tempfile.TemporaryDirectory() as temp:
             path = pathlib.Path(temp) / "history.jsonl"
