@@ -41,6 +41,12 @@
       "triage_complete": false,
       "summary": "Повторяются сообщения индексации VLC, Fontconfig, NativeWindow/FrameEvents/Codec2; встречаются buffer deadlock prevented и задержанные аудиобуферы. Нужны разбор и воспроизведение."
     },
+    "qr_live_checks": {
+      "tested_installed_version": "0.3.9",
+      "vlc": "Кнопка запуска открывает VLC; HTTP-интерфейс на TCP 8080 не слушает, поэтому QR-ссылка удалённого VLC не работает.",
+      "total_commander": "Кнопка запуска открывает Total Commander. Переход в WiFi-обмен запускает WiFi Transfer, но открывает экран приёма URL без QR-кода сервера; полный сценарий QR не подтверждён.",
+      "result": "partial; not counted as functional gate pass"
+    },
     "nightly_candidate": {
       "file": "Panadonik-0.4.0-nightly-20261106-8399a56-emmc.zip",
       "installed": false,
