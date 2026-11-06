@@ -94,15 +94,19 @@
       "adult_channels_first": 184,
       "credentials_found": false,
       "unique_stream_urls_in_final_playlist": 3007,
-      "stream_urls_confirmed_in_latest_repeat_pass": 3007,
-      "temporarily_unconfirmed_but_recently_confirmed": 0,
+      "stream_urls_confirmed_in_latest_repeat_pass": 2990,
+      "temporarily_unconfirmed_but_recently_confirmed": 17,
       "measurement_policy": "только измерение видеокадра из HLS/TS сегмента через ffprobe; метки имени, URL и манифеста без измеренного кадра недостаточны",
       "latin_category_names": 0,
       "m3u_categories": 58,
       "duplicate_names": 0,
       "duplicate_urls": 0,
       "global_url_credential_check": "pass: 6027 адресов проверено, credentials не найдены",
-      "playlist_sha256": "978b7ef5260092a71a9301d4eb8479dcc1422940fc634ac0eafd979aaf65a0af"
+      "playlist_sha256": "978b7ef5260092a71a9301d4eb8479dcc1422940fc634ac0eafd979aaf65a0af",
+      "latest_global_check": "2026-11-06T20:30:25Z: 2990 OK, 17 временных таймаутов; все 17 оставлены после одного отказа, согласно правилу исключения только после трёх разнесённых по времени неудач",
+      "adult_channels_pass_latest": 183,
+      "availability_history_rows": 3007,
+      "availability_history_scope": "global; локальный host history file, без URL; device-scope пока недоступен"
     },
     "iptv_full_hd_live_attempt": {
       "channel_title": "Первый",
@@ -256,6 +260,21 @@
     "source_urls_checked_for_secrets": 6027,
     "playlist_sha256": "978b7ef5260092a71a9301d4eb8479dcc1422940fc634ac0eafd979aaf65a0af",
     "playlist_bytes": 630860,
-    "hot_installed_on_device": false
+    "hot_installed_on_device": false,
+    "global_recheck": {
+      "checked_at": "2026-11-06T20:30:25Z",
+      "ok": 2990,
+      "temporary_timeouts": 17,
+      "excluded_after_history": 0,
+      "adult_ok": 183,
+      "adult_temporary_timeout": 1,
+      "minimum_measured_height_among_ok": 1080,
+      "history_rows": 3007,
+      "history_scope": "global",
+      "history_has_stream_urls": false,
+      "history_file": "diagnostics/iptv-availability-history.jsonl (локальный файл; исключён из Git)",
+      "csv_file": "release/qa/iptv-global-verify.csv (локальный отчёт; исключён из Git)"
+    },
+    "availability_policy": "17 одиночных временных таймаутов оставлены; исключение требует трёх неудач с интервалом не менее 24 часов"
   }
 }
