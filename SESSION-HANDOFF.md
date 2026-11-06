@@ -40,9 +40,9 @@
 ## Текущий итог сессии — 2026-11-06
 
 - Финальная полная сборка eMMC 0.4.0 выполнена после ограничения размеров чтения в `ota/tvbox-flash.c`; compile `-Werror` и build log без ошибок/предупреждений. OTA SHA-256 `715a1ee6280ef4fb0880837614eb54d138489c08bd3ddf18700de70be3ee5854`; clean-install SHA-256 `87ed2fe047f0f84abd2b088fbe311a2754632e8d2e35af0d183be838714d5243`; подписи и архивы проверены прежним сертификатом. 24 автотеста PASS. Артефакты локальны, релиза/тега нет.
-- Свежие IPTV/Links APK установлены горячим способом. IPTV и Links Activity запускаются; «Для взрослых» первая. Wi-Fi validated, ping шлюза 2/2; Ethernet без carrier. TorrServer endpoint доступен из Links UI. VLC remote 8080 отсутствует, Alice не установлена; RuStore phone/TV удалены из профиля пользователя.
+- Свежие IPTV/Links APK установлены горячим способом. IPTV и Links Activity запускаются; «Для взрослых» первая. Wi-Fi validated, ping шлюза 2/2; Ethernet без carrier. TorrServer endpoint доступен из Links UI. Кнопка выбора VLC в Links запускает VLC на передний план, но remote-порт 8080 не слушает. TorrServer endpoint отвечает; QR вторым устройством не сканировали. RuStore TV не открыл карточку Alice, мобильный RuStore блокирует использование на ТВ; Alice не установлена, оба магазина удалены.
 - IPTV-плейлист на приставке schema 4: 3008 уникальных URL, 48 UI-групп, 184 взрослых первыми; повторно доступны 2992 потока, 16 временно не ответили после недавнего успеха. Индексация 103,5 с. Полный HD видеокадр на TV/lag-free playback, torrent и graphics не подтверждены.
-- Кандидат не установлен: OTA recovery очищает данные и требует отдельного подтверждения. Dev gate не пройден; cold boot ≤10 с, boot log, QR VLC, Ethernet, IPTV visual playback, torrent, graphics и stress остаются pending. Образ сохраняет `ro.debuggable=1` и `androidboot.selinux=permissive`; security review fail. См. `docs/release-qa/0.4.0.json` и `REMAINING-GOALS.md`.
+- Кандидат не установлен: OTA recovery очищает данные и требует отдельного подтверждения. Dev gate не пройден; cold boot ≤10 с, boot log, VLC QR remote (8080), Ethernet, IPTV visual playback, torrent, graphics и stress остаются pending. Образ сохраняет `ro.debuggable=1` и `androidboot.selinux=permissive`; security review fail. См. `docs/release-qa/0.4.0.json` и `REMAINING-GOALS.md`.
 
 ## Состояние целевой приставки в этой сессии
 

@@ -108,7 +108,8 @@
       "iptv_activity_launch": "pass: ActivityManager completed launch in 1.14 seconds; category «Для взрослых» is first in UI",
       "links_activity_launch": "pass: ActivityManager completed launch in 0.50 seconds; TorrServer address UI reported service available",
       "crash_log_after_launch": "pass: no AndroidRuntime/TvboxIptv/TvboxLinks error rows in the sampled post-launch logcat window",
-      "vlc_remote_endpoint": "fail: TCP 8080 is not listening; VLC QR remote service is unavailable"
+      "vlc_remote_endpoint": "fail: TCP 8080 does not listen, so the displayed remote-control URL has no service behind it",
+      "vlc_qr_button": "pass: selecting VLC in Links reveals the button; pressing it brings org.videolan.vlc/org.videolan.television.ui.MainTvActivity to the foreground"
     },
     "network_live": {
       "wifi": "pass: Android ConnectivityService reports VALIDATED; gateway ICMP 2/2, 0% loss",
@@ -116,9 +117,10 @@
       "addresses_or_credentials_recorded": false
     },
     "temporary_store_cleanup": {
-      "ru_store_phone": "removed for user 0",
-      "ru_store_tv": "removed for user 0",
-      "alice": "not installed"
+      "ru_store_phone": "removed for user 0 after temporary official-source check",
+      "ru_store_tv": "removed for user 0 after temporary official-source check",
+      "alice": "not installed",
+      "official_source_attempt": "RuStore TV catalog detail route returned an error; mobile RuStore reports its build is unsuitable for TV. No Alice APK was downloaded or installed."
     }
   },
   "cold_boot_seconds": null,
@@ -132,7 +134,7 @@
     "cold_boot_le_10s": "pending",
     "boot_log_review": "pending",
     "security_review": "fail",
-    "qr_vlc": "fail: VLC remote endpoint 8080 is not listening; button launch must still be confirmed in the UI",
+    "qr_vlc": "fail: launch button opens VLC on the box, but remote endpoint TCP 8080 is not listening",
     "wired_network": "pending: Ethernet interface has no carrier",
     "wifi_network": "pass: validated Wi-Fi connection and gateway ping 2/2",
     "iptv_playback": "pending: activity/index pass, but visible video frame and no-lag criterion are unconfirmed",
@@ -144,8 +146,10 @@
     "device_update": "pending: OTA is not installed; installation clears user data and needs separate confirmation",
     "iptv_activity_launch": "pass",
     "links_activity_launch": "pass",
-    "ru_store_absent": "pass: both temporary packages uninstalled for user 0",
-    "alice_voice": "pending"
+    "ru_store_absent": "pass: both temporary RuStore packages removed for user 0 after lookup",
+    "alice_voice": "pending: official RuStore TV listing failed and the mobile store build refused TV use; no APK installed",
+    "qr_vlc_launch_button": "pass: selected VLC QR service launches VLC on the box",
+    "qr_torrserver_endpoint": "pass: Links UI reports TorrServer endpoint available; QR scan from a second device not performed"
   },
   "log_analysis": {
     "reviewed": true,
@@ -160,7 +164,8 @@
     },
     "post_hot_apk_launch": {
       "android_runtime_crashes": 0,
-      "scope": "1500 most recent logcat rows filtered to AndroidRuntime, TvboxIptv and TvboxLinks; apps launched successfully"
+      "scope": "1500 most recent logcat rows filtered to AndroidRuntime, TvboxIptv and TvboxLinks; apps launched successfully",
+      "vlc_button": "VLC foreground activity observed after pressing the selected-service launch button"
     }
   },
   "candidate_build": {
