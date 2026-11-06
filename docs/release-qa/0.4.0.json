@@ -156,7 +156,7 @@
   "last_reboot_to_screen_seconds": 75,
   "automated_tests": {
     "status": "pass",
-    "count": 26,
+    "count": 27,
     "command": "python3 -m unittest discover -s tests -v"
   },
   "checks": {
@@ -171,7 +171,7 @@
     "graphics_video": "pending",
     "graphics_stress": "pending",
     "swap_disabled": "pass",
-    "ota_build": "pass: eMMC 0.4.0 rebuilt from 39a5db0 with measured-segment-only IPTV quality gate; 26 automated tests; build log 0/0/0; OTA CMS and clean-install detached signatures verified with existing project certificate; ZIP integrity checked; embedded M3U hash verified against measured playlist",
+    "ota_build": "pass: eMMC 0.4.0 rebuilt from 39a5db0 with measured-segment-only IPTV quality gate; 27 automated tests; build log 0/0/0; OTA CMS and clean-install detached signatures verified with existing project certificate; ZIP integrity checked; embedded M3U hash verified against measured playlist",
     "device_update": "pending: новая сборка подготовлена; OTA сценарий в приложении требует очистки данных, отдельного согласия пользователя нет",
     "iptv_activity_launch": "pass",
     "links_activity_launch": "pass",
@@ -183,7 +183,7 @@
   "log_analysis": {
     "reviewed": true,
     "untriaged_errors": 1,
-    "summary": "В полном окне 10003 строк: одна ошибка EGL в Obtainium воспроизводится при запуске, но экран списка приложений отрисовался; оценка плавности остаётся pending. Три строки wl_run_escan LEGACY_SCAN sync ID отнесены к служебным по исходнику Broadcom; фактические Escan set error отсутствуют. Остались предупреждения FunctionFS (751 за 13 минут), RSN cipher (16), modem stats (1). После временного изменения USB gadget профиля ADB перестал отвечать; требуется перезагрузка и повторная диагностика. IPTV на живой 0.3.9: 3008 каналов, 53 русские группы, 184 канала 18+ первыми, индекс 101.5 с. Кадр Full HD и отсутствие лагов не доказаны. Wi-Fi был validated до смены профиля; Ethernet без carrier. QR VLC remote порт 8080 не слушает. eMMC 0.4.0 локально пересобрана из 39a5db0, 26 тестов PASS; встроенный M3U содержит 3007 измеренных потоков 1080p+ и совпал с локально проверенным файлом, сборка/тестовые журналы чистые. Кандидат локальный и не установлен. SELinux permissive/ro.debuggable=1; cold boot, торрент и графический стресс остаются непроверенными.",
+    "summary": "В полном окне 10003 строк: одна ошибка EGL в Obtainium воспроизводится при запуске, но экран списка приложений отрисовался; оценка плавности остаётся pending. Три строки wl_run_escan LEGACY_SCAN sync ID отнесены к служебным по исходнику Broadcom; фактические Escan set error отсутствуют. Остались предупреждения FunctionFS (751 за 13 минут), RSN cipher (16), modem stats (1). После временного изменения USB gadget профиля ADB перестал отвечать; требуется перезагрузка и повторная диагностика. IPTV на живой 0.3.9: 3008 каналов, 53 русские группы, 184 канала 18+ первыми, индекс 101.5 с. Кадр Full HD и отсутствие лагов не доказаны. Wi-Fi был validated до смены профиля; Ethernet без carrier. QR VLC remote порт 8080 не слушает. eMMC 0.4.0 локально пересобрана из 39a5db0, 27 тестов PASS; встроенный M3U содержит 3007 измеренных потоков 1080p+ и совпал с локально проверенным файлом, сборка/тестовые журналы чистые. Кандидат локальный и не установлен. SELinux permissive/ro.debuggable=1; cold boot, торрент и графический стресс остаются непроверенными.",
     "build_log": {
       "lines": 94,
       "critical": 0,

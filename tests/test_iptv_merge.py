@@ -122,6 +122,13 @@ class IptvCategoryTests(unittest.TestCase):
              mock.patch.object(MERGE, "probe_segment_resolution", return_value=0):
             self.assertEqual(MERGE.stream_resolution("https://example.invalid/master.m3u8"), 0)
 
+    def test_unknown_transport_stream_resolution_is_not_replaced_by_url_label(self):
+        with mock.patch.object(MERGE, "fetch", return_value=(
+                200, "video/mp2t", b"unrecognized transport stream",
+                "https://example.invalid/channel-2160p.ts")), \
+             mock.patch.object(MERGE, "probe_segment_resolution", return_value=0):
+            self.assertEqual(MERGE.stream_resolution("https://example.invalid/channel-2160p.ts"), 0)
+
     def test_verified_quality_label_replaces_conflicting_source_label(self):
         entry = {"name": "Channel (720p)", "attrs": {}}
         MERGE.label_verified_quality(entry, 1080)
