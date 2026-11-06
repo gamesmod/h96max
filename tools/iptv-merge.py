@@ -163,6 +163,11 @@ def dedupe(entries):
         seen |= keys; out.append(e)
     return out
 
+def playlist_sort_key(entry):
+    """Ключ сортировки: 18+ первой, затем категории и каналы по названию."""
+    group = entry["attrs"].get("group-title", "") or "яяя"
+    return (0 if group == "Для взрослых" else 1, group.casefold(), entry["name"].casefold())
+
 def logo_ok(url):
     try:
         st, ct, body, _ = fetch(url, limit=4096)
@@ -239,8 +244,7 @@ def main():
         if best: out.append(best)
     out = dedupe(out)
     # Категорию 18+ ставим первой, остальные группы и каналы упорядочиваем по-русски.
-    out.sort(key=lambda e: (0 if e["attrs"].get("group-title") == "Для взрослых" else 1,
-                            e["attrs"].get("group-title", "") or "яяя", e["name"].lower()))
+    out.sort(key=playlist_sort_key)
     write(out, a.out)
     print(f"written {len(out)} channels -> {a.out}", file=sys.stderr)
 

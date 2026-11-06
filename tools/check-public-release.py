@@ -35,6 +35,10 @@ def main():
             urls.append(fields[0])
     if args.playlist:
         entries = MERGE.parse(pathlib.Path(args.playlist).read_text(encoding="utf-8", errors="replace"))
+        groups = list(dict.fromkeys(entry["attrs"].get("group-title", "") for entry in entries))
+        if groups and groups[0] != "Для взрослых":
+            print("Ошибка: категория «Для взрослых» должна быть первой в общем плейлисте", file=sys.stderr)
+            return 1
         for entry in entries:
             urls.extend((entry["url"], entry["attrs"].get("tvg-logo", "")))
         adult_count = sum(entry["attrs"].get("group-title") == "Для взрослых" for entry in entries)
