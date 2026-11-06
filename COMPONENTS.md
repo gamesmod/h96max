@@ -21,7 +21,7 @@
 | `com.tvlauncher` (TV Launcher) | 1.6.2 | [F-Droid APK](https://f-droid.org/repo/com.tvlauncher_10602.apk); [исходники](https://github.com/wiiguy/lightweight_androidtv_launcher) | `7afde83f96ccf30d1bc69ca06692d385800d2d9a14dd5f7d85fb4ad4f3c5c210` | `9e9f185a5b3cfb6ff65ac2907d3180c150483705ba129787c60667088647a767` |
 | `org.maintainteam.hypatia` (Hypatia, антивирус-движок) | 3.18 | https://apt.izzysoft.de/fdroid/repo/org.maintainteam.hypatia_318.apk (IzzyOnDroid) | `d0e31c8dbb338e61220373be61ee524c8476f39aa2d59517984fe45c5e7576c3` | `1b008d64bb95ab4774d68b87f22b8be9a272f4924df52029d7e6183835d918cc` |
 | `org.smarttube.stable` (SmartTube) | 32.68 | https://github.com/yuliskov/SmartTube/releases (файл `smarttube_stable.apk`, релиз 32.68) | `45a36e62110bcb866527ba8e9ab876f4122e1143647bbd0a97362d13803f6b94` | `109735aa24fe85e2e1623ebb3b1ecc4bf4263f4c6374e4411d646bfa2eda482a` |
-| Total Commander + LAN/FTP/SFTP/WiFi Transfer | 3.62d / 3.60 / 3.0 / 2.94 / 4.5 | https://raw.githubusercontent.com/chrisgch/tca/master/fdroid/repo (репозиторий разработчика) | см. apps-sources.md | `e50eb216a57d5eb0b1e67802e783df7b587bdbdc379e3e296f89b49ed32f00fd` (требуемый) |
+| Total Commander + LAN/FTP/SFTP | 3.62d / 3.60 / 3.0 / 2.94 | https://raw.githubusercontent.com/chrisgch/tca/master/fdroid/repo (репозиторий разработчика) | см. apps-sources.md | `e50eb216a57d5eb0b1e67802e783df7b587bdbdc379e3e296f89b49ed32f00fd` (требуемый) |
 
 Совпадение VLC, TorrServe, TV Launcher, Pixel Wheels с F-Droid проверено по sha256 против **подписанного**
 индекса https://f-droid.org/repo/index-v1.jar (подпись JAR проверена, ключ репозитория `43238d51…9c9ccab`).

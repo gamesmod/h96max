@@ -27,12 +27,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/** One full-size QR at a time, with explicit service and network address selection. */
+/** Показывает один QR-код за раз с выбором службы и сетевого интерфейса. */
 public class MainActivity extends Activity {
     static final String[][] SERVICES = {
         {"TorrServer", "8090", ""},
-        {"VLC — удалённый доступ", "8080", "org.videolan.vlc"},
-        {"Total Commander", "", "com.ghisler.android.TotalCommander"}
+        {"VLC — удалённый доступ", "8080", "org.videolan.vlc"}
     };
     final List<String[]> addresses = new ArrayList<>(), services = new ArrayList<>();
     Spinner network, service;
@@ -69,7 +68,7 @@ public class MainActivity extends Activity {
         url = text("", 26, 0xFF4FC3F7);
         url.setTextIsSelectable(true);
         root.addView(url);
-        TextView help = text("Телефон должен видеть выбранную сеть. Для TorrServer укажите этот адрес как сервер. Total Commander сам покажет QR для Wi‑Fi Transfer.", 16, 0xFFB0BEC5);
+        TextView help = text("QR содержит адрес выбранной службы. Его открывает приложение на устройстве, которое сканирует код. Для VLC нужен включённый удалённый интерфейс.", 16, 0xFFB0BEC5);
         root.addView(help);
         setContentView(root);
         AdapterView.OnItemSelectedListener change = new AdapterView.OnItemSelectedListener() {
@@ -117,11 +116,11 @@ public class MainActivity extends Activity {
         final String host=addresses.get(n)[1], port=services.get(s)[1];
         final String pkg=services.get(s)[2];
         launch.setVisibility(pkg.isEmpty() ? View.GONE : View.VISIBLE);
-        launch.setText("Запустить " + (pkg.equals("org.videolan.vlc") ? "VLC" : "Total Commander") + " на приставке");
+        launch.setText("Запустить VLC на приставке");
         if (port.isEmpty()) {
-            url.setText("Откройте в Total Commander → WiFi Transfer");
+            url.setText("У службы нет сетевого адреса");
             image.setImageDrawable(null);
-            hint.setText("Плагин Total Commander запустит передачу и покажет актуальный QR-код.");
+            hint.setText("Выберите службу с доступным сетевым адресом.");
             return;
         }
         final String link="http://"+host+":"+port+"/";
@@ -129,7 +128,7 @@ public class MainActivity extends Activity {
         int size=Math.min(image.getWidth(),image.getHeight())-dp(16);
         if(size>0) {
             Bitmap bitmap=qr(link,size);
-            // DENSITY_NONE prevents a second scale at non-mdpi TV density.
+            // DENSITY_NONE отключает повторное масштабирование при плотности экрана, отличной от mdpi.
             bitmap.setDensity(Bitmap.DENSITY_NONE);
             android.graphics.drawable.BitmapDrawable d=new android.graphics.drawable.BitmapDrawable(getResources(),bitmap);
             d.setFilterBitmap(false); d.setAntiAlias(false);
@@ -146,7 +145,7 @@ public class MainActivity extends Activity {
         } }).start();
     }
 
-    /** Запускает выбранное локальное приложение, не подменяя его сетевой адрес ссылкой из QR. */
+    /** Запускает локальное приложение службы, адрес которой показан в QR. */
     void launchSelectedApp() {
         int s = service.getSelectedItemPosition();
         if (s < 0 || s >= services.size()) return;
@@ -158,8 +157,8 @@ public class MainActivity extends Activity {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             hint.setText(pkg.equals("org.videolan.vlc")
-                    ? "VLC запущен на приставке. QR работает, если удалённый HTTP-интерфейс VLC доступен по порту 8080."
-                    : "Total Commander запущен. Откройте в нём WiFi Transfer — плагин покажет QR с действующим адресом.");
+                    ? "VLC запущен на приставке. QR ведёт к удалённому интерфейсу VLC; он должен быть включён в настройках VLC."
+                    : "Приложение не удалось запустить.");
         } catch (Exception e) {
             Toast.makeText(this, "Приложение не установлено: " + pkg, Toast.LENGTH_LONG).show();
         }

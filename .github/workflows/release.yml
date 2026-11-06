@@ -23,7 +23,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y aapt attr curl e2fsprogs gcc-aarch64-linux-gnu gdisk git-lfs openssl python3 python3-pil unzip zip zstd
+          sudo apt-get install -y aapt attr curl e2fsprogs ffmpeg gcc-aarch64-linux-gnu gdisk git-lfs openssl python3 python3-pil unzip zip zstd
           if [ -n "${ANDROID_HOME:-}" ]; then sudo rm -rf "$ANDROID_HOME"; fi
           sudo apt-get clean
           df -h /

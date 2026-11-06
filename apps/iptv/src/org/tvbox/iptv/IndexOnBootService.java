@@ -37,7 +37,7 @@ public class IndexOnBootService extends Service {
         // Сразу переводим службу в foreground: Android 12 завершает её, если уведомление запаздывает.
         startForeground(NOTIFICATION_ID, notification("Подготавливаю список ТВ-каналов", 0, 1, 0));
         if (worker != null && worker.isAlive()) return START_NOT_STICKY;
-        final File playlist = new File(MainActivity.BUNDLED);
+        final File playlist = MainActivity.playlistFile(this);
         final long size = playlist.length(), modified = playlist.lastModified();
         final android.content.SharedPreferences prefs = getSharedPreferences("iptv_index", MODE_PRIVATE);
         if (!playlist.isFile() || size == 0) {
@@ -149,10 +149,11 @@ public class IndexOnBootService extends Service {
 
     static String normalize(String name) {
         String n = Normalizer.normalize(name.toLowerCase(Locale.ROOT).replace('ё', 'е'), Normalizer.Form.NFD)
+                .replaceAll("(?i)\\s*\\(\\s*\\d+\\s*\\)\\s*$|\\s+[+-]\\s*\\d+\\s*$", " ")
                 .replaceAll("(?i)\\[(?:hd|fhd|uhd|4k|sd|hq|\\d{3,4}p|50\\s?fps|60\\s?fps)\\]|\\((?:hd|fhd|uhd|4k|sd|hq|\\d{3,4}p|50\\s?fps|60\\s?fps)\\)", " ")
                 .replaceAll("(?i)(?<![\\p{L}\\p{N}])(?:hd|fhd|uhd|4k|sd|hq|\\d{3,4}p|50\\s?fps|60\\s?fps|hevc|h\\.?265|backup|резерв)(?![\\p{L}\\p{N}])", " ")
                 .replaceAll("\\p{M}", "");
-        return n.replaceAll("[^\\p{L}\\p{N}]", "");
+        return n.replaceAll("[^\\p{L}\\p{N}+]", "");
     }
 
     Notification notification(String text, int progress, int total, int left) {

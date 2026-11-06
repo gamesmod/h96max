@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Merge IPTV playlists into one checked list for the "ТВ-каналы" tile (apps/iptv).
 
-  python3 -I tools/iptv-merge.py [--sources tools/iptv-sources.txt] [--out overlay/.../iptv.m3u] [--keep-adult]
+  python3 -I tools/iptv-merge.py [--sources tools/iptv-sources.txt] [--out overlay/.../iptv.m3u]
 
 Rules (user, 2026-10-27): no duplicates, every channel has a working logo, every stream answers from this network.
 - sources: "group=NAME" filters a category; "set-group=NAME" assigns one; order = priority.
@@ -9,14 +9,16 @@ Rules (user, 2026-10-27): no duplicates, every channel has a working logo, every
 - stream: HTTP 200; HLS is followed master -> first variant -> first segment (all must answer 200).
 - duplicates: same stream URL, or the same normalized name (case, HD/FHD/4K/SD/50fps/orig/[..]/(..) dropped);
   the first working entry in source order wins. Adult channels are included in the main playlist by default;
-  --exclude-adult removes them.
+  --exclude-adult removes them. Детские категории и явно помеченные детские каналы всегда исключаются.
 Downloads are only parsed, never executed. Network: VLC user agent, short timeouts, 48 parallel checks.
 """
-import argparse, concurrent.futures as cf, re, sys, urllib.parse, urllib.request
+import argparse, concurrent.futures as cf, re, shlex, shutil, subprocess, sys, urllib.parse, urllib.request
 
 UA = "VLC/3.0.20 LibVLC/3.0.20"
 ADULT = re.compile(r"18\+|xxx|adult|эрот|взросл|для взрослых|playboy|brazzers|hustler|private|redlight|blue hustler|секс|sex", re.I)
+CHILD_CHANNEL = re.compile(r"\b(?:kids?|children?|cartoons?|animation|boomerang|nick(?:elodeon)?|junior|baby|disney)\b|дет(?:ские|ский|ям)|мульт(?:фильм|иман|ик)|теленян|мультиланд|дисней", re.I)
 QUAL = re.compile(r"(?<![\w])(?:hd|fhd|uhd|4k|sd|hq|orig(?:inal)?|50\s?fps|60\s?fps|\d{3,4}p|h\.?265|hevc|backup|резерв)(?![\w])", re.I)
+RESOLUTION = re.compile(r"(?<!\d)(\d{3,4})\s*p?(?!\d)", re.I)
 
 def fetch(url, limit=262144, timeout=8, rng=False):
     h = {"User-Agent": UA}
@@ -39,30 +41,50 @@ def parse(text, only_group=None):
         elif line and not line.startswith("#") and cur is not None:
             cur["url"], cur["opts"] = line, opts
             if not only_group or cur["attrs"].get("group-title", "") == only_group:
-                cur["attrs"]["group-title"] = normalize_group(cur["attrs"].get("group-title", ""))
+                cur["attrs"]["group-title"] = normalize_group(cur["attrs"].get("group-title", ""), cur["name"])
                 out.append(cur)
             cur = None
     return out
 
-def normalize_group(group):
+def normalize_group(group, channel_name=""):
     """Свести варианты категорий к единому русскому названию."""
     value = re.sub(r"[^a-zа-яё0-9+]+", " ", (group or "").lower()).strip()
     value = value.replace("ё", "е")
     if not value:
-        return "Прочее"
+        value = ""
     rules = (
         (r"18\+|xxx|adult|эрот|взросл|playboy|brazzers|hustler|private|redlight|sex|секс", "Для взрослых"),
-        (r"sport|спорт", "Спорт"),
-        (r"news|новост|информац", "Новости"),
         (r"kid|child|cartoon|дет|мульт", "Детские"),
+        (r"football|soccer|футбол", "Спорт · Футбол"),
+        (r"hockey|хоккей", "Спорт · Хоккей"),
+        (r"tennis|теннис", "Спорт · Теннис"),
+        (r"basketball|баскетбол", "Спорт · Баскетбол"),
+        (r"racing|motorsport|автоспорт|гонк", "Спорт · Автоспорт"),
+        (r"series|serial|сериал", "Фильмы · Сериалы"),
         (r"movie|film|cinema|кино|фильм", "Фильмы"),
+        (r"world|international|мир|международ", "Новости · Мир"),
+        (r"business|эконом|финанс", "Новости · Экономика"),
+        (r"news|новост|информац", "Новости"),
         (r"music|музык", "Музыка"),
-        (r"document|science|education|познав|документ|науч|образоват", "Познавательные"),
+        (r"science|науч", "Познавательные · Наука"),
+        (r"nature|wildlife|природ|животн", "Познавательные · Природа"),
+        (r"history|истори", "Познавательные · История"),
+        (r"document|education|познав|документ|образоват", "Познавательные"),
+        (r"religious|religion|spiritual|церк|религи|духов", "Религиозные"),
+        (r"auto|automotive|авто|автомоб", "Авто"),
+        (r"cooking|food|кулин|рецепт", "Кулинария"),
+        (r"outdoor|hunting|fishing|охот|рыбалк", "Отдых · Природа"),
+        (r"travel|туризм|путешеств", "Путешествия"),
+        (r"legislative|government|parliament|государств|парламент", "Государственные"),
+        (r"culture|культур", "Культура"),
+        (r"comedy|humor|юмор|комед", "Юмор"),
         (r"radio|радио", "Радио"),
         (r"entertain|развлек", "Развлекательные"),
+        (r"sport|спорт", "Спорт"),
+        (r"general|undefined|основн|общие", "Общие"),
     )
     for pattern, title in rules:
-        if re.search(pattern, value):
+        if value and re.search(pattern, value):
             return title
 
     # Региональные группы получают русское название и флаг страны; топонимы областей и штатов сохраняются.
@@ -113,28 +135,72 @@ def normalize_group(group):
 
     countries = (
         (r"^(?:ru|russia|russian|россия|российские|русские)$", "🇷🇺 Россия"),
-        (r"^(?:by|belarus|belarussian|беларусь|белоруссия)$", "🇧🇾 Беларусь"),
-        (r"^(?:ua|ukraine|ukrainian|украина)$", "🇺🇦 Украина"),
-        (r"^(?:kz|kazakhstan|казахстан)$", "🇰🇿 Казахстан"),
+        (r"^(?:by|belarus|belarussian|беларусь|белоруссия|беларускіе)$", "🇧🇾 Беларусь"),
+        (r"^(?:ua|ukraine|ukrainian|украина|українські)$", "🇺🇦 Украина"),
+        (r"^(?:kz|kazakhstan|казахстан|қазақстан)$", "🇰🇿 Казахстан"),
         (r"^(?:us|usa|united states|america|сша|соединенные штаты)$", "🇺🇸 США"),
         (r"^(?:gb|uk|united kingdom|great britain|британия|великобритания)$", "🇬🇧 Великобритания"),
         (r"^(?:ca|canada|канада)$", "🇨🇦 Канада"),
         (r"^(?:de|germany|german|германия)$", "🇩🇪 Германия"),
         (r"^(?:fr|france|франция)$", "🇫🇷 Франция"),
-        (r"^(?:tr|turkey|turkiye|турция)$", "🇹🇷 Турция"),
+        (r"^(?:tr|turkey|turkiye|турция|türk)$", "🇹🇷 Турция"),
         (r"^(?:kg|kyrgyzstan|кыргызстан|киргизия)$", "🇰🇬 Кыргызстан"),
         (r"^(?:uz|uzbekistan|узбекистан)$", "🇺🇿 Узбекистан"),
         (r"^(?:am|armenia|армения)$", "🇦🇲 Армения"),
         (r"^(?:az|azerbaijan|азербайджан)$", "🇦🇿 Азербайджан"),
         (r"^(?:ge|georgia|грузия)$", "🇬🇪 Грузия"),
-        (r"^(?:md|moldova|молдова)$", "🇲🇩 Молдова"),
+        (r"^(?:md|moldova|moldovenească|молдова|молдавия)$", "🇲🇩 Молдова"),
+        (r"^(?:ro|romania|румыния)$", "🇷🇴 Румыния"),
+        (r"^(?:il|israel|израиль|ישראלי)$", "🇮🇱 Израиль"),
+        (r"^(?:in|india|индия)$", "🇮🇳 Индия"),
+        (r"^(?:pl|poland|польша)$", "🇵🇱 Польша"),
+        (r"^(?:se|sweden|швеция)$", "🇸🇪 Швеция"),
+        (r"^(?:it|italy|италия)$", "🇮🇹 Италия"),
+        (r"^(?:uz|uzbekistan|узбекистан)$", "🇺🇿 Узбекистан"),
+        (r"^(?:lv|latvia|латвия)$", "🇱🇻 Латвия"),
+        (r"^(?:lt|lithuania|литва)$", "🇱🇹 Литва"),
+        (r"^(?:az|azerbaijan|азербайджан|azərbaycan)$", "🇦🇿 Азербайджан"),
+        (r"^(?:ae|uae|united arab emirates|оаэ)$", "🇦🇪 ОАЭ"),
+        (r"^(?:br|brazil|бразилия)$", "🇧🇷 Бразилия"),
+        (r"^(?:pt|portugal|португалия)$", "🇵🇹 Португалия"),
+        (r"^(?:tj|tajikistan|таджикистан)$", "🇹🇯 Таджикистан"),
+        (r"^(?:ee|estonia|эстония)$", "🇪🇪 Эстония"),
+        (r"^(?:cz|czechia|czech republic|чехия)$", "🇨🇿 Чехия"),
+        (r"^(?:bg|bulgaria|болгария)$", "🇧🇬 Болгария"),
+        (r"^(?:dk|denmark|дания)$", "🇩🇰 Дания"),
+        (r"^(?:no|norway|норвегия)$", "🇳🇴 Норвегия"),
+        (r"^(?:sk|slovakia|словакия)$", "🇸🇰 Словакия"),
+        (r"^(?:kr|south korea|korea|южная корея|корея)$", "🇰🇷 Южная Корея"),
+        (r"^(?:au|australia|австралия)$", "🇦🇺 Австралия"),
+        (r"^(?:eu|europe|европа)$", "🌍 Европа"),
     )
     for pattern, title in countries:
-        if re.fullmatch(pattern, value):
+        # Некоторые списки записывают сразу два языка, например «Germany | Германия».
+        alias_pattern = pattern.removeprefix("^").removesuffix("$")
+        if re.search(r"(?<!\w)(?:" + alias_pattern + r")(?!\w)", value):
             return title
-    if re.search(r"regional|local|регион|местн", value):
+    if value and re.search(r"regional|local|регион|местн", value):
         return "Региональные"
-    return "Прочее"
+    # У источников с пустой/непонятной группой осторожно выводим тему из названия.
+    title = re.sub(r"\[[^\]]*\]|\([^)]*\)", " ", (channel_name or "").lower())
+    inferred = (
+        (r"18\+|xxx|adult|эрот|взросл|porn|sex|секс", "Для взрослых"),
+        (r"football|soccer|футбол", "Спорт · Футбол"),
+        (r"hockey|хоккей", "Спорт · Хоккей"),
+        (r"sport|sports|спорт|матч", "Спорт"),
+        (r"news|новост|24\s*час", "Новости"),
+        (r"music|музык|radio|радио|мтв|mtv", "Музыка"),
+        (r"movie|film|cinema|кино|фильм|serial|сериал", "Фильмы"),
+        (r"documentary|science|nature|history|познав|документ|науч|природ|истори", "Познавательные"),
+        (r"kids?|cartoon|junior|baby|дет|мульт", "Детские"),
+        (r"religious|religion|church|церк|религи", "Религиозные"),
+        (r"cooking|food|кулин|рецепт", "Кулинария"),
+        (r"auto|авто", "Авто"),
+    )
+    for pattern, category in inferred:
+        if re.search(pattern, title):
+            return category
+    return "Общие" if not value else "Прочее"
 
 TR = str.maketrans({"а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ж": "zh", "з": "z", "и": "i", "й": "y",
                     "к": "k", "л": "l", "м": "m", "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",
@@ -146,6 +212,8 @@ def norm(name):
     common spelling variants folded (kh/h, iy/y, ts/c), spaces dropped."""
     # Удаляем обозначения качества до скобок, чтобы «Канал (HD)» и «Канал 1080p» совпадали.
     n = name.lower().replace("ё", "е")
+    # Сдвиги времени и копии в скобках относятся к тому же каналу; плюс в бренде сохраняется.
+    n = re.sub(r"\s*\(\s*\d+\s*\)\s*$|\s+[+-]\s*\d+\s*$", " ", n)
     n = re.sub(r"\[[^\]]*\]|\([^)]*\)", lambda m: " " if QUAL.search(m.group(0)) else m.group(0), n)
     n = QUAL.sub(" ", n).translate(TR)
     n = re.sub(r"[^\w+]+", "", n)
@@ -153,15 +221,70 @@ def norm(name):
         n = n.replace(a, b)
     return n
 
+def resolution(entry):
+    """Вернуть минимальную известную вертикальную развёртку потока в пикселях."""
+    values = []
+    for value in (entry.get("name", ""), entry.get("attrs", {}).get("tvg-name", ""), entry.get("url", "")):
+        values.extend(int(m.group(1)) for m in RESOLUTION.finditer(value) if int(m.group(1)) >= 240)
+    for opt in entry.get("opts", []):
+        values.extend(int(m.group(1)) for m in RESOLUTION.finditer(opt) if int(m.group(1)) >= 240)
+    return max(values, default=0)
+
+def hls_variant_resolution(text):
+    """Извлечь наибольшую RESOLUTION из master-playlist HLS."""
+    values = [int(m.group(1)) for m in re.finditer(r"RESOLUTION\s*=\s*\d+x(\d+)", text, re.I)]
+    return max(values, default=0)
+
+def probe_segment_resolution(data):
+    """Прочитать разрешение из ограниченного буфера MPEG-TS через ffprobe."""
+    probe = shutil.which("ffprobe")
+    if not probe or not data:
+        return 0
+    try:
+        result = subprocess.run(
+            [probe, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
+             "-of", "csv=s=x:p=0", "-i", "pipe:0"],
+            input=data, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=8, check=False)
+        match = re.search(rb"\d+x(\d+)", result.stdout)
+        return int(match.group(1)) if result.returncode == 0 and match else 0
+    except (OSError, subprocess.TimeoutExpired):
+        return 0
+
+def quality_ok(entry):
+    """Не принимать поток, пока разрешение 1080 строк не подтверждено."""
+    return resolution(entry) >= 1080 or entry.get("verified_resolution", 0) >= 1080
+
+def label_verified_quality(entry, height):
+    """Показать измеренное качество в имени, удалив конфликтующие исходные метки."""
+    name = QUAL.sub(" ", entry.get("name", ""))
+    name = re.sub(r"\(\s*\)|\[\s*\]", " ", name)
+    name = re.sub(r"\s+", " ", name).strip()
+    label = "4K" if height >= 2160 else f"{height}p"
+    entry["name"] = f"{name} ({label})"
+
 def dedupe(entries):
     """Keep the first entry per normalized name and per tvg-id (entries are already in priority order)."""
     seen, out = set(), []
     for e in entries:
-        keys = {"n:" + norm(e["name"])}
+        keys = {"n:" + norm(e["name"]), "u:" + e.get("url", "")}
         if e["attrs"].get("tvg-id"): keys.add("i:" + e["attrs"]["tvg-id"].lower())
         if keys & seen: continue
         seen |= keys; out.append(e)
     return out
+
+def is_child_channel(entry):
+    """Исключить детскую категорию и каналы, явно помеченные как детские."""
+    group = entry.get("attrs", {}).get("group-title", "")
+    name = entry.get("name", "")
+    category = normalize_group(group)
+    if category == "Для взрослых":
+        return False
+    return category == "Детские" or bool(CHILD_CHANNEL.search(group + " " + name))
+
+def parse_source_line(line):
+    """Разбирает строку источника с поддержкой пробелов в кавычках у параметров групп."""
+    parts = shlex.split(line)
+    return (parts[0], parts[1:]) if parts else None
 
 def playlist_sort_key(entry):
     """Ключ сортировки: 18+ первой, затем категории и каналы по названию."""
@@ -175,24 +298,46 @@ def logo_ok(url):
     except Exception:
         return False
 
-def stream_ok(url):
+def stream_resolution(url):
+    """Проверить поток и вернуть подтверждённое разрешение; 0 означает неизвестно/ниже порога."""
     try:
         st, ct, body, final = fetch(url)
-        if st not in (200, 206): return False
+        if st not in (200, 206): return 0
         if b"#EXTM3U" not in body[:1024]:
-            return "mpegurl" not in ct.lower() and len(body) > 0          # plain TS/other stream
+            observed = probe_segment_resolution(body)
+            return observed or resolution({"name": "", "attrs": {}, "url": final, "opts": []})
         lines = [l.strip() for l in body.decode("utf-8", "replace").splitlines()]
-        if any(l.startswith("#EXT-X-STREAM-INF") for l in lines):       # master -> first variant
-            v = next(l for i, l in enumerate(lines) if i and lines[i - 1].startswith("#EXT-X-STREAM-INF") and l and not l.startswith("#"))
+        if any(l.startswith("#EXT-X-STREAM-INF") for l in lines):       # master -> лучший описанный вариант
+            variants = []
+            for i, line in enumerate(lines):
+                if not line.startswith("#EXT-X-STREAM-INF"):
+                    continue
+                uri = next((item for item in lines[i + 1:] if item and not item.startswith("#")), None)
+                if not uri: continue
+                height = hls_variant_resolution(line)
+                bandwidth = int(re.search(r"BANDWIDTH=(\d+)", line).group(1)) if re.search(r"BANDWIDTH=(\d+)", line) else 0
+                if height > 0: variants.append((height, bandwidth, uri))
+            if not variants: return 0
+            height, _, v = max(variants)
             st, ct, body, final = fetch(urllib.parse.urljoin(final, v))
-            if st not in (200, 206) or b"#EXTM3U" not in body[:1024]: return False
+            if st not in (200, 206) or b"#EXTM3U" not in body[:1024]: return 0
             lines = [l.strip() for l in body.decode("utf-8", "replace").splitlines()]
+        else:
+            height = 0
+        if not height:
+            height = hls_variant_resolution("\n".join(lines))
         seg = next((l for l in lines if l and not l.startswith("#")), None)
-        if not seg: return False
+        if not seg: return 0
         st, _, data, _ = fetch(urllib.parse.urljoin(final, seg), limit=65536, rng=True)
-        return st in (200, 206) and len(data) > 0
+        if st not in (200, 206) or not data: return 0
+        observed = probe_segment_resolution(data)
+        return observed or height
     except Exception:
-        return False
+        return 0
+
+def stream_ok(url):
+    """Совместимая булева обёртка проверки доступности и порога 1080p."""
+    return stream_resolution(url) >= 1080
 
 def main():
     ap = argparse.ArgumentParser()
@@ -203,15 +348,18 @@ def main():
     a = ap.parse_args()
     if a.dedupe_file:
         ent = parse(open(a.dedupe_file, encoding="utf-8").read())
-        out = dedupe(ent)
+        filtered = [e for e in ent if not is_child_channel(e)]
+        out = dedupe(filtered)
         write(out, a.dedupe_file)
-        print(f"dedupe: {len(ent)} -> {len(out)} channels", file=sys.stderr)
+        print(f"dedupe and child filter: {len(ent)} -> {len(out)} channels", file=sys.stderr)
         return
     entries = []
     for line in open(a.sources, encoding="utf-8"):
         line = line.strip()
         if not line or line.startswith("#"): continue
-        url, *opt = line.split()
+        parsed = parse_source_line(line)
+        if not parsed: continue
+        url, opt = parsed
         grp = next((o[6:] for o in opt if o.startswith("group=")), None)
         set_grp = next((o[10:] for o in opt if o.startswith("set-group=")), None)
         try:
@@ -225,6 +373,9 @@ def main():
         entries += got
     total = len(entries)
     entries = [e for e in entries if e["name"] and e["attrs"].get("tvg-logo", "").startswith("http")]
+    before_children = len(entries)
+    entries = [e for e in entries if not is_child_channel(e)]
+    print(f"детские каналы исключены: {before_children - len(entries)}", file=sys.stderr)
     if a.exclude_adult:
         entries = [e for e in entries if not ADULT.search(e["name"] + " " + e["attrs"].get("group-title", ""))]
     print(f"entries {total}, with name+logo{', excluding adult' if a.exclude_adult else ', adult included'}: {len(entries)}", file=sys.stderr)
@@ -237,11 +388,14 @@ def main():
         logo_res = dict(zip(logos, ex.map(logo_ok, logos)))
         urls = [e["url"] for v in cand.values() for e in v if logo_res[e["attrs"]["tvg-logo"]]]
         print(f"channels {len(cand)}, logos ok {sum(logo_res.values())}/{len(logos)}, streams to check {len(urls)}", file=sys.stderr)
-        stream_res = dict(zip(urls, ex.map(stream_ok, urls)))
+        stream_res = dict(zip(urls, ex.map(stream_resolution, urls)))
     out = []
     for key, v in cand.items():
-        best = next((e for e in v if logo_res[e["attrs"]["tvg-logo"]] and stream_res.get(e["url"])), None)
-        if best: out.append(best)
+        best = next((e for e in sorted(v, key=lambda x: max(resolution(x), stream_res.get(x["url"], 0)), reverse=True)
+                     if stream_res.get(e["url"], 0) >= 1080 and logo_res[e["attrs"]["tvg-logo"]]), None)
+        if best:
+            label_verified_quality(best, stream_res[best["url"]])
+            out.append(best)
     out = dedupe(out)
     # Категорию 18+ ставим первой, остальные группы и каналы упорядочиваем по-русски.
     out.sort(key=playlist_sort_key)

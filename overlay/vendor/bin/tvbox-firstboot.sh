@@ -52,6 +52,7 @@ done
 for p in com.agateau.tinywheels.android org.supertux.supertux2 app.flicky; do
     if pm path "$p" >/dev/null 2>&1; then pm uninstall --user 0 "$p"; fi
 done
+pm uninstall --user 0 com.ghisler.tcplugins.wifitransfer >/dev/null 2>&1 || true
 appops set dev.imranr.obtainium REQUEST_INSTALL_PACKAGES allow
 # VLC нужен полный доступ к файлам для локальных папок и USB-накопителей.
 appops set org.videolan.vlc MANAGE_EXTERNAL_STORAGE allow
@@ -116,8 +117,8 @@ if pm path com.yandex.aliceapp >/dev/null 2>&1; then
     A=$(cmd role get-role-holders --user 0 android.app.role.ASSISTANT 2>/dev/null)
     case "$A" in *com.yandex.aliceapp*) echo "alice: default assistant ready; USB voice key uses VOICE_ASSIST";; *) echo "alice: enable as default assistant in Android settings";; esac
 fi
-for p in com.ghisler.android.TotalCommander com.ghisler.tcplugins.LAN com.ghisler.tcplugins.FTP com.ghisler.tcplugins.SFTP \
-         com.ghisler.tcplugins.wifitransfer; do g $p READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE; done
+for p in com.ghisler.android.TotalCommander com.ghisler.tcplugins.LAN com.ghisler.tcplugins.FTP \
+         com.ghisler.tcplugins.SFTP; do g $p READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE; done
 pm path ru.yourok.torrserve >/dev/null 2>&1 && appops set ru.yourok.torrserve MANAGE_EXTERNAL_STORAGE allow
 # Один раз выбрать VLC для TorrServe, чтобы убрать диалог выбора плеера (ключ player содержит пакет приложения).
 TS=/data/data/ru.yourok.torrserve/shared_prefs/ru.yourok.torrserve_preferences.xml

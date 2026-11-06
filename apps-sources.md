@@ -14,7 +14,6 @@
 | `com.ghisler.tcplugins.LAN` | 3.60 | tcandroidlan360.apk | `c3091b317e4f4c4a0139a98830cef4269a79fc18bd27dce6c94d10e7bae308e8` | `e50eb216a57d5eb0b1e67802e783df7b587bdbdc379e3e296f89b49ed32f00fd` |
 | `com.ghisler.tcplugins.FTP` | 3.0 | tcandroidftp30.apk | `aa5608bf13826f086c00a6fa161ecc197e4d2bfed15b55810c7eee517ba4a5bc` | `e50eb216a57d5eb0b1e67802e783df7b587bdbdc379e3e296f89b49ed32f00fd` |
 | `com.ghisler.tcplugins.SFTP` | 2.94 | tcandroidsftp294.apk | `10b08c835d4b7d1f65a61a1c027fbe0d87ed5c7a79ea4b54240e43a87d4e2090` | `e50eb216a57d5eb0b1e67802e783df7b587bdbdc379e3e296f89b49ed32f00fd` |
-| `com.ghisler.tcplugins.wifitransfer` | 4.5 | tcandroidwifi45.apk | `722d44b168c00736ce45cdf2f4bc4d2dad5357d95bf75e3593797b68ed25517f` | `e50eb216a57d5eb0b1e67802e783df7b587bdbdc379e3e296f89b49ed32f00fd` |
 
 ## Pixel Wheels — f-droid.org
 Индекс https://f-droid.org/repo/index-v1.jar: подпись JAR проверена вручную (CMS + дайджесты SF→MANIFEST→index-v1.json, SHA1withRSA),

@@ -23,7 +23,7 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
             "cold_boot_seconds": 8,
             "checks": {
                 name: "pass" for name in (
-                    "cold_boot_le_10s", "boot_log_review", "qr_vlc", "qr_total_commander",
+                    "cold_boot_le_10s", "boot_log_review", "qr_vlc",
                     "wired_network", "wifi_network", "iptv_playback", "torrent_playback",
                     "graphics_video", "graphics_stress", "swap_disabled",
                 )

@@ -6,7 +6,26 @@
     "tested_installed_version": "0.3.9",
     "iptv_channel": "Sochi24 (720p)",
     "vlc_playback": "pass: VLC media session reported playing and the video frame was visible during a 20-second check; frame-drop counters were not available",
-    "playlist_version": "fail: the installed list starts with Детские and has no first-position Для взрослых category; this is the older installed playlist, not the local 0.4.0 candidate",
+    "playlist_version": "pass: подтверждён минимум 1080 вертикальных строк; финальный список на горячей приставке после индексации schema 4 содержит 3008 каналов, 48 нормализованных групп, 54 категории M3U и 184 канала 18+ первыми; детских каналов и дублей по Android-ключу нет.",
+    "iptv_playlist_override": {
+      "app_updated_on_live_device": true,
+      "playlist_bytes": 630964,
+      "playlist_sha256": "60438409e7f73b4577b6f288113f375468dcbd602604fafbe4facdf8f182d3b1",
+      "index_complete": true,
+      "index_schema": 4,
+      "channels": 3008,
+      "normalized_groups_on_live_device": 48,
+      "adult_group_channels": 184,
+      "adult_group_first_in_ui": true,
+      "child_channels_detected": 0,
+      "duplicate_names_reported_by_index": 0,
+      "index_elapsed_ms": 103514,
+      "quality_minimum": "1080p",
+      "quality_measurement": "проверка HLS master resolution и ffprobe для MPEG-TS сегмента; неизвестное или ниже 1080p исключается",
+      "globally_verified_unique_streams_before_duplicate_removal": 2992,
+      "global_url_credential_check": "pass: 6029 адресов проверено, credentials не найдены",
+      "m3u_categories": 54
+    },
     "network_capture": {
       "duration_seconds": 15,
       "packets": 5000,
@@ -43,23 +62,46 @@
     },
     "qr_live_checks": {
       "tested_installed_version": "0.3.9",
-      "vlc": "Кнопка запуска открывает VLC; HTTP-интерфейс на TCP 8080 не слушает, поэтому QR-ссылка удалённого VLC не работает.",
-      "total_commander": "Кнопка запуска открывает Total Commander. Переход в WiFi-обмен запускает WiFi Transfer, но открывает экран приёма URL без QR-кода сервера; полный сценарий QR не подтверждён.",
-      "result": "partial; not counted as functional gate pass"
+      "services_shown": [
+        "TorrServer",
+        "VLC — удалённый доступ"
+      ],
+      "vlc_launch_button": "pass: открывает VLC на приставке",
+      "vlc_remote_port_8080": "fail: listener отсутствует; QR удалённого интерфейса не работает",
+      "launch_policy": "кнопка запускает только приложение выбранной QR-службы; Total Commander исключён",
+      "result": "TorrServer QR доступен; VLC remote endpoint не настроен; Total Commander из этого модуля не запускается"
     },
     "nightly_candidate": {
       "file": "Panadonik-0.4.0-nightly-20261106-8399a56-emmc.zip",
       "installed": false,
       "sha256_verified": true,
       "ota_cms_signature_verified": true,
-      "adult_playlist_local_check": "pass; 20+ channels, first category is 18+; not yet checked on device"
+      "adult_playlist_local_check": "предыдущий подписанный OTA содержит старый список; проверенный 1080p+ плейлист установлен только как горячий override и ещё требует пересборки OTA"
+    },
+    "iptv_quality_verification": {
+      "minimum_vertical_pixels": 1080,
+      "transport_stream_probe": "ffprobe 8.0.1",
+      "hls_variant_resolution_checked": true,
+      "unknown_or_lower_quality_rejected": true,
+      "globally_verified_stream_urls": 2992,
+      "channels_after_deduplication": 3008,
+      "adult_channels_first": 184,
+      "credentials_found": false
+    },
+    "iptv_full_hd_live_attempt": {
+      "channel_title": "Первый",
+      "globally_measured_vertical_pixels": 1920,
+      "vlc_media_session_state": "playing",
+      "visible_picture_confirmed": false,
+      "adb_screenshot": "чёрный кадр; VLC сообщает playing, но видимый кадр не подтверждён",
+      "release_gate": "pending"
     }
   },
   "cold_boot_seconds": null,
   "last_reboot_to_screen_seconds": 75,
   "automated_tests": {
     "status": "pass",
-    "count": 10,
+    "count": 24,
     "command": "python3 -m unittest discover -s tests -v"
   },
   "checks": {
@@ -67,7 +109,6 @@
     "boot_log_review": "pending",
     "security_review": "fail",
     "qr_vlc": "pending",
-    "qr_total_commander": "pending",
     "wired_network": "pending",
     "wifi_network": "pending",
     "iptv_playback": "pending",
@@ -79,6 +120,6 @@
   "log_analysis": {
     "reviewed": true,
     "untriaged_errors": 4,
-    "summary": "Проверены 42 088 строк доступного logcat и 11 485 строк после исправления IPTV; остаются 4 неразобранные группы: USB gadget/FunctionFS, vendor Wi-Fi/boot, hwcomposer/EGL, VLC/MediaCodec. На живой версии 0.3.9 подтверждено воспроизведение Sochi24 (720p) во VLC. Захват 5 000 пакетов/15 секунд без потерь: IPTV использовал незашифрованный HTTP, шаблоны Authorization/Cookie/token не найдены, сырой PCAP удалён. Подтверждена критичная открытая поверхность: сетевой ADB слушает все интерфейсы на TCP 5555 без авторизации (ro.secure=0, ro.adb.secure=0), shell работает от root; SELinux Permissive, build type userdebug. Установленный список IPTV старый, без категории 18+ первой. Аппаратные проверки относятся к 0.3.9 и не подтверждают локального кандидата 0.4.0."
+    "summary": "Проверены 42 088 строк доступного logcat и 11 485 строк после исправления IPTV; остаются 4 неразобранные группы: USB gadget/FunctionFS, vendor Wi-Fi/boot, hwcomposer/EGL, VLC/MediaCodec. На живой версии 0.3.9 подтверждено воспроизведение Sochi24 (720p) во VLC. Захват 5 000 пакетов/15 секунд без потерь: IPTV использовал незашифрованный HTTP, шаблоны Authorization/Cookie/token не найдены, сырой PCAP удалён. Подтверждена критичная открытая поверхность: сетевой ADB слушает все интерфейсы на TCP 5555 без авторизации (ro.secure=0, ro.adb.secure=0), shell работает от root; SELinux Permissive, build type userdebug. Установленный список IPTV старый, без категории 18+ первой. Аппаратные проверки относятся к 0.3.9 и не подтверждают локального кандидата 0.4.0. Последующая горячая проверка обновлённой IPTV-плитки завершила индексацию нового списка: 3008 каналов, 48 групп, категория 18+ первой; детских групп на экране нет. Горячая перепроверка IPTV после этого: схема 4, 3008 каналов, 48 групп, 184 взрослых первыми, 0 дублей, индексирование 103.5 секунды; адреса URL глобально проверены, качество не ниже 1080p подтверждено. Визуальная проверка Full HD во VLC на приставке не подтверждена: медиасессия в состоянии playing, но ADB screenshot чёрный; iptv_playback остаётся pending. Финальная горячая индексация schema 4: 3008 каналов, 48 групп, 184 канала 18+ первыми, 0 дублей, 103.5 секунды; M3U содержит 54 категории, SHA-256 60438409e7f73b4577b6f288113f375468dcbd602604fafbe4facdf8f182d3b1. VLC сообщает playing для «Первый», метаданные показывают 1920 вертикальных пикселей, но ADB screenshot чёрный и видимый кадр не подтверждён."
   }
 }

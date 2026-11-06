@@ -101,6 +101,7 @@ sudo install -m 0644 $R/obtainium-apps.json $MNT/tvbox/obtainium-apps.json
 for a in $R/dl/apk/*.apk; do
     case "${a##*/}" in
         com.tvlauncher.apk) continue ;;
+        tcandroidwifi45.apk|com.ghisler.tcplugins.wifitransfer.apk) echo "skip removed Total Commander WiFi Transfer plugin"; continue ;;
         com.agateau.tinywheels.android.apk|org.supertux.supertux2.apk|app.flicky.apk) echo "skip removed APK ${a##*/}"; continue ;;
     esac
     sudo install -m 0644 $a $MNT/tvbox/apk/

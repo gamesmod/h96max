@@ -40,21 +40,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Channel list for an M3U playlist: groups -> channels (with logos) -> play in VLC.
- * The playlist comes with the image (/system/etc/tvbox/iptv.m3u, merged and checked by tools/iptv-merge.py);
- * the network playlist is only a fallback, cached in the files dir. Logos are cached in memory and in cacheDir.
+ * Список групп и каналов M3U с запуском воспроизведения во VLC.
+ * Основной плейлист входит в образ, пользовательский файл из каталога приложения имеет приоритет.
+ * Сетевой список используется только как запасной источник; логотипы кэшируются в памяти и cacheDir.
  */
 public class MainActivity extends Activity {
     static final String BUNDLED = "/system/etc/tvbox/iptv.m3u";
+    static final String USER_PLAYLIST = "iptv.m3u";
     static final String PLAYLIST = "https://ngrch.github.io/iptv/ru.m3u";
     static final String VLC = "org.videolan.vlc";
-    static final int INDEX_SCHEMA = 3;
+    static final int INDEX_SCHEMA = 4;
 
     ListView lv;
     final Map<String, List<String[]>> groups = new LinkedHashMap<>();
     List<String> groupNames = new ArrayList<>();
-    String cur;          // open group, null = group list
-    int groupPos;        // selection to restore when going back
+    String cur;          // Открытая группа; null означает список групп.
+    int groupPos;        // Позиция группы для восстановления при возврате.
     final LruCache<String, Bitmap> logos = new LruCache<>(200);
     final ExecutorService loader = Executors.newFixedThreadPool(4);
     final Handler indexUi = new Handler();
@@ -63,7 +64,7 @@ public class MainActivity extends Activity {
         public void run() {
             android.content.SharedPreferences p = getSharedPreferences("iptv_index", MODE_PRIVATE);
             if (!p.getBoolean("running", false)) {
-                File bundled = new File(BUNDLED);
+                File bundled = playlistFile(MainActivity.this);
                 if (!indexCurrent(bundled, p) && p.getString("error", "").isEmpty()) {
                     indexUi.postDelayed(this, 250);
                     return;
@@ -113,7 +114,7 @@ public class MainActivity extends Activity {
                 }
             }
         });
-        File bundled = new File(BUNDLED);
+        File bundled = playlistFile(this);
         if (loadCachedIndex(bundled)) {
             showGroups();
             showBootIndexStatus();
@@ -165,7 +166,7 @@ public class MainActivity extends Activity {
 
     void showBootIndexStatus() {
         android.content.SharedPreferences p = getSharedPreferences("iptv_index", MODE_PRIVATE);
-        if (p.getBoolean("running", false) || !indexCurrent(new File(BUNDLED), p)) {
+        if (p.getBoolean("running", false) || !indexCurrent(playlistFile(this), p)) {
             indexDialog = new ProgressDialog(this);
             indexDialog.setTitle("Подготовка ТВ-каналов");
             indexDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -186,7 +187,7 @@ public class MainActivity extends Activity {
     }
 
     void ensureIndexService() {
-        File playlist = new File(BUNDLED);
+        File playlist = playlistFile(this);
         android.content.SharedPreferences p = getSharedPreferences("iptv_index", MODE_PRIVATE);
         if (p.getBoolean("complete", false) && p.getInt("schema", 0) == INDEX_SCHEMA &&
                 p.getLong("size", -1) == playlist.length() &&
@@ -197,6 +198,16 @@ public class MainActivity extends Activity {
             try { android.content.Context.class.getMethod("startForegroundService", Intent.class).invoke(this, service); }
             catch (Exception e) { startService(service); }
         } else startService(service);
+    }
+
+    /** Выбирает пользовательский плейлист, если он установлен, иначе берёт плейлист из образа. */
+    static File playlistFile(android.content.Context context) {
+        File external = context.getExternalFilesDir(null);
+        if (external != null) {
+            File userPlaylist = new File(external, USER_PLAYLIST);
+            if (userPlaylist.isFile() && userPlaylist.length() > 0) return userPlaylist;
+        }
+        return new File(BUNDLED);
     }
 
     static String m3uAttr(String line, String key) {
@@ -231,8 +242,8 @@ public class MainActivity extends Activity {
     }
 
     static String canonicalGroup(String group) {
-        // Сохраняем нормализованное название региона вместе с флагом из итогового M3U.
-        if (group != null && group.contains(" · ") && group.matches(".*\\p{So}.*")) return group.trim();
+        // Итоговый плейлист уже нормализован: сохраняем подкатегории и подписи с флагами.
+        if (group != null && (group.contains(" · ") || group.matches(".*\\p{So}.*"))) return group.trim();
         String s = group == null ? "" : group.toLowerCase(java.util.Locale.ROOT).replace('ё', 'е')
                 .replaceAll("[^a-zа-я0-9+]+", " ").trim();
         if (s.length() == 0) return "Прочее";
@@ -458,7 +469,7 @@ public class MainActivity extends Activity {
         });
     }
 
-    // select a row only after the new adapter is laid out, so the first OK press already acts on it
+    // Выбираем строку после раскладки нового адаптера, чтобы первое нажатие OK сразу сработало.
     void focus(final int pos) {
         lv.post(new Runnable() {
             public void run() {
