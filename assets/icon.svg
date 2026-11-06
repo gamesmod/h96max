@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Panadonik</title>
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#162630"/><stop offset="1" stop-color="#080e13"/></linearGradient>
+    <linearGradient id="screen" x2="0" y2="1"><stop stop-color="#14232b"/><stop offset="1" stop-color="#0b141a"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="52" y="67" width="408" height="378" rx="54" fill="url(#screen)" stroke="#354953" stroke-width="12"/>
+  <g fill="#42d392" opacity=".8" font-family="monospace" font-size="23" filter="url(#glow)">
+    <text x="86" y="133">01 110010 101</text><text x="108" y="174">100 01 110 010</text>
+    <text x="86" y="215">0101 110 01 10</text><text x="108" y="256">1 010 10110 00</text>
+  </g>
+  <path d="M106 295h300v8H106z" fill="#42d392" opacity=".75"/>
+  <text x="256" y="370" text-anchor="middle" fill="#f4f8fa" font-family="Arial,sans-serif" font-size="52" font-weight="700" letter-spacing="3">PANA</text>
+  <text x="256" y="420" text-anchor="middle" fill="#f4f8fa" font-family="Arial,sans-serif" font-size="52" font-weight="700" letter-spacing="3">DONIK</text>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 240" role="img" aria-labelledby="title desc">
+  <title id="title">Panadonik</title>
+  <desc id="desc">Телевизионная матрица с зелёными символами и названием Panadonik</desc>
+  <defs>
+    <linearGradient id="screen" x2="0" y2="1"><stop stop-color="#101a22"/><stop offset="1" stop-color="#070b0f"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect x="16" y="18" width="768" height="204" rx="24" fill="url(#screen)" stroke="#2a3944" stroke-width="5"/>
+  <g fill="#42d392" font-family="monospace" font-size="24" opacity=".62" filter="url(#glow)">
+    <text x="48" y="72">01 110010 101 001 10</text><text x="72" y="108">100 01 110 01010 101</text>
+    <text x="48" y="144">0101 110 01 101001 10</text><text x="72" y="180">1 010 10110 001 11010</text>
+  </g>
+  <text x="400" y="143" text-anchor="middle" fill="#f5f8fa" font-family="Arial,sans-serif" font-size="68" font-weight="700" letter-spacing="8">PANADONIK</text>
+  <path d="M306 195h188" stroke="#42d392" stroke-width="4" stroke-linecap="round"/>
+</svg>

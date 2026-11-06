@@ -1,0 +1,67 @@
+#!/system/bin/sh
+# rk3318-android OTA installer, run by recovery: update-binary API FD ZIP
+# Writes the partition images listed in tvbox/parts.txt with tvbox-flash (write + read-back MD5).
+# Test on a running system: TVBOX_DEV_DIR=/data/local$TMP/fakedev update-binary 3 1 pkg.zip
+FD=$2; ZIP=$3; OUT=/proc/self/fd/$FD
+DEV=${TVBOX_DEV_DIR:-/dev/block/by-name}
+TMP=${TVBOX_TMP:-/tmp}
+LOG=/cache/recovery/tvbox-ota.log
+say() { echo "ui_print $*" >> $OUT; echo "ui_print" >> $OUT; echo "$*" >> $LOG 2>/dev/null; }
+die() { say "ERROR: $*"; exit 1; }
+# 64-bit tools of the recovery ramdisk (unzip = ziptool/libziparchive, gzip = toybox); /sbin/busybox there is 32-bit
+UNZIP="unzip"; GZIP="gzip"
+
+# The package on /data reaches us as "@/cache/recovery/block.map" (uncrypt; recovery unmounts /data and the file is
+# in several pieces). tvbox-flash (embedded below: the zip is not readable yet) joins the block ranges into a
+# device-mapper linear device and reads STORED zip entries from it (the recovery ziptool refuses block devices).
+# No awk in this recovery; sizes come from the map as strings.
+PKGDEV=""
+if [ "${ZIP#@}" != "$ZIP" ]; then
+    MAP=${ZIP#@}
+    [ -f "$MAP" ] || die "block map $MAP not found"
+    sed -n '/^__TVBOX_FLASH_B64__$/,$p' "$0" | sed 1d | base64 -d > $TMP/tvbox-flash && chmod 755 $TMP/tvbox-flash \
+        || die "cannot unpack the embedded tvbox-flash"
+    # the dm table opens userdata exclusively: nothing may hold it (Rockchip recovery mounts /data for its own use)
+    for m in /data /sdcard /storage/emulated; do umount $m 2>/dev/null; done
+    say "mounts on userdata: $(grep -c "$(readlink -f $(sed -n 1p $MAP))" /proc/mounts)"
+    set -- $($TMP/tvbox-flash --dm-map $MAP tvbox-ota /dev/tvbox-pkg 2>$TMP/dm.err)
+    # tvbox-flash prints exactly: NODE MAJOR:MINOR SIZE. Check the third field;
+    # the old fourth-field check treated a successful mapping as a failure.
+    [ -n "$3" ] || die "device-mapper setup failed: $(tr '\n' ' ' < $TMP/dm.err)"
+    PKGDEV=$1; PKGSIZE=$3
+    say "package: $(sed -n 3p $MAP) block range(s) from $(sed -n 1p $MAP)"
+fi
+# zip entry to stdout
+entry() { if [ -n "$PKGDEV" ]; then $TMP/tvbox-flash --zip-cat $PKGDEV $PKGSIZE "$1"; else $UNZIP -p $ZIP "$1"; fi; }
+say "tvbox: update to $(entry tvbox/release.txt)"
+[ -n "$TVBOX_DEV_DIR" ] || grep -q rk3318 /proc/device-tree/compatible 2>/dev/null || grep -q rockchip /proc/device-tree/compatible || die "not an RK3318 box"
+MEDIA=$(entry tvbox/media.txt)
+case "$MEDIA" in emmc) CTRL=ff520000;; sd) CTRL=ff500000;; *) die "package has no media tag (cannot read the package?)";; esac
+[ -n "$TVBOX_DEV_DIR" ] || grep -q "androidboot.boot_devices=$CTRL" /proc/cmdline || die "package is for $MEDIA but the system booted from another media"
+[ -n "$PKGDEV" ] || { entry tvbox/tvbox-flash > $TMP/tvbox-flash && chmod 755 $TMP/tvbox-flash; } || die "no tvbox-flash in package"
+entry tvbox/parts.txt > $TMP/tvbox-parts.txt || die "no parts.txt in package"
+# preflight: every target exists and is big enough, before the first write
+while read part size md5 file frac; do
+    [ -n "$TVBOX_DEV_DIR" ] || [ -b $DEV/$part ] || die "no partition $part"
+    $TMP/tvbox-flash --check $DEV/$part $size || die "partition $part is smaller than the image"
+done < $TMP/tvbox-parts.txt
+n=$(wc -l < $TMP/tvbox-parts.txt); i=0
+while read part size md5 file frac; do
+    i=$((i + 1))
+    say "($i/$n) writing $part"
+    [ -n "$TVBOX_DEV_DIR" ] || [ -b $DEV/$part ] || die "no partition $part"
+    entry images/$file | $GZIP -dc | $TMP/tvbox-flash $DEV/$part $size $md5 > $TMP/tvbox-flash.log 2>&1 \
+        || die "$part: $(tail -1 $TMP/tvbox-flash.log)"
+    echo "set_progress $frac" >> $OUT
+    say "$part: written and verified"
+done < $TMP/tvbox-parts.txt
+sync
+# "с очисткой": tvboxd leaves the request in /cache (mounted during install; /data is not, the package comes
+# through the uncrypt block map as /sideload/package.zip); mark misc so userdata is cleared on the next boot
+if [ -f /cache/recovery/tvbox-wipe-requested ] || [ -f "${ZIP%/*}/wipe-requested" ]; then
+    [ -n "$TVBOX_DEV_DIR" ] && M=$DEV/misc || M=/dev/block/by-name/misc
+    printf 'TVBOX-WIPE' | dd of=$M bs=4096 seek=16 conv=notrunc,fsync 2>/dev/null || die "could not set the wipe marker"
+    say "User data will be cleared on the next boot"
+fi
+say "Update installed"
+exit 0

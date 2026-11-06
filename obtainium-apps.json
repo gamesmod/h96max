@@ -1,0 +1,9 @@
+[
+  {"id":"org.videolan.vlc","url":"https://f-droid.org/packages/org.videolan.vlc","author":"VideoLAN","name":"VLC"},
+  {"id":"ru.yourok.torrserve","url":"https://f-droid.org/packages/ru.yourok.torrserve","author":"yourok","name":"TorrServe"},
+  {"id":"com.tvlauncher","url":"https://f-droid.org/packages/com.tvlauncher","author":"wiiguy","name":"TV Launcher"},
+  {"id":"dev.imranr.obtainium","url":"https://github.com/ImranR98/Obtainium","author":"ImranR98","name":"Obtainium"},
+  {"id":"org.smarttube.stable","url":"https://github.com/yuliskov/SmartTube","author":"yuliskov","name":"SmartTube"},
+  {"id":"org.maintainteam.hypatia","url":"https://apt.izzysoft.de/fdroid/index/apk/org.maintainteam.hypatia","author":"MaintainTeam","name":"Hypatia"},
+  {"id":"com.yandex.aliceapp","url":"https://www.rustore.ru/catalog/app/com.yandex.aliceapp","author":"Яндекс","name":"Алиса AI"}
+]
