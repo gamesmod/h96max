@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -14,29 +15,43 @@ import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.os.Bundle;
 import android.os.Handler;
+import android.net.Uri;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * "Производительность": temperature, CPU, GPU and RAM live with a history graph, top processes, and one button that
- * frees resources. Metrics come from tvboxd (PERF_NOW, root: apps cannot read /proc/stat) every 2 s, only while this
- * screen is open; the history lives in memory for as long as the screen is open (up to 1 h).
+ * frees resources. Metrics come from tvboxd every 2 s while this screen is open. A small CSV history is stored
+ * privately for seven days, with one sample per minute; no background sampler is started.
  */
 public class MainActivity extends Activity {
     static final int PERIOD_MS = 2000, KEEP = 3600 * 1000 / PERIOD_MS;
+    static final long HISTORY_PERIOD_MS = 60_000L, HISTORY_KEEP_MS = 7L * 24 * 60 * 60 * 1000;
     static final int BG = 0xFF101418, CARD = 0xFF1A2026, GREEN = 0xFF66BB6A, YELLOW = 0xFFFFCA28, RED = 0xFFEF5350;
 
     final Handler ui = new Handler();
@@ -44,6 +59,8 @@ public class MainActivity extends Activity {
     TextView uptime, procs;
     TextView zramInfo;
     volatile boolean running;
+    long lastHistoryWrite, lastHistoryPrune;
+    int exportRequest;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -74,6 +91,9 @@ public class MainActivity extends Activity {
         compression.addView(zramInfo, new LinearLayout.LayoutParams(0, -2, 1));
         compression.addView(button("Сжатие памяти…", new View.OnClickListener() {
             public void onClick(View v) { configureZram(); }
+        }));
+        compression.addView(button("История 7 дней", new View.OnClickListener() {
+            public void onClick(View v) { showHistory(); }
         }));
         root.addView(compression);
 
@@ -133,6 +153,7 @@ public class MainActivity extends Activity {
         float pct = total > 0 ? used * 100 / total : 0;
         mem.add(pct, String.format("%.1f / %.1f ГБ", used / 1024, total / 1024), level(pct),
                 "своп " + (sw.length > 1 ? sw[0] + " / " + sw[1] + " МБ" : "—"));
+        storeHistory(m, t, c, g, used, total);
         long up = (long) f(one(m, "UPTIME"));
         uptime.setText(String.format("работает %d ч %02d мин · история с открытия: %s", up / 3600, up / 60 % 60, temp.span()));
         StringBuilder p = new StringBuilder("Больше всего памяти:  ");
@@ -142,6 +163,138 @@ public class MainActivity extends Activity {
             p.append(i > 0 ? "  ·  " : "").append(x.length > 1 ? x[1] : "?").append(' ').append(x[0]).append(" МБ");
         }
         procs.setText(p);
+    }
+
+    /** Записывать только одну строку в минуту и удалять всё старше недели; опрос останавливается при закрытии экрана. */
+    void storeHistory(Map<String, List<String>> m, float t, float c, float g, float used, float total) {
+        long now = System.currentTimeMillis();
+        File file = historyFile();
+        if (lastHistoryWrite == 0) lastHistoryWrite = lastHistoryTimestamp(file);
+        if (now - lastHistoryWrite >= HISTORY_PERIOD_MS) {
+            try {
+                if (!file.exists()) file.getParentFile().mkdirs();
+                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8"));
+                if (file.length() == 0) out.write("epoch,temp_c,cpu_pct,gpu_pct,ram_used_mb,ram_total_mb,cpu_mhz\n");
+                out.write(String.format(Locale.US, "%d,%.2f,%.2f,%.2f,%.0f,%.0f,%s\n", now / 1000,
+                        t, c, g, used, total, one(m, "CPU_MHZ")));
+                out.close();
+                lastHistoryWrite = now;
+            } catch (Exception e) { android.util.Log.w("tvbox-perf", "Не удалось сохранить историю показателей", e); }
+        }
+        if (now - lastHistoryPrune > 6L * 60 * 60 * 1000) {
+            pruneHistory(file, now / 1000 - HISTORY_KEEP_MS / 1000);
+            lastHistoryPrune = now;
+        }
+    }
+
+    File historyFile() { return new File(getFilesDir(), "performance-history.csv"); }
+
+    long lastHistoryTimestamp(File file) {
+        long last = 0;
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+            String line;
+            while ((line = in.readLine()) != null) {
+                int comma = line.indexOf(',');
+                if (comma > 0) try { last = Math.max(last, Long.parseLong(line.substring(0, comma)) * 1000); }
+                catch (NumberFormatException ignored) { }
+            }
+            in.close();
+        } catch (Exception ignored) { }
+        return last;
+    }
+
+    void pruneHistory(File file, long cutoff) {
+        if (!file.isFile()) return;
+        File tmp = new File(file.getParentFile(), "performance-history.tmp");
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmp), "UTF-8"));
+            String line;
+            while ((line = in.readLine()) != null) {
+                int comma = line.indexOf(',');
+                if (comma < 0) { if (line.startsWith("epoch,")) out.write(line + "\n"); continue; }
+                try { if (Long.parseLong(line.substring(0, comma)) >= cutoff) out.write(line + "\n"); }
+                catch (NumberFormatException ignored) { }
+            }
+            in.close(); out.close();
+            if (tmp.renameTo(file)) return;
+            file.delete(); tmp.renameTo(file);
+        } catch (Exception e) { tmp.delete(); android.util.Log.w("tvbox-perf", "Не удалось очистить старую историю", e); }
+    }
+
+    /** Показать агрегаты по дням и дать сохранить исходный CSV для последующего анализа. */
+    void showHistory() {
+        TreeMap<String, HistoryDay> days = new TreeMap<>();
+        File file = historyFile();
+        int samples = 0;
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+            SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            String line;
+            while ((line = in.readLine()) != null) {
+                String[] x = line.split(",");
+                if (x.length != 7 || x[0].equals("epoch")) continue;
+                try {
+                    long epoch = Long.parseLong(x[0]);
+                    HistoryDay day = days.get(dayFormat.format(new java.util.Date(epoch * 1000)));
+                    if (day == null) { day = new HistoryDay(); days.put(dayFormat.format(new java.util.Date(epoch * 1000)), day); }
+                    day.add(Float.parseFloat(x[1]), Float.parseFloat(x[2]), Float.parseFloat(x[3]), Float.parseFloat(x[4]));
+                    samples++;
+                } catch (NumberFormatException ignored) { }
+            }
+            in.close();
+        } catch (Exception ignored) { }
+        StringBuilder report = new StringBuilder("Опрос идёт раз в минуту только пока открыта плитка. Хранится до 7 дней; записей: ").append(samples).append("\n\n");
+        if (days.isEmpty()) report.append("История пока пуста. Оставьте экран открытым хотя бы на минуту.");
+        else for (Map.Entry<String, HistoryDay> e : days.entrySet()) {
+            HistoryDay d = e.getValue();
+            report.append(e.getKey()).append(" · ").append(d.n).append(" зам.\n")
+                    .append(String.format(Locale.getDefault(), "  CPU ср./пик %.0f/%.0f%% · GPU %.0f/%.0f%% · температура ср./пик %.1f/%.1f°C · ОЗУ ср. %.0f МБ\n\n",
+                            d.cpu / d.n, d.cpuMax, d.gpu / d.n, d.gpuMax, d.temp / d.n, d.tempMax, d.ram / d.n));
+        }
+        TextView body = text(report.toString(), 20, 0xFFCFD8DC);
+        body.setPadding(32, 24, 32, 24);
+        ScrollView scroll = new ScrollView(this);
+        scroll.addView(body);
+        new AlertDialog.Builder(this).setTitle("История производительности")
+                .setView(scroll).setNegativeButton("Закрыть", null)
+                .setPositiveButton("Экспорт CSV", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface d, int which) { exportHistory(); }
+                }).show();
+    }
+
+    void exportHistory() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/csv");
+        intent.putExtra(Intent.EXTRA_TITLE, "panadonik-performance-history.csv");
+        try { startActivityForResult(intent, 17); }
+        catch (Exception e) { Toast.makeText(this, "Не удалось открыть выбор файла", Toast.LENGTH_LONG).show(); }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != 17 || resultCode != RESULT_OK || data == null) return;
+        Uri uri = data.getData();
+        try {
+            InputStream in = new FileInputStream(historyFile());
+            OutputStream out = getContentResolver().openOutputStream(uri);
+            byte[] buf = new byte[8192]; int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            in.close(); out.close();
+            Toast.makeText(this, "CSV сохранён", Toast.LENGTH_LONG).show();
+        } catch (Exception e) { Toast.makeText(this, "Ошибка экспорта CSV: " + e.getMessage(), Toast.LENGTH_LONG).show(); }
+    }
+
+    static class HistoryDay {
+        int n; float temp, tempMax, cpu, cpuMax, gpu, gpuMax, ram;
+        void add(float t, float c, float g, float r) {
+            if (n++ == 0) { tempMax = t; cpuMax = c; gpuMax = g; }
+            temp += t; cpu += c; gpu += g; ram += r;
+            tempMax = Math.max(tempMax, t); cpuMax = Math.max(cpuMax, c); gpuMax = Math.max(gpuMax, g);
+        }
     }
 
     void free() {
