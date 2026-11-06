@@ -715,7 +715,7 @@ public class Main {
             try {
                 java.util.Map<String, String> m = latest(base);
                 String ver = m.get("version");
-                op.send("UPD url:" + base + "\t" + ver + "\t" + base + media() + "/\t" + (Long.parseLong(m.get("size")) >> 20) + " МБ\t" + (newer(ver, cur) ? "new" : "old"));
+                op.send("UPD url:" + base + "\t" + ver + "\t" + packageUrl(base, m.get("file")) + "\t" + (Long.parseLong(m.get("size")) >> 20) + " МБ\t" + (newer(ver, cur) ? "new" : "old"));
                 if (m.containsKey("notes")) op.send("NOTES url:" + base + "\t" + m.get("notes"));
                 found++;
             } catch (Exception e) {
@@ -829,11 +829,24 @@ public class Main {
     }
 
     /** base/latest.txt: key=value lines (version, file, sha256, size, notes). */
+    /** Проверяет, что источник указывает на прямые ассеты последнего GitHub Release. */
+    static boolean githubReleaseBase(String base) {
+        return base.contains("github.com/") && base.contains("/releases/latest/download/");
+    }
+
+    static String latestUrl(String base) {
+        return base + (githubReleaseBase(base) ? "latest-" + media() + ".txt" : media() + "/latest.txt");
+    }
+
+    static String packageUrl(String base, String file) {
+        return base + (githubReleaseBase(base) ? file : media() + "/" + file);
+    }
+
     static String media() { return bootedFromSd() ? "sd" : "emmc"; }
 
     static java.util.Map<String, String> latest(String base) throws Exception {
         java.util.Map<String, String> m = new java.util.HashMap<>();
-        HttpURLConnection c = (HttpURLConnection) new URL(base + media() + "/latest.txt").openConnection();
+        HttpURLConnection c = (HttpURLConnection) new URL(latestUrl(base)).openConnection();
         c.setConnectTimeout(8_000); c.setReadTimeout(15_000);
         try (BufferedReader r = new BufferedReader(new InputStreamReader(c.getInputStream(), "UTF-8"))) {
             for (String l; (l = r.readLine()) != null; ) {
@@ -877,8 +890,9 @@ public class Main {
             java.util.Map<String, String> m = latest(base);
             wantSha = m.get("sha256");
             if (new File("/data").getUsableSpace() < Long.parseLong(m.get("size")) + (512L << 20)) { op.done(false, "мало места для загрузки"); return; }
-            op.log("загрузка " + base + media() + "/" + m.get("file"));
-            HttpURLConnection c = (HttpURLConnection) new URL(base + media() + "/" + m.get("file")).openConnection();
+            String pkgUrl = packageUrl(base, m.get("file"));
+            op.log("загрузка " + pkgUrl);
+            HttpURLConnection c = (HttpURLConnection) new URL(pkgUrl).openConnection();
             c.setConnectTimeout(15_000); c.setReadTimeout(60_000);
             copy(c.getInputStream(), tmp, Long.parseLong(m.get("size")), op);
         } else { op.done(false, "неизвестный источник"); return; }

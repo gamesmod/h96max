@@ -1,6 +1,6 @@
 # IPTV playlists merged by tools/iptv-merge.py (order = priority when the same channel is in several lists)
 # Общий список: тематические каналы 18+ включаются сюда и маркируются отдельной категорией.
-https://raw.githubusercontent.com/zwrt/IPTV/Files/Adult.m3u group=Для взрослых
+https://raw.githubusercontent.com/zwrt/IPTV/Files/Adult.m3u set-group=Для взрослых
 https://ngrch.github.io/iptv/ru.m3u
 # webarmen.com: domain gone (NXDOMAIN 2026-10-27), was https://webarmen.com/my/iptv/auto.nogrp.m3u
 https://raw.githubusercontent.com/Sanuyyq/iptv-ot-sanaeye/master/brbrbr.txt

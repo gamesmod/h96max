@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Poll Keenetic routers' system log + wifi associations; append new lines to logs/.
-Creds: ~/rk3318-android/secrets/keenetic.env (600): one line per router: URL LOGIN PASSWORD"""
+Creds: ~/h96max/secrets/keenetic.env (600): one line per router: URL LOGIN PASSWORD"""
 import hashlib, http.cookiejar, json, os, time, urllib.request
-S = os.path.expanduser('~/rk3318-android/secrets/keenetic.env')
-L = os.path.expanduser('~/rk3318-android/logs'); os.makedirs(L, exist_ok=True)
-PAT = ('h96', 'rk3318', 'android', '10.12.54.40', 'assoc', 'auth', 'deauth', 'dhcp', 'wpa', 'eapol')
+S = os.path.expanduser('~/h96max/secrets/keenetic.env')
+L = os.path.expanduser('~/h96max/logs'); os.makedirs(L, exist_ok=True)
+PAT = ('h96', 'rk3318', 'android', 'assoc', 'auth', 'deauth', 'dhcp', 'wpa', 'eapol')
 
 class R:
     def __init__(s, url, login, pw):

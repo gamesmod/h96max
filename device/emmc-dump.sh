@@ -1,7 +1,7 @@
 #!/bin/bash
 # Full eMMC dump (read-only) over adb in 512 MiB chunks, sha256-verified device<->host.
-A="adb -s 10.12.54.40:5555"; D=~/rk3318-android/backup/emmc-full; mkdir -p $D
-$A push ~/rk3318-android/device/emmc-dump-chunk.sh /data/local/tmp/edc.sh >/dev/null
+TARGET=${ADB_TARGET:?Укажите адрес приставки в ADB_TARGET}; A="adb -s $TARGET"; D=~/h96max/backup/emmc-full; mkdir -p "$D"
+$A push ~/h96max/device/emmc-dump-chunk.sh /data/local/tmp/edc.sh >/dev/null
 SZ=$($A shell cat /sys/block/mmcblk2/size | tr -d '\r'); echo "eMMC sectors: $SZ" > $D/info.txt
 LAST=$(( (SZ / 2048 + 511) / 512 - 1 ))
 for N in $(seq 0 $LAST); do

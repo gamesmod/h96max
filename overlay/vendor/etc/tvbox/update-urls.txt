@@ -1,2 +1,2 @@
 # update sources: each folder has emmc/latest.txt and sd/latest.txt (tools/release-ota.sh)
-http://10.12.54.20:8099/
+https://github.com/gamesmod/h96max/releases/latest/download/

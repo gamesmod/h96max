@@ -10,7 +10,7 @@ V=$(grep '^ro.tvbox.release=' build-sd.sh | cut -d= -f2)
 NOTES=release/notes/$V.txt
 [ -f $NOTES ] || { echo "missing $NOTES"; exit 1; }
 [ -e release/$V ] && { echo "release/$V already exists"; exit 1; }
-for f in secrets/tvbox-key.pem secrets/tvbox-cert.pem secrets/ota-key.pem secrets/ota-cert.pem secrets/wifi.env; do
+for f in secrets/tvbox-key.pem secrets/tvbox-cert.pem secrets/ota-key.pem secrets/ota-cert.pem; do
     [ -f $f ] || { echo "missing $f"; exit 1; }; done
 step() { echo; echo "=== [$(date +%T)] $*"; }
 

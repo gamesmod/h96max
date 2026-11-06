@@ -4,6 +4,18 @@
 
 Значок проекта: [`assets/icon.svg`](assets/icon.svg). Крупные образы, архивы, APK и бинарные компоненты при добавлении в Git хранятся через Git LFS; исходники, документация и SVG остаются обычными Git-файлами.
 
+Для настройки локального Git и фильтров LFS установите Git LFS, затем выполните `tools/setup-git.sh`.
+
+## Публикация релиза через GitHub Actions
+
+Workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) запускается при push тега `v<версия>`, совпадающего с `ro.tvbox.release` в `build-sd.sh`. GitHub-hosted runner собирает только eMMC OTA, готовит changelog для приложения «Установка» из коммитов после прошлого тега и создаёт GitHub Release с автоматически подготовленными GitHub Release Notes. До сборки workflow проверяет запас диска, подписи входного архива и публичность IPTV URL.
+
+В Settings → Secrets and variables → Actions задаются секреты `RELEASE_INPUTS_ARCHIVE_URL`, `RELEASE_INPUTS_SHA256`, `TVBOX_SIGNING_KEY`, `TVBOX_SIGNING_CERT`, `OTA_SIGNING_KEY`, `OTA_SIGNING_CERT`. Приватный `.tar.zst` содержит A12 base и необходимые бинарные зависимости; точный состав перечислен в `tools/package-ci-inputs.sh`, архив готовится этой командой, а URL и SHA-256 задаются в Secrets. Используются прежние ключи проекта. Wi-Fi credentials не нужны: `build-sd.sh` удаляет `vendor/etc/tvbox/wifi.env` из базового образа и не включает сетевые пароли в OTA.
+
+Стандартный runner `ubuntu-24.04` может не иметь достаточного свободного диска для Android base и промежуточных образов. Workflow останавливается при запасе меньше 18 GB. Если это происходит, подключите GitHub-hosted larger runner с достаточным диском и задайте в Actions → Variables переменную `RELEASE_RUNNER` равной его метке. Параметры larger runner и стоимость задаются в GitHub организации/аккаунте; сам workflow не создаёт платные ресурсы.
+
+В Release прикладываются подписанный `tvbox-update-<версия>-emmc.zip`, `latest-emmc.txt` и `SHA256SUMS`. Новая версия tvboxd получает метаданные и OTA по HTTPS из GitHub Releases. После проверки исходников и повышения версии push тега запускает сборку и автоматически публикует релиз, если все CI шаги прошли. Аппаратные критерии (загрузка до 20 секунд, воспроизведение, QR, сеть и графическая нагрузка) GitHub runner проверить не может: перед созданием тега ответственный должен подтвердить их на приставке. Автоматический workflow не заменяет эту проверку.
+
 Релиз `0.3.9` собирается для eMMC поверх заводской Android 12. Обновление устанавливается из приложения **Установка**: по сети либо с SD/USB через штатное recovery (`Install update from SD card`). Recovery проверяет подпись OTA; используются прежние ключи проекта. Отдельный образ системы для SD не собирается; загрузка и установка на SD остаются штатными возможностями A12.
 
 Сборка образа eMMC, подписанного OTA и контрольных сумм:

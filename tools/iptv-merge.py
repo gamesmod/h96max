@@ -4,7 +4,7 @@
   python3 -I tools/iptv-merge.py [--sources tools/iptv-sources.txt] [--out overlay/.../iptv.m3u] [--keep-adult]
 
 Rules (user, 2026-10-27): no duplicates, every channel has a working logo, every stream answers from this network.
-- sources: one URL per line, optional "group=NAME" keeps only that group-title; order = priority.
+- sources: "group=NAME" filters a category; "set-group=NAME" assigns one; order = priority.
 - logo: tvg-logo must be http(s) and return an image (or any 200 body for servers without content-type).
 - stream: HTTP 200; HLS is followed master -> first variant -> first segment (all must answer 200).
 - duplicates: same stream URL, or the same normalized name (case, HD/FHD/4K/SD/50fps/orig/[..]/(..) dropped);
@@ -115,11 +115,14 @@ def main():
         if not line or line.startswith("#"): continue
         url, *opt = line.split()
         grp = next((o[6:] for o in opt if o.startswith("group=")), None)
+        set_grp = next((o[10:] for o in opt if o.startswith("set-group=")), None)
         try:
             text = fetch(url, limit=16 << 20, timeout=60)[2].decode("utf-8", "replace")
         except Exception as e:
             print(f"source FAIL {url}: {e}", file=sys.stderr); continue
         got = parse(text, grp)
+        if set_grp:
+            for e in got: e["attrs"]["group-title"] = set_grp
         print(f"source {len(got):5d} {url}", file=sys.stderr)
         entries += got
     total = len(entries)

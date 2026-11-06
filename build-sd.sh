@@ -229,7 +229,7 @@ done
 umnt
 
 fi # VANILLA skips debloat/apps
-log "vendor: tvbox init, eMMC safety, rpmb lock, wifi creds"
+log "vendor: tvbox init, eMMC safety, rpmb lock; no Wi-Fi credentials in image"
 # Взять полную раскладку AOSP и явно закрепить голосовую клавишу за VID/PID USB-пульта.
 debugfs -R "dump /system/usr/keylayout/Generic.kl $W/usb-remote.kl" $LP/system.img >/dev/null
 grep -qE '^key[[:space:]]+582[[:space:]]+VOICE_ASSIST' $W/usb-remote.kl || { echo "В раскладке AOSP нет привязки клавиши 582 к VOICE_ASSIST"; exit 1; }
@@ -283,14 +283,9 @@ cmp -s $MNT/etc/fstab.rk30board $W/fstab.orig || { echo "vendor fstab differs fr
 sudo install -m 0644 $W/fstab.sd $MNT/etc/fstab.rk30board
 lbl u:object_r:vendor_configs_file:s0 $MNT/etc/fstab.rk30board
 sudo mkdir -p $MNT/etc/tvbox; sudo chmod 0700 $MNT/etc/tvbox
-python3 -I - $R/secrets/wifi.env <<'PY' | sudo tee $MNT/etc/tvbox/wifi.env >/dev/null
-import ast, shlex, sys
-for line in open(sys.argv[1]):
-    k, v = line.rstrip("\n").split("=", 1)
-    print(f"{k}={shlex.quote(ast.literal_eval(v))}")
-PY
-sudo chmod 0600 $MNT/etc/tvbox/wifi.env
-lbl u:object_r:vendor_configs_file:s0 $MNT/etc/tvbox $MNT/etc/tvbox/wifi.env
+# Не переносить сетевые пароли в образ или OTA; Wi-Fi при необходимости восстанавливает пользователь.
+sudo rm -f $MNT/etc/tvbox/wifi.env
+lbl u:object_r:vendor_configs_file:s0 $MNT/etc/tvbox
 # Wi-Fi/BT settings proven on this board (stock A9): dhd config (ccode XZ/11) + BT patch
 sudo install -m 0644 $R/a9fw/config.txt $MNT/etc/firmware/config.txt
 sudo install -m 0644 $R/a9fw/bcm4334.hcd $MNT/etc/firmware/bcm4334b0.hcd

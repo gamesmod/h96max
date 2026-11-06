@@ -1,0 +1,122 @@
+name: Build and publish eMMC OTA
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    # Можно задать собственную метку большего GitHub-hosted runner через Actions variable.
+    runs-on: ${{ vars.RELEASE_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 360
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y aapt attr curl e2fsprogs gcc-aarch64-linux-gnu gdisk git-lfs python3 python3-pil zstd
+          if [ -n "${ANDROID_HOME:-}" ]; then sudo rm -rf "$ANDROID_HOME"; fi
+          sudo apt-get clean
+          df -h /
+
+      - name: Check runner disk space
+        run: |
+          set -euo pipefail
+          available_kb="$(df -Pk / | awk 'NR==2 {print $4}')"
+          # Сборка держит распакованную A12 базу, промежуточный образ и подписанный OTA.
+          if [ "$available_kb" -lt 18000000 ]; then
+            echo "Недостаточно места: требуется не менее 18 GB свободно. Установите Actions variable RELEASE_RUNNER на метку runner с большим диском." >&2
+            exit 1
+          fi
+
+      - name: Verify tag and download private release inputs
+        env:
+          INPUTS_URL: ${{ secrets.RELEASE_INPUTS_ARCHIVE_URL }}
+          INPUTS_SHA256: ${{ secrets.RELEASE_INPUTS_SHA256 }}
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
+          tag_version="${GITHUB_REF_NAME#v}"
+          test "$tag_version" = "$version" || { echo "Tag does not match firmware version" >&2; exit 1; }
+          test -n "$INPUTS_URL" && test -n "$INPUTS_SHA256" || { echo "Configure RELEASE_INPUTS_ARCHIVE_URL and RELEASE_INPUTS_SHA256 repository secrets" >&2; exit 1; }
+          echo "::add-mask::$INPUTS_URL"
+          curl --fail --location --retry 3 --silent --show-error "$INPUTS_URL" --output /tmp/release-inputs.tar.zst
+          printf '%s  %s\n' "$INPUTS_SHA256" /tmp/release-inputs.tar.zst | sha256sum --check --status
+          tar --zstd -xf /tmp/release-inputs.tar.zst -C .
+          rm /tmp/release-inputs.tar.zst
+          test -f dl/a12/Image/lp/system.img
+          test -f dl/a12/Image/lp/vendor.img
+          test -f dl/a12/MiniLoaderAll.bin
+          test -f dl/apk/com.tvlauncher.apk
+          test -f dl/webview/webview-arm64.apk
+          test -f dl/torrserver/TorrServer-android-arm64
+          test -f a9fw/fw_bcm4334b1_ag.bin
+          test -f stock/vfd/vfdsrv
+          test -f overlay-wifi/TvboxWifiOverlay.apk
+
+      - name: Load existing signing keys
+        env:
+          TVBOX_KEY: ${{ secrets.TVBOX_SIGNING_KEY }}
+          TVBOX_CERT: ${{ secrets.TVBOX_SIGNING_CERT }}
+          OTA_KEY: ${{ secrets.OTA_SIGNING_KEY }}
+          OTA_CERT: ${{ secrets.OTA_SIGNING_CERT }}
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p secrets
+          test -n "$TVBOX_KEY" && test -n "$TVBOX_CERT" && test -n "$OTA_KEY" && test -n "$OTA_CERT"
+          printf '%s\n' "$TVBOX_KEY" > secrets/tvbox-key.pem
+          printf '%s\n' "$TVBOX_CERT" > secrets/tvbox-cert.pem
+          printf '%s\n' "$OTA_KEY" > secrets/ota-key.pem
+          printf '%s\n' "$OTA_CERT" > secrets/ota-cert.pem
+
+      - name: Generate notes for the installer
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          mkdir -p release/notes
+          previous="$(git describe --tags --abbrev=0 "${GITHUB_SHA}^" 2>/dev/null || true)"
+          if [ -n "$previous" ]; then
+            git log --no-merges --pretty=format:'- %s (%h)' "$previous..$GITHUB_SHA" > "release/notes/$version.txt"
+          else
+            git log --no-merges --pretty=format:'- %s (%h)' -20 "$GITHUB_SHA" > "release/notes/$version.txt"
+          fi
+          test -s "release/notes/$version.txt"
+
+      - name: Build and verify a public IPTV list
+        run: |
+          set -euo pipefail
+          python3 -I tools/check-public-release.py --sources tools/iptv-sources.txt
+          python3 -I tools/iptv-merge.py --out overlay/system/etc/tvbox/iptv.m3u
+          python3 -I tools/check-public-release.py --sources tools/iptv-sources.txt --playlist overlay/system/etc/tvbox/iptv.m3u --min-adult 20
+
+      - name: Build signed OTA
+        run: |
+          set -euo pipefail
+          tools/setup-sdk.sh
+          tools/build-release.sh
+          test ! -e secrets/wifi.env
+          cp release/updates/emmc/latest.txt release/updates/emmc/latest-emmc.txt
+          cd release/updates/emmc
+          sha256sum "tvbox-update-${GITHUB_REF_NAME#v}-emmc.zip" latest-emmc.txt > SHA256SUMS
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          gh release create "$GITHUB_REF_NAME" \
+            "release/updates/emmc/tvbox-update-$version-emmc.zip" \
+            release/updates/emmc/latest-emmc.txt \
+            release/updates/emmc/SHA256SUMS \
+            --title "Panadonik $version" \
+            --generate-notes
