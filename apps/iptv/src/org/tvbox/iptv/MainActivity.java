@@ -212,6 +212,7 @@ public class MainActivity extends Activity {
     static String groupIcon(String group) {
         String s = canonicalGroup(group);
         if (s.contains(" · ")) return "📍";
+        if (s.matches("^[\\p{So}]+ .*")) return "📺";
         if (s.equals("Для взрослых")) return "🔞";
         if (s.equals("Спорт")) return "⚽";
         if (s.equals("Новости")) return "📰";
@@ -269,6 +270,15 @@ public class MainActivity extends Activity {
         if (s.matches("(us|usa|united states|america|сша|соединенные штаты)")) return "🇺🇸 США";
         if (s.matches("(gb|uk|united kingdom|great britain|британия|великобритания)")) return "🇬🇧 Великобритания";
         if (s.matches("(ca|canada|канада)")) return "🇨🇦 Канада";
+        if (s.matches("(de|germany|german|германия)")) return "🇩🇪 Германия";
+        if (s.matches("(fr|france|франция)")) return "🇫🇷 Франция";
+        if (s.matches("(tr|turkey|turkiye|турция)")) return "🇹🇷 Турция";
+        if (s.matches("(kg|kyrgyzstan|кыргызстан|киргизия)")) return "🇰🇬 Кыргызстан";
+        if (s.matches("(uz|uzbekistan|узбекистан)")) return "🇺🇿 Узбекистан";
+        if (s.matches("(am|armenia|армения)")) return "🇦🇲 Армения";
+        if (s.matches("(az|azerbaijan|азербайджан)")) return "🇦🇿 Азербайджан";
+        if (s.matches("(ge|georgia|грузия)")) return "🇬🇪 Грузия";
+        if (s.matches("(md|moldova|молдова)")) return "🇲🇩 Молдова";
         return "Прочее";
     }
 
