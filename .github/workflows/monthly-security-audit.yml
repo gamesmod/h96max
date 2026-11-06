@@ -21,17 +21,24 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Проверить ежемесячное подтверждение логов и трафика
-        run: python3 tools/check-monthly-audit-evidence.py --file docs/security/monthly-audit.json --max-age-days 31
-
       - name: Запустить полный набор тестов
         run: |
-          set -euo pipefail
+          set -uo pipefail
           mkdir -p release/qa
+          set +e
           python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/monthly-tests.log
+          test_status=${PIPESTATUS[0]}
           python3 tools/analyze-release-logs.py /tmp/monthly-tests.log \
             --source "ежемесячный запуск тестов безопасности" \
             --output release/qa/monthly-security-tests.md --fail-on-errors
+          analysis_status=$?
+          set -e
+          if [ "$test_status" -ne 0 ]; then exit "$test_status"; fi
+          exit "$analysis_status"
+
+      - name: Проверить ежемесячное подтверждение логов и трафика
+        if: always()
+        run: python3 tools/check-monthly-audit-evidence.py --file docs/security/monthly-audit.json --max-age-days 31
 
       - name: Сохранить очищенный отчёт тестов
         if: always()

@@ -45,6 +45,8 @@ class MonthlyAuditEvidenceTests(unittest.TestCase):
         self.assertIn("schedule:", workflow)
         self.assertIn("cron: '17 8 1 * *'", workflow)
         self.assertIn("--max-age-days 31", workflow)
+        self.assertGreater(workflow.index("--fail-on-errors"), workflow.index("python3 -m unittest"))
+        self.assertGreater(workflow.index("--max-age-days 31"), workflow.index("--fail-on-errors"))
 
 
 if __name__ == "__main__":
