@@ -43,7 +43,7 @@
     "torrent_playback": "pending",
     "graphics_video": "pending",
     "graphics_stress": "pending",
-    "swap_disabled": "pass: /proc/swaps пуст",
+    "swap_disabled": "pass",
     "network_capture_review": "pending: захват относится к установленной 0.3.9, после установки кандидата повторить",
     "device_update": "pending: OTA очищает пользовательские данные; отдельное подтверждение на очистку не получено",
     "alice_voice": "pending: Алиса не установлена"
