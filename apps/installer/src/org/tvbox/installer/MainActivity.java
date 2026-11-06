@@ -3,6 +3,7 @@ package org.tvbox.installer;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -95,6 +96,7 @@ public class MainActivity extends Activity {
         menu.removeAllViews();
         item("Обновить состояние", "Откуда загружена система, что на внутренней памяти", false, new Runnable() { public void run() { refresh(); } });
         item("Проверить обновления", "Флешка, SD-карта, адреса в сети", false, new Runnable() { public void run() { checkUpdates(); } });
+        item("Обновления приложений", "Открыть Obtainium: источники и обновления APK", false, new Runnable() { public void run() { openObtainium(); } });
         if (sd) {
             item("Установить на внутреннюю память", "Записать систему с SD-карты на eMMC и сверить", true, new Runnable() { public void run() {
                 confirmInstall(); } });
@@ -107,6 +109,17 @@ public class MainActivity extends Activity {
         item("Источники обновлений", "Адреса в локальной сети и интернете", false, new Runnable() { public void run() { sources(); } });
         item("Журнал последней операции", "Что делалось и чем закончилось", false, new Runnable() { public void run() { op("LOG", "Журнал"); } });
         menu.getChildAt(0).requestFocus();
+    }
+
+    /** Запустить менеджер приложений из плитки «Установка», не дублируя его отдельной плиткой на главном экране. */
+    void openObtainium() {
+        Intent launch = getPackageManager().getLaunchIntentForPackage("dev.imranr.obtainium");
+        if (launch == null) {
+            alert("Obtainium не найден", "Проверьте установку приложения Obtainium и повторите запуск.");
+            return;
+        }
+        try { startActivity(launch); }
+        catch (Exception e) { alert("Не удалось открыть Obtainium", e.getMessage() == null ? "Ошибка запуска" : e.getMessage()); }
     }
 
     // ------------------------------------------------------------------ updates

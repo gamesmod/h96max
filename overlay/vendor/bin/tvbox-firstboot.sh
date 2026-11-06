@@ -138,16 +138,16 @@ L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
 if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initialized" ]; then
     # Атомарно записать настройки до остановки HOME; особенности запуска описаны в HANDOFF.md.
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
-    ALLOWED="org.tvbox.iptv ru.yourok.torrserve org.smarttube.stable com.ghisler.android.TotalCommander dev.imranr.obtainium org.tvbox.links org.tvbox.installer org.tvbox.bootlog com.android.tv.settings org.tvbox.clean org.tvbox.power"
+    ALLOWED="org.tvbox.iptv ru.yourok.torrserve org.smarttube.stable com.ghisler.android.TotalCommander org.tvbox.links org.tvbox.installer org.tvbox.bootlog com.android.tv.settings org.tvbox.clean org.tvbox.power"
     T=""; EXTRA=""; N=0
     # Сохранить установленные функции и их порядок; удалить дубли, игры и устаревшие плитки.
     for p in $(printf '%s' "$OLD" | sed 's/\&\#30;/ /g'); do
-        case "$p" in com.agateau.tinywheels.android|org.supertux.supertux2) continue;; esac
+        case "$p" in com.agateau.tinywheels.android|org.supertux.supertux2|dev.imranr.obtainium) continue;; esac
         pm path "$p" >/dev/null 2>&1 || continue
         case " $T $EXTRA " in *" $p "*) continue;; esac
         case " $ALLOWED " in *" $p "*) T="${T:+$T&#30;}$p"; N=$((N+1));; *) EXTRA="${EXTRA:+$EXTRA }$p";; esac
     done
-    # Добавить отсутствующие штатные плитки в описанном порядке (по умолчанию 11; лаунчер поддерживает 14).
+    # Добавить отсутствующие штатные плитки в описанном порядке (по умолчанию 10; лаунчер поддерживает 14).
     for p in $ALLOWED; do
         pm path "$p" >/dev/null 2>&1 || continue
         case " $T " in *" $p "*) ;; *)
@@ -219,6 +219,25 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-vlc-tile-remove
         echo "tvlauncher: removed the separate VLC tile"
     fi
     touch "$D/launcher-vlc-tile-removed"
+fi
+# Obtainium запускается из пункта «Обновления приложений» внутри плитки «Установка».
+if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-obtainium-integrated" ] && [ -f "$L" ]; then
+    OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
+    T=""; CHANGED=0
+    for p in $(printf '%s' "$OLD" | sed 's/\&#30;/ /g'); do
+        if [ "$p" = dev.imranr.obtainium ]; then CHANGED=1; continue; fi
+        T="${T:+$T&#30;}$p"
+    done
+    if [ "$CHANGED" = 1 ]; then
+        REPL=$(printf '%s' "$T" | sed 's/\&/\\\&/g')
+        sed "s|<string name=\"apps_order\">[^<]*</string>|<string name=\"apps_order\">$REPL</string>|" "$L" > "$L.new"
+        u=$(stat -c %u /data/data/com.tvlauncher)
+        chown "$u:$u" "$L.new"; chmod 660 "$L.new"; mv "$L.new" "$L"; restorecon "$L"
+        am force-stop com.tvlauncher
+        am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
+        echo "tvlauncher: moved Obtainium access into the installer tile"
+    fi
+    touch "$D/launcher-obtainium-integrated"
 fi
 # При переходе с Flicky на Obtainium заменить только старый пакет плитки и сохранить её позицию.
 L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml

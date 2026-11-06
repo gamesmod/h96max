@@ -30,14 +30,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -169,12 +166,16 @@ public class MainActivity extends Activity {
     void storeHistory(Map<String, List<String>> m, float t, float c, float g, float used, float total) {
         long now = System.currentTimeMillis();
         File file = historyFile();
-        if (lastHistoryWrite == 0) lastHistoryWrite = lastHistoryTimestamp(file);
+        if (lastHistoryWrite == 0) {
+            ensureHistoryHeader(file);
+            lastHistoryWrite = lastHistoryTimestamp(file);
+        }
         if (now - lastHistoryWrite >= HISTORY_PERIOD_MS) {
             try {
                 if (!file.exists()) file.getParentFile().mkdirs();
+                boolean empty = file.length() == 0;
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8"));
-                if (file.length() == 0) out.write("epoch,temp_c,cpu_pct,gpu_pct,ram_used_mb,ram_total_mb,cpu_mhz\n");
+                if (empty) out.write("epoch,temp_c,cpu_pct,gpu_pct,ram_used_mb,ram_total_mb,cpu_mhz\n");
                 out.write(String.format(Locale.US, "%d,%.2f,%.2f,%.2f,%.0f,%.0f,%s\n", now / 1000,
                         t, c, g, used, total, one(m, "CPU_MHZ")));
                 out.close();
@@ -188,6 +189,24 @@ public class MainActivity extends Activity {
     }
 
     File historyFile() { return new File(getFilesDir(), "performance-history.csv"); }
+
+    /** Старую историю без строки заголовка привести к обычному CSV при первом открытии после обновления. */
+    void ensureHistoryHeader(File file) {
+        if (!file.isFile() || file.length() == 0) return;
+        File tmp = new File(file.getParentFile(), "performance-history.tmp");
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+            String first = in.readLine();
+            if (first == null || first.startsWith("epoch,")) { in.close(); return; }
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmp), "UTF-8"));
+            out.write("epoch,temp_c,cpu_pct,gpu_pct,ram_used_mb,ram_total_mb,cpu_mhz\n");
+            out.write(first); out.write('\n');
+            String line;
+            while ((line = in.readLine()) != null) { out.write(line); out.write('\n'); }
+            in.close(); out.close();
+            if (!tmp.renameTo(file)) { file.delete(); tmp.renameTo(file); }
+        } catch (Exception e) { tmp.delete(); android.util.Log.w("tvbox-perf", "Не удалось добавить заголовок истории", e); }
+    }
 
     long lastHistoryTimestamp(File file) {
         long last = 0;
@@ -279,10 +298,15 @@ public class MainActivity extends Activity {
         if (requestCode != 17 || resultCode != RESULT_OK || data == null) return;
         Uri uri = data.getData();
         try {
-            InputStream in = new FileInputStream(historyFile());
-            OutputStream out = getContentResolver().openOutputStream(uri);
-            byte[] buf = new byte[8192]; int n;
-            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(historyFile()), "UTF-8"));
+            OutputStreamWriter out = new OutputStreamWriter(getContentResolver().openOutputStream(uri), "UTF-8");
+            String first = in.readLine();
+            if (first == null || !first.startsWith("epoch,")) {
+                out.write("epoch,temp_c,cpu_pct,gpu_pct,ram_used_mb,ram_total_mb,cpu_mhz\n");
+            }
+            if (first != null) { out.write(first); out.write('\n'); }
+            String line;
+            while ((line = in.readLine()) != null) { out.write(line); out.write('\n'); }
             in.close(); out.close();
             Toast.makeText(this, "CSV сохранён", Toast.LENGTH_LONG).show();
         } catch (Exception e) { Toast.makeText(this, "Ошибка экспорта CSV: " + e.getMessage(), Toast.LENGTH_LONG).show(); }
