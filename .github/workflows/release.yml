@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
       - 'dev-v*'
+  # Ручной запуск собирает проверяемый кандидат как Actions artifact,
+  # но не создаёт тег и не публикует GitHub Release.
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -37,7 +40,7 @@ jobs:
           python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log
           python3 tools/analyze-release-logs.py /tmp/panadonik-tests.log \
             --source "автоматические тесты" --output release/qa/test-log-analysis.md --fail-on-errors
-          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then test_scope="dev: IPTV и функциональный release gate"; else test_scope="stable: полный набор, включая конфигурацию безопасности"; fi
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then test_scope="candidate: автоматические проверки перед аппаратной приёмкой"; elif [[ "$GITHUB_REF_NAME" == dev-v* ]]; then test_scope="dev: IPTV и функциональный release gate"; else test_scope="stable: полный набор, включая конфигурацию безопасности"; fi
           cat > release/qa/automated-tests.md <<EOF
           # Автоматические проверки выпуска
 
@@ -61,7 +64,7 @@ jobs:
         run: |
           set -euo pipefail
           version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
-          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then tag_version="${GITHUB_REF_NAME#dev-v}"; else tag_version="${GITHUB_REF_NAME#v}"; fi
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then tag_version="$version"; elif [[ "$GITHUB_REF_NAME" == dev-v* ]]; then tag_version="${GITHUB_REF_NAME#dev-v}"; else tag_version="${GITHUB_REF_NAME#v}"; fi
           test "$tag_version" = "$version" || { echo "Tag does not match firmware version" >&2; exit 1; }
           test -n "$INPUTS_URL" && test -n "$INPUTS_SHA256" || { echo "Configure RELEASE_INPUTS_ARCHIVE_URL and RELEASE_INPUTS_SHA256 repository secrets" >&2; exit 1; }
           echo "::add-mask::$INPUTS_URL"
@@ -98,7 +101,7 @@ jobs:
       - name: Generate notes for the installer
         run: |
           set -euo pipefail
-          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then version="${GITHUB_REF_NAME#dev-v}"; else version="${GITHUB_REF_NAME#v}"; fi
+          version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
           mkdir -p release/notes
           if [ -s "release/notes/$version.txt" ]; then
             echo "Using committed release notes"
@@ -142,15 +145,17 @@ jobs:
           cp apps/iptv/out/TvboxIptv.apk release/obtainium/Panadonik-iptv.apk
           cp apps/links/out/TvboxLinks.apk release/obtainium/Panadonik-links.apk
           cp apps/power/out/TvboxPower.apk release/obtainium/Panadonik-power.apk
-          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then version="${GITHUB_REF_NAME#dev-v}"; else version="${GITHUB_REF_NAME#v}"; fi
+          version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
           cp release/updates/emmc/latest.txt release/updates/emmc/latest-emmc.txt
           cd release/updates/emmc
           sha256sum "tvbox-update-$version-emmc.zip" latest-emmc.txt > SHA256SUMS
 
       - name: Require target-device release evidence
+        if: github.event_name == 'push'
         run: |
           set -euo pipefail
-          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then version="${GITHUB_REF_NAME#dev-v}"; channel=dev; else version="${GITHUB_REF_NAME#v}"; channel=stable; fi
+          version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
+          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then channel=dev; else channel=stable; fi
           cp "docs/release-qa/$version.json" release/qa/device-evidence.json
           python3 tools/check-release-evidence.py --file "docs/release-qa/$version.json" --version "$version" --channel "$channel"
 
@@ -165,7 +170,28 @@ jobs:
           if-no-files-found: ignore
           retention-days: 90
 
+      - name: Upload signed build candidate (manual run only)
+        if: github.event_name == 'workflow_dispatch' && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: panadonik-candidate-${{ github.sha }}
+          path: |
+            release/updates/emmc/tvbox-update-*.zip
+            release/updates/emmc/latest-emmc.txt
+            release/updates/emmc/SHA256SUMS
+            release/Panadonik-*-emmc-clean-install.zip
+            release/Panadonik-*-emmc-clean-install.zip.sha256
+            release/Panadonik-*-emmc-clean-install.zip.sig
+            release/Panadonik-*-ota-cert.pem
+            release/obtainium/*.apk
+            release/qa/automated-tests.md
+            release/qa/test-log-analysis.md
+            release/qa/build-log-analysis.md
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Publish GitHub Release
+        if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
