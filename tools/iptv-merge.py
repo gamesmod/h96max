@@ -264,8 +264,8 @@ def probe_segment_resolution(data):
         return 0
 
 def quality_ok(entry):
-    """Не принимать поток, пока разрешение 1080 строк не подтверждено."""
-    return resolution(entry) >= 1080 or entry.get("verified_resolution", 0) >= 1080
+    """Не считать подпись в названии доказательством измеренного разрешения."""
+    return entry.get("verified_resolution", 0) >= 1080
 
 def label_verified_quality(entry, height):
     """Показать измеренное качество в имени, удалив конфликтующие исходные метки."""
@@ -317,8 +317,8 @@ def stream_resolution(url):
         st, ct, body, final = fetch(url)
         if st not in (200, 206): return 0
         if b"#EXTM3U" not in body[:1024]:
-            observed = probe_segment_resolution(body)
-            return observed or resolution({"name": "", "attrs": {}, "url": final, "opts": []})
+            # Имя URL может обещать 1080p, но принимать поток можно только по измеренному кадру.
+            return probe_segment_resolution(body)
         lines = [l.strip() for l in body.decode("utf-8", "replace").splitlines()]
         if any(l.startswith("#EXT-X-STREAM-INF") for l in lines):       # master -> лучший описанный вариант
             variants = []
@@ -343,8 +343,8 @@ def stream_resolution(url):
         if not seg: return 0
         st, _, data, _ = fetch(urllib.parse.urljoin(final, seg), limit=65536, rng=True)
         if st not in (200, 206) or not data: return 0
-        observed = probe_segment_resolution(data)
-        return observed or height
+        # Метаданные HLS — только подсказка; неизвестное по сегменту качество не проходит порог.
+        return probe_segment_resolution(data)
     except Exception:
         return 0
 

@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import unittest
 import tempfile
+from unittest import mock
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -96,9 +97,30 @@ class IptvCategoryTests(unittest.TestCase):
         self.assertEqual(MERGE.normalize_group("", "Match! Football"), "Спорт · Футбол")
 
     def test_unconfirmed_and_sub_1080_quality_are_rejected(self):
-        for label, expected in (("1080p", True), ("FHD", False), ("720p", False), ("", False)):
+        for label, expected in (("1080p", False), ("FHD", False), ("720p", False), ("", False)):
             entry = {"name": "Channel " + label, "attrs": {}, "url": "https://example.invalid/a", "opts": []}
             self.assertEqual(MERGE.quality_ok(entry), expected)
+
+    def test_only_measured_resolution_controls_quality_gate(self):
+        entry = {"name": "Channel (4K)", "attrs": {}, "url": "https://example.invalid/channel-4k-2160p.ts",
+                 "opts": [], "verified_resolution": 720}
+        self.assertFalse(MERGE.quality_ok(entry))
+        entry["verified_resolution"] = 1080
+        self.assertTrue(MERGE.quality_ok(entry))
+
+    def test_unknown_segment_resolution_is_not_replaced_by_hls_label(self):
+        responses = [
+            (200, "application/vnd.apple.mpegurl",
+             b"#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=4000000,RESOLUTION=1920x1080\nhigh.m3u8\n",
+             "https://example.invalid/master.m3u8"),
+            (200, "application/vnd.apple.mpegurl", b"#EXTM3U\nsegment.ts\n",
+             "https://example.invalid/high.m3u8"),
+            (206, "video/mp2t", b"not enough data to identify a frame",
+             "https://example.invalid/segment.ts"),
+        ]
+        with mock.patch.object(MERGE, "fetch", side_effect=responses), \
+             mock.patch.object(MERGE, "probe_segment_resolution", return_value=0):
+            self.assertEqual(MERGE.stream_resolution("https://example.invalid/master.m3u8"), 0)
 
     def test_verified_quality_label_replaces_conflicting_source_label(self):
         entry = {"name": "Channel (720p)", "attrs": {}}
