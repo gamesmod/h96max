@@ -160,6 +160,13 @@ public class MainActivity extends Activity {
             .setMessage((note != null ? note + "\n\n" : "") + "Источник: " + u[2] + ", " + u[3] + "\n\n"
                 + "Приставка перезагрузится, recovery проверит подпись пакета и установит его, затем система запустится снова.")
             .setNegativeButton("Отмена", null)
+            .setPositiveButton("Сохранить данные", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface d, int w) {
+                    confirmCmd("Обновить с сохранением данных?",
+                        "Системные разделы будут обновлены. Приложения, настройки, торренты и пользовательские файлы останутся на месте.",
+                        "UPDATE_INSTALL " + u[0] + " keep", "Обновление с сохранением данных");
+                }
+            })
             .setNeutralButton("С очисткой данных", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface d, int w) {
                     confirmCmd("Обновить с очисткой?", "Будут удалены все приложения, настройки, торренты и файлы пользователя. Система запустится как новая.",

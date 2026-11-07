@@ -870,13 +870,15 @@ public class Main {
 
     static int num(String s) { try { return Integer.parseInt(s.replaceAll("\\D", "")); } catch (Exception e) { return 0; } }
 
-    /** "file:/path|url:base keep|wipe": fetch, verify (sha256 + OTA signature), then reboot into recovery. */
+    /** Загружает и проверяет OTA-пакет, затем перезагружает приставку в recovery. */
     static void updateInstall(Op op, String args) throws Exception {
         String[] a = args.split(" ");
         String src = a[0];
         boolean wipe = a.length > 1 && a[1].equals("wipe");
-        // keeping user data is switched off for now (user, 2026-10-28; OTA through recovery is in the backlog)
-        if (!wipe) { op.done(false, "обновление с сохранением данных временно отключено"); return; }
+        if (a.length > 1 && !a[1].equals("keep") && !wipe) {
+            op.done(false, "неизвестный режим обновления");
+            return;
+        }
         new File(OTA_DIR).mkdirs();
         File pkg = new File(OTA_PKG), tmp = new File(OTA_PKG + ".part");
         tmp.delete();

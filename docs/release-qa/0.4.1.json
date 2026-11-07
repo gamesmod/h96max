@@ -1,7 +1,7 @@
 {
   "version": "0.4.1",
   "device": "Panadonik H96 Max, Android 12",
-  "reviewed_at": "2026-11-06",
+  "reviewed_at": "2026-11-07",
   "cold_boot_seconds": null,
   "last_reboot_to_screen_seconds": 75,
   "hot_test": {
@@ -17,7 +17,47 @@
       "raw_capture_retained": false,
       "scope": "снято на 0.3.9; после установки 0.4.1 нужен новый sanity-захват"
     },
-    "adb": "приставка отвечает на ping, TCP 5555 отклоняет соединение; установка и аппаратные тесты невозможны до восстановления ADB"
+    "adb": "TCP ADB подключён для диагностики; полный OTA 0.4.1 не установлен",
+    "iptv_debug_run": {
+      "diagnostic_apk_sha256": "b2dfe6c0900cd38c8fb1f1c7c77ce009cd6d3b3e38348b9951ccdb614d192fa2",
+      "installed_without_data_wipe": true,
+      "debug_setting_enabled": true,
+      "bundled_adult_channels_checked_on_device": 184,
+      "bundled_http_401": 184,
+      "alternative_channels_from_configured_sources": 92,
+      "alternatives_http_200_on_device": 92,
+      "alternative_quality_measured_on_build_host": {
+        "1080p": 91,
+        "2160p": 1
+      },
+      "vlc_http_200_and_mpeg_ts_demux_observed": true,
+      "video_codec": "HEVC",
+      "audio_codec": "AAC",
+      "visible_video_confirmed": false,
+      "temporary_user_playlist_removed": true,
+      "restored_full_user_playlist_installed": true,
+      "restored_playlist_channels": 2912,
+      "restored_playlist_adult_channels": 94,
+      "restored_playlist_child_channels": 0,
+      "restored_playlist_minimum_quality": 1080,
+      "restored_playlist_sha256": "4fa82050759cf9733457e2f4a8d7b772d966c79345d8a8ad4f978d19c5efe512",
+      "raw_urls_or_logs_committed": false,
+      "report": "docs/release-qa/0.4.1-iptv-debug.md",
+      "refreshed_adult_playlist_http_200_on_device": 93,
+      "refreshed_adult_playlist_total": 94,
+      "refreshed_adult_playlist_unconfirmed": 1,
+      "next_release_generated_playlist": {
+        "channels": 885,
+        "adult_channels": 95,
+        "adult_quality_measured": {
+          "1080p": 91,
+          "2160p": 4
+        },
+        "child_channels": 0,
+        "minimum_quality": 1080,
+        "public_validator": "pass"
+      }
+    }
   },
   "automated_tests": {
     "status": "pass",
@@ -39,7 +79,7 @@
     "qr_vlc": "pending: кандидат не установлен",
     "wired_network": "pending",
     "wifi_network": "pending",
-    "iptv_playback": "pending: M3U в образе проверен локально, воспроизведение на приставке не проверено",
+    "iptv_playback": "pending: 184 прежних взрослых потоков вернули HTTP 401; текущий полный список содержит 94 взрослых, из них 93 подтвердили HTTP 200 на приставке, 1 остался без результата; видимое видео и плавность не подтверждены",
     "torrent_playback": "pending",
     "graphics_video": "pending",
     "graphics_stress": "pending",
@@ -51,7 +91,7 @@
   "log_analysis": {
     "reviewed": true,
     "untriaged_errors": 1,
-    "summary": "Последний журнал установленной 0.3.9 содержит одну ошибку Obtainium EGL и повторные предупреждения FunctionFS; их повторная проверка и разбор после загрузки кандидата ожидаются."
+    "summary": "На приставке исходные 184 взрослых потока ответили HTTP 401; альтернативные ссылки менялись (92/92 HTTP 200 в первом проходе, затем 70/92, после обновления списка 93/94). VLC разобрал MPEG-TS с HEVC/AAC, но видимый кадр и отсутствие лагов не подтверждены. Диагностический сканер получил 8-секундный общий лимит с DNS. Полный разбор журналов и release sanity следующего OTA остаются незавершёнными."
   },
   "candidate_build": {
     "built_at": "2026-11-06T21:03:25Z",

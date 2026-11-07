@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.LruCache;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -49,6 +51,9 @@ public class MainActivity extends Activity {
     static final String USER_PLAYLIST = "iptv.m3u";
     static final String PLAYLIST = "https://ngrch.github.io/iptv/ru.m3u";
     static final String VLC = "org.videolan.vlc";
+    static final String TAG = "TvboxIptv";
+    static final String EXTRA_DEBUG_SCAN_ADULT = "org.tvbox.iptv.DEBUG_SCAN_ADULT";
+    static final String EXTRA_USE_USER_PLAYLIST = "org.tvbox.iptv.USE_USER_PLAYLIST";
     static final int INDEX_SCHEMA = 4;
 
     ListView lv;
@@ -102,6 +107,16 @@ public class MainActivity extends Activity {
         lv = new ListView(this);
         lv.setPadding(48, 24, 48, 24);
         setContentView(lv);
+        if (getIntent().hasExtra(EXTRA_USE_USER_PLAYLIST)) {
+            boolean enabled = getIntent().getBooleanExtra(EXTRA_USE_USER_PLAYLIST, false);
+            getSharedPreferences("iptv_settings", MODE_PRIVATE).edit().putBoolean("use_user_playlist", enabled).apply();
+            iptvLog("playlist_override", "enabled=" + enabled);
+        }
+        if (getIntent().getBooleanExtra(EXTRA_DEBUG_SCAN_ADULT, false)) {
+            setTitle("Диагностика IPTV: Для взрослых");
+            startAdultCategoryProbe();
+            return;
+        }
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> p, View v, int pos, long id) {
                 if (cur == null) {
@@ -200,10 +215,11 @@ public class MainActivity extends Activity {
         } else startService(service);
     }
 
-    /** Выбирает пользовательский плейлист, если он установлен, иначе берёт плейлист из образа. */
+    /** Берёт список из образа; пользовательский список используется только по явному переключателю. */
     static File playlistFile(android.content.Context context) {
+        android.content.SharedPreferences settings = context.getSharedPreferences("iptv_settings", MODE_PRIVATE);
         File external = context.getExternalFilesDir(null);
-        if (external != null) {
+        if (settings.getBoolean("use_user_playlist", false) && external != null) {
             File userPlaylist = new File(external, USER_PLAYLIST);
             if (userPlaylist.isFile() && userPlaylist.length() > 0) return userPlaylist;
         }
@@ -485,24 +501,187 @@ public class MainActivity extends Activity {
      */
     void playGroup(List<String[]> chans, int pos) {
         String[] ch = chans.get(pos);
-        play(ch[0], ch[1]);
+        play(ch[0], ch[1], ch[3]);
     }
 
-    void play(String url, String name) {
+    void play(String url, String name, String channelId) {
+        if (iptvDebugEnabled()) {
+            iptvLog("playback_selected", "epg_id=" + safeLogValue(channelId) + " scheme=" + safeScheme(url));
+            probeSelectedStream(url);
+        }
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setDataAndType(Uri.parse(url), "video/*");
         i.putExtra("title", name);
         i.setPackage(VLC);
         try {
             startActivity(i);
+            iptvLog("playback_handoff", "target=vlc scheme=" + safeScheme(url));
         } catch (Exception e) {
+            iptvLog("playback_handoff_failed", "target=vlc scheme=" + safeScheme(url) + " error=" + e.getClass().getSimpleName());
             i.setPackage(null);
             try {
                 startActivity(i);
+                iptvLog("playback_fallback", "target=implicit scheme=" + safeScheme(url));
             } catch (Exception e2) {
+                iptvLog("playback_failed", "target=implicit scheme=" + safeScheme(url) + " error=" + e2.getClass().getSimpleName());
                 Toast.makeText(this, "Нет плеера: " + e2.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    static String safeScheme(String url) {
+        try {
+            String scheme = Uri.parse(url).getScheme();
+            return scheme == null ? "missing" : scheme.toLowerCase(java.util.Locale.ROOT);
+        } catch (Exception ignored) { return "invalid"; }
+    }
+
+    static String safeLogValue(String value) {
+        return value != null && value.matches("[A-Za-z0-9_.-]{1,80}") ? value : "unknown";
+    }
+
+    boolean iptvDebugEnabled() {
+        try {
+            if (android.provider.Settings.Global.getInt(getContentResolver(), "tvbox_iptv_debug", 0) == 1)
+                return true;
+        } catch (Exception ignored) { }
+        try {
+            Class<?> properties = Class.forName("android.os.SystemProperties");
+            String enabled = (String) properties.getMethod("get", String.class, String.class)
+                    .invoke(null, "persist.tvbox.iptv.debug", "0");
+            return "1".equals(enabled);
+        } catch (Exception ignored) { return false; }
+    }
+
+    /** Только проверяет заголовки потока; адрес, тело ответа и заголовки не записываются в журнал. */
+    void probeSelectedStream(final String url) {
+        new Thread(new Runnable() {
+            @Override public void run() {
+                ProbeResult result = probeStreamBounded(url, 8000);
+                iptvLog(result.error.isEmpty() ? "stream_probe" : "stream_probe_failed",
+                        result.asLogDetail());
+            }
+        }, "iptv-stream-probe").start();
+    }
+
+    void startAdultCategoryProbe() {
+        if (!iptvDebugEnabled()) {
+            setTitle("Сначала включите отладку IPTV");
+            return;
+        }
+        new Thread(new Runnable() {
+            @Override public void run() {
+                List<String[]> channels = adultStreams(playlistFile(MainActivity.this));
+                iptvLog("category_probe_start", "category=adult count=" + channels.size());
+                Map<Integer, Integer> statuses = new LinkedHashMap<>();
+                int failed = 0;
+                boolean timedOut = false;
+                for (String[] channel : channels) {
+                    ProbeResult result = probeStreamBounded(channel[0], 8000);
+                    if (result.error.isEmpty()) {
+                        Integer count = statuses.get(result.status);
+                        statuses.put(result.status, count == null ? 1 : count + 1);
+                    } else failed++;
+                    iptvLog(result.error.isEmpty() ? "category_probe_result" : "category_probe_error",
+                            "epg_id=" + safeLogValue(channel[1]) + " " + result.asLogDetail());
+                    if ("Timeout".equals(result.error)) { timedOut = true; break; }
+                    try { Thread.sleep(500); }
+                    catch (InterruptedException e) { Thread.currentThread().interrupt(); break; }
+                }
+                int checked = failed;
+                for (Integer count : statuses.values()) checked += count;
+                StringBuilder summary = new StringBuilder("category=adult checked=")
+                        .append(checked).append(" failed=").append(failed)
+                        .append(" timed_out=").append(timedOut);
+                for (Map.Entry<Integer, Integer> status : statuses.entrySet())
+                    summary.append(" http_").append(status.getKey()).append('=').append(status.getValue());
+                iptvLog("category_probe_complete", summary.toString());
+            }
+        }, "iptv-adult-category-probe").start();
+    }
+
+    static List<String[]> adultStreams(File playlist) {
+        List<String[]> out = new ArrayList<>();
+        try {
+            BufferedReader reader = new BufferedReader(new java.io.FileReader(playlist));
+            String line, channelId = "", group = "";
+            boolean pending = false;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith("#EXTINF")) {
+                    group = canonicalGroup(m3uAttr(line, "group-title"));
+                    channelId = m3uAttr(line, "tvg-id");
+                    pending = true;
+                } else if (pending && !line.isEmpty() && !line.startsWith("#")) {
+                    if ("Для взрослых".equals(group)) out.add(new String[]{line, channelId});
+                    pending = false;
+                }
+            }
+            reader.close();
+        } catch (Exception ignored) { }
+        return out;
+    }
+
+    static ProbeResult probeStream(String url) {
+        HttpURLConnection connection = null;
+        try {
+            String scheme = safeScheme(url);
+            if (!"http".equals(scheme) && !"https".equals(scheme))
+                return new ProbeResult(-1, "", scheme, "UnsupportedScheme");
+            connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.setRequestProperty("User-Agent", "VLC/3.0.20 LibVLC/3.0.20");
+            connection.setRequestProperty("Range", "bytes=0-0");
+            int status = connection.getResponseCode();
+            String type = connection.getContentType();
+            if (type != null) type = type.split(";", 2)[0].replaceAll("[^A-Za-z0-9!#$&^_.+/-]", "");
+            return new ProbeResult(status, type, safeScheme(connection.getURL().toString()), "");
+        } catch (Exception e) {
+            return new ProbeResult(-1, "", safeScheme(url), e.getClass().getSimpleName());
+        } finally {
+            if (connection != null) connection.disconnect();
+        }
+    }
+
+    /** Ограничивает полное время запроса, включая DNS-поиск, который не входит в тайм-аут URLConnection. */
+    static ProbeResult probeStreamBounded(final String url, long timeoutMillis) {
+        final ProbeResult[] result = new ProbeResult[1];
+        Thread worker = new Thread(new Runnable() {
+            @Override public void run() { result[0] = probeStream(url); }
+        }, "iptv-probe-request");
+        worker.setDaemon(true);
+        worker.start();
+        try { worker.join(timeoutMillis); }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return new ProbeResult(-1, "", safeScheme(url), "Interrupted");
+        }
+        if (worker.isAlive()) {
+            worker.interrupt();
+            return new ProbeResult(-1, "", safeScheme(url), "Timeout");
+        }
+        return result[0] == null ? new ProbeResult(-1, "", safeScheme(url), "ProbeFailed") : result[0];
+    }
+
+    static final class ProbeResult {
+        final int status;
+        final String contentType, finalScheme, error;
+        ProbeResult(int status, String contentType, String finalScheme, String error) {
+            this.status = status;
+            this.contentType = contentType == null ? "" : contentType;
+            this.finalScheme = finalScheme == null ? "unknown" : finalScheme;
+            this.error = error == null ? "unknown" : error;
+        }
+        String asLogDetail() {
+            return "status=" + (status < 0 ? "unknown" : status) + " content_type=" +
+                    (contentType.isEmpty() ? "unknown" : contentType) + " final_scheme=" + finalScheme +
+                    (error.isEmpty() ? "" : " error=" + error);
+        }
+    }
+
+    void iptvLog(String event, String detail) {
+        if (iptvDebugEnabled()) Log.d(TAG, "event=" + event + " " + detail);
     }
 
     @Override
