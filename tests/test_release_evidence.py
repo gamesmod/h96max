@@ -34,6 +34,7 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
                     "cold_boot_le_10s", "boot_log_review", "qr_vlc",
                     "wired_network", "wifi_network", "iptv_playback", "torrent_playback",
                     "graphics_video", "graphics_stress", "swap_disabled", "network_capture_review",
+                    "usb_remote_iptv_channels",
                 )
             },
             "log_analysis": {"reviewed": True, "untriaged_errors": 0, "summary": "test"},
@@ -58,6 +59,12 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         result = self.run_checker("stable")
         self.assertEqual(result.returncode, 1)
         self.assertIn("security_review", result.stderr)
+
+    def test_dev_gate_requires_usb_remote_channel_switching(self):
+        self.data["checks"]["usb_remote_iptv_channels"] = "pending"
+        result = self.run_checker("dev")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("usb_remote_iptv_channels", result.stderr)
 
     def test_dev_gate_requires_network_capture_review(self):
         self.data["checks"]["network_capture_review"] = "pending"

@@ -10,7 +10,7 @@ import sys
 FUNCTIONAL_CHECKS = (
     "cold_boot_le_10s", "boot_log_review", "qr_vlc",
     "wired_network", "wifi_network", "iptv_playback", "torrent_playback", "graphics_video",
-    "graphics_stress", "swap_disabled", "network_capture_review",
+    "graphics_stress", "swap_disabled", "network_capture_review", "usb_remote_iptv_channels",
 )
 STABLE_SECURITY_CHECKS = ("security_review",)
 
