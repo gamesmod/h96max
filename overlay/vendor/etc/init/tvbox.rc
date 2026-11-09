@@ -1,5 +1,12 @@
 # tvbox: SD-boot safety + first-boot provisioning (rk3318-android)
 on early-init
+    # Force the physical HDMI link to Full HD; Auto follows a 4K sink EDID on RK3328.
+    setprop persist.vendor.resolution.main 1920x1080@60-1920-2008-2052-2200-1080-1084-1089-1125-5
+    # VLC's verbose HTTP diagnostics include expiring IPTV access URLs. Keep app-level redacted logs only.
+    setprop log.tag.VLC SILENT
+    setprop persist.log.tag.VLC SILENT
+    setprop log.tag.libvlc SILENT
+    setprop persist.log.tag.libvlc SILENT
     exec u:r:su:s0 root root -- /system/bin/sh /vendor/bin/tvbox-emmc-ro.sh early-init
 
 on init

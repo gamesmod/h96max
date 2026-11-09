@@ -1,0 +1,297 @@
+{
+  "version": "0.4.2",
+  "device": "Panadonik H96 Max, Android 12",
+  "reviewed_at": "2026-11-07",
+  "cold_boot_seconds": null,
+  "last_reboot_to_screen_seconds": 75,
+  "hot_test": {
+    "tested_installed_version": "0.3.9",
+    "candidate_installed": false,
+    "network_capture": {
+      "captured_at": "2026-11-06",
+      "duration_seconds": 15,
+      "packets": 5000,
+      "dropped": 0,
+      "unencrypted_iptv_http": true,
+      "auth_cookie_or_token_patterns": 0,
+      "raw_capture_retained": false,
+      "scope": "снято на 0.3.9; после установки 0.4.1 нужен новый sanity-захват"
+    },
+    "adb": "TCP ADB подключён для диагностики; полный OTA 0.4.1 не установлен",
+    "iptv_debug_run": {
+      "diagnostic_apk_sha256": "5e44ee64719d634a6d6d8af2986db7da6989a735d73e933afcbd2522e4d552a3",
+      "installed_without_data_wipe": true,
+      "debug_setting_enabled": true,
+      "bundled_adult_channels_checked_on_device": 184,
+      "bundled_http_401": 184,
+      "alternative_channels_from_configured_sources": 92,
+      "alternatives_http_200_on_device": 92,
+      "alternative_quality_measured_on_build_host": {
+        "1080p": 91,
+        "2160p": 1
+      },
+      "vlc_http_200_and_mpeg_ts_demux_observed": true,
+      "video_codec": "HEVC",
+      "audio_codec": "AAC",
+      "visible_video_confirmed": false,
+      "temporary_user_playlist_removed": true,
+      "restored_full_user_playlist_installed": true,
+      "restored_playlist_channels": 2894,
+      "restored_playlist_adult_channels": 76,
+      "restored_playlist_child_channels": 0,
+      "restored_playlist_minimum_quality": 1080,
+      "restored_playlist_sha256": "5ca44920f00324385198316bc69cf2d277eaebf78d00b79eac0bf0dc0df4d64e",
+      "raw_urls_or_logs_committed": false,
+      "report": "docs/release-qa/0.4.2-iptv-debug.md",
+      "refreshed_adult_playlist_http_200_on_device": 76,
+      "refreshed_adult_playlist_total": 76,
+      "refreshed_adult_playlist_unconfirmed": 0,
+      "next_release_generated_playlist": {
+        "channels": 1291,
+        "adult_channels": 70,
+        "adult_quality_measured": {
+          "1080p": 70
+        },
+        "child_channels": 0,
+        "minimum_quality": 1080,
+        "public_validator": "pass",
+        "playlist_sha256": "7a33a5d3721dcb44a2709d8083dc04f2a0325eb433ecc6248465b9acf0a81003",
+        "playlist_bytes": 271888,
+        "adult_device_allowlist_entries": 76,
+        "adult_device_allowlist_quality_passed": 70,
+        "child_name_filter": "Cartoonito explicitly excluded"
+      },
+      "latest_screencap_black": true,
+      "latest_adb_shell_timeout_seconds": 5,
+      "device_restart_performed": false,
+      "vlc_interrupted": false,
+      "workspace_apk_sha256": "42b29f2f5fd762dcbc1e977b077c3110420f04faeb9f4afbf086c61df2da6935",
+      "prior_candidate_adult_channels_checked": 94,
+      "prior_candidate_http_200": 76,
+      "prior_candidate_http_404": 18,
+      "final_device_scan_complete": true,
+      "final_device_scan_http_404": 0,
+      "device_playlist_http_200_confirmed": 76,
+      "selected_playback_preflight_removed": true,
+      "vlc_handoff_observed_after_fix": true,
+      "vlc_media_session_playing_after_fix": true,
+      "vlc_mpeg_ts_demux_after_fix": true,
+      "vlc_video_codec_after_fix": "HEVC",
+      "vlc_audio_codec_after_fix": "AAC",
+      "display_mode": {
+        "width": 1920,
+        "height": 1080,
+        "refresh_hz": 60,
+        "supported_modes": 1,
+        "physical_output_mode_before_fix": "3840x2160p30",
+        "physical_output_mode_after_fix": "1920x1080p60",
+        "physical_mode_fix": "persist.vendor.resolution.main timing applied before boot; confirmed by DRM after reboot"
+      },
+      "system_resolution_matches_minimum_channel_quality": true,
+      "tested_1080p_news_stream_http": 200,
+      "vlc_media_codec_ndk_opened": true,
+      "vlc_video_output_width": 1920,
+      "vlc_video_output_height": 1080,
+      "display_resolution_mismatch_indicated": true,
+      "display_protected_buffers_supported": true,
+      "candidate_apk_sha256": "42b29f2f5fd762dcbc1e977b077c3110420f04faeb9f4afbf086c61df2da6935"
+    },
+    "iptv_app_installed_version": "0.4.2",
+    "iptv_app_version_code": 4002,
+    "iptv_app_sha256": "42b29f2f5fd762dcbc1e977b077c3110420f04faeb9f4afbf086c61df2da6935",
+    "iptv_app_installed_without_data_wipe": true,
+    "iptv_debug_setting_enabled_after_update": true,
+    "iptv_user_playlist_sha256_after_update": "5ca44920f00324385198316bc69cf2d277eaebf78d00b79eac0bf0dc0df4d64e",
+    "iptv_playback_state_after_install": "launcher resumed; physical video confirmation pending",
+    "iptv_0_4_2_live_playback": {
+      "selected_epg_id": "7742",
+      "selection_logged_without_url": true,
+      "vlc_foreground": true,
+      "media_session": "PLAYING",
+      "mpeg_ts_demux": true,
+      "video_codec": "HEVC",
+      "audio_codec": "AAC",
+      "visible_video_confirmed": false,
+      "user_visual_confirmation": "pending",
+      "surfaceflinger_latency_rows_sample1": 0,
+      "surfaceflinger_latency_rows_sample2": 0,
+      "current_run_vlc_decoder_open_logged": false,
+      "current_run_vout_events_logged": false,
+      "demux_streams_found": [
+        "HEVC",
+        "AAC"
+      ],
+      "vlc_media_session_still_playing_on_recheck": true,
+      "adult_channel_samples": [
+        {
+          "epg_id": "7742",
+          "vlc": "PLAYING",
+          "demux": "MPEG-TS",
+          "tracks": [
+            "HEVC",
+            "AAC"
+          ],
+          "decoder_open_logged": false,
+          "video_output_logged": false
+        },
+        {
+          "epg_id": "7741",
+          "vlc": "PLAYING",
+          "demux": "MPEG-TS",
+          "tracks": [
+            "HEVC",
+            "AAC"
+          ],
+          "decoder_open_logged": false,
+          "video_output_logged": false
+        }
+      ],
+      "latest_device_adult_scan": {
+        "checked": 76,
+        "http_200": 76,
+        "failed": 0,
+        "timeouts": 0,
+        "scan_complete": true
+      },
+      "epg_7741_vlc_user_agent_probe": {
+        "result": "success",
+        "codec": "HEVC",
+        "profile": "Main",
+        "pixel_format": "yuv420p",
+        "width": 1920,
+        "height": 1080,
+        "level": 120
+      },
+      "epg_7741_host_software_decode": {
+        "duration_seconds": 5,
+        "decoded_frames": 145,
+        "result": "pass"
+      },
+      "epg_7741_ffprobe_default_user_agent": {
+        "result": "404",
+        "interpretation": "client-specific result; not used as device availability evidence"
+      },
+      "vlc_acceleration_ab_test": {
+        "original": "Full acceleration",
+        "tested": [
+          "Decoding acceleration",
+          "Disabled"
+        ],
+        "decoder_open_or_video_output_logged": false,
+        "restored": "Full acceleration"
+      },
+      "device_hevc_codec_registry": [
+        "c2.rk.hevc.decoder",
+        "OMX.google.hevc.decoder",
+        "c2.android.hevc.decoder"
+      ],
+      "physical_output_mode": "1920x1080p60",
+      "1080p60_ab_test_after_reboot": {
+        "selected_epg_id": "7741",
+        "debug_logs_contained_url": false,
+        "media_session": "PLAYING",
+        "video_plane_active": false,
+        "decoder_open_or_video_output_logged": false,
+        "visible_video_confirmed": false,
+        "interpretation": "HDMI output mode mismatch is fixed, but it does not resolve this stream playback failure"
+      }
+    }
+  },
+  "automated_tests": {
+    "status": "pass",
+    "count": 50,
+    "command": "python3 -m unittest discover -s tests -v"
+  },
+  "automated_test_log_analysis": {
+    "status": "pending",
+    "lines": null,
+    "critical": null,
+    "errors": null,
+    "warnings": null,
+    "report": "release/qa/test-log-analysis-0.4.2.md"
+  },
+  "checks": {
+    "cold_boot_le_10s": "pending",
+    "boot_log_review": "pending: образ 0.4.2 собран; полный разбор журналов приставки после установки образа не выполнен",
+    "security_review": "pending: проверка образа на Wi-Fi credentials прошла, полный анализ безопасности сборки и живой системы не выполнен",
+    "qr_vlc": "pending: кандидат не установлен",
+    "wired_network": "pending",
+    "wifi_network": "pending",
+    "iptv_playback": "pending: HDMI Auto mode reproducibly selected 3840x2160p30 while UI framebuffer remained 1920x1080. Applying the documented Rockchip 1080p60 timing and reboot switched DRM to 1920x1080p60. The same EPG 7741 still reached VLC PLAYING but created no video plane or decoder output, so HDMI mode was a real configuration defect but not the sole cause of the black stream. VLC URL logging is silenced; app debug logs contain only EPG and event metadata. Need continue VLC/HEVC playback diagnosis and visual verification.",
+    "torrent_playback": "pending",
+    "graphics_video": "pending",
+    "graphics_stress": "pending",
+    "swap_disabled": "pass",
+    "network_capture_review": "pending: контролируемый захват и анализ трафика для 0.4.2 не выполнены",
+    "device_update": "pending: полный OTA не установлен; требование очистки/сохранения данных нужно проверить на приставке и получить отдельное согласие, если потребуется очистка",
+    "alice_voice": "pending: Алиса не установлена"
+  },
+  "log_analysis": {
+    "reviewed": false,
+    "untriaged_errors": 1,
+    "summary": "Для кандидата 0.4.2 анализ журналов после установки образа ещё не выполнен."
+  },
+  "candidate_build": {
+    "version": "0.4.2",
+    "built_at": "2026-11-07T19:07:29Z",
+    "source_commit": "6be711c",
+    "source_worktree_modified": true,
+    "medium": "eMMC",
+    "build_status": "pass_local_candidate_before_HDMI_and_log_safety_fix_rebuild",
+    "installed_on_device": false,
+    "ota": {
+      "file": "release/updates/emmc/tvbox-update-0.4.2-emmc.zip",
+      "size_bytes": 1303806464,
+      "sha256": "5569effddbaef61251e13d5ebfff10ba824d4056ee6f6b1a0a078c4806381811",
+      "signature": "pass: CMS Verification successful after release-note refresh",
+      "zip_integrity": "pass",
+      "release_notes_refreshed": true
+    },
+    "clean_install": {
+      "file": "release/Panadonik-0.4.2-emmc-clean-install.zip",
+      "size_bytes": 1307045444,
+      "sha256": "eb8da86f084af4f97be2e17ceb8b2168861dd9f331ade545f9eae9903ef39a03",
+      "detached_signature": "pass"
+    },
+    "system_image": {
+      "file": "build/work/system.img",
+      "size_bytes": 1485463552,
+      "sha256": "26afc22caf138c6db34fbbf697de550df749c646687eb16bc32a9be3a76c68b8"
+    },
+    "vendor_image": {
+      "file": "build/work/vendor.img",
+      "size_bytes": 182308864,
+      "sha256": "7198763a8b43ed06eb61508f3a83a4621a52ba36bfe15130f02fc11b67aee2aa"
+    },
+    "signing_certificate_sha256": "906ea1f4a463757434aade51e7f469e7fd49030812e1db40cf74b55c2a7843c0",
+    "installation_requires_data_wipe_confirmation": true,
+    "wifi_credentials_scan": {
+      "status": "pass",
+      "configuration_files_checked": 2,
+      "saved_ssid_or_key_fields_found": 0,
+      "secret_values_printed": false,
+      "checker": "tools/check-image-wifi-secrets.py"
+    },
+    "build_log": "/tmp/build-release-0.4.2.log (local only; not committed)"
+  },
+  "candidate_playlist_validation": {
+    "status": "pass_in_image_not_hot_installed",
+    "channels": 1291,
+    "adult_channels": 70,
+    "adult_category_first": true,
+    "all_categories_russian": true,
+    "duplicate_names": 0,
+    "duplicate_urls": 0,
+    "child_channels": 0,
+    "cartoonito_excluded_by_name": true,
+    "minimum_measured_vertical_pixels": 1080,
+    "unknown_resolution_rejected": true,
+    "hot_installed_on_device": false,
+    "playlist_sha256": "7a33a5d3721dcb44a2709d8083dc04f2a0325eb433ecc6248465b9acf0a81003",
+    "playlist_bytes": 271888,
+    "device_allowlist_adult_ids": 76,
+    "adult_ids_surviving_build_quality_and_availability": 70,
+    "included_in_system_image": true,
+    "build_image_matches_playlist_sha256": true
+  }
+}

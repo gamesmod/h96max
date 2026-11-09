@@ -17,7 +17,7 @@ import argparse, concurrent.futures as cf, re, shlex, shutil, subprocess, sys, u
 UA = "VLC/3.0.20 LibVLC/3.0.20"
 ADULT = re.compile(r"18\+|xxx|adult|эрот|взросл|для взрослых|playboy|brazzers|hustler|private|redlight|blue hustler|секс|sex", re.I)
 ADULT_NAME_TAG = re.compile(r"18\+|xxx|adult|эрот|взросл|porn|порн|playboy|brazzers|hustler|private|redlight|blue hustler", re.I)
-CHILD_CHANNEL = re.compile(r"\b(?:kids?|children?|cartoons?|animation|boomerang|nick(?:elodeon)?|junior|baby|disney)\b|дет(?:ские|ский|ям)|мульт(?:фильм|иман|ик)|теленян|мультиланд|дисней", re.I)
+CHILD_CHANNEL = re.compile(r"\b(?:kids?|children?|cartoons?|animation|boomerang|nick(?:elodeon)?|junior|baby|disney)\b|cartoonito|дет(?:ские|ский|ям)|мульт(?:фильм|иман|ик)|теленян|мультиланд|дисней", re.I)
 QUAL = re.compile(r"(?<![\w])(?:hd|fhd|uhd|4k|sd|hq|orig(?:inal)?|50\s?fps|60\s?fps|\d{3,4}p|h\.?265|hevc|backup|резерв)(?![\w])", re.I)
 RESOLUTION = re.compile(r"(?<!\d)(\d{3,4})\s*p?(?!\d)", re.I)
 
@@ -362,6 +362,8 @@ def main():
     ap.add_argument("--sources", default="tools/iptv-sources.txt")
     ap.add_argument("--out", default="overlay/system/etc/tvbox/iptv.m3u")
     ap.add_argument("--exclude-adult", action="store_true", help="исключить каналы 18+ из общего списка")
+    ap.add_argument("--adult-allowlist", default="tools/iptv-adult-allowlist.txt",
+                    help="EPG IDs взрослых каналов, проверенных на целевом устройстве")
     ap.add_argument("--dedupe-file", help="only re-run duplicate removal on an already checked playlist (no network)")
     a = ap.parse_args()
     if a.dedupe_file:
@@ -396,6 +398,14 @@ def main():
     print(f"детские каналы исключены: {before_children - len(entries)}", file=sys.stderr)
     if a.exclude_adult:
         entries = [e for e in entries if not ADULT.search(e["name"] + " " + e["attrs"].get("group-title", ""))]
+    else:
+        with open(a.adult_allowlist, encoding="utf-8") as f:
+            adult_ids = {line.strip() for line in f if line.strip() and not line.lstrip().startswith("#")}
+        before_adult = sum(e["attrs"].get("group-title") == "Для взрослых" for e in entries)
+        entries = [e for e in entries if e["attrs"].get("group-title") != "Для взрослых" or
+                   e["attrs"].get("tvg-id", "").strip() in adult_ids]
+        kept_adult = sum(e["attrs"].get("group-title") == "Для взрослых" for e in entries)
+        print(f"взрослые каналы по allowlist устройства: {before_adult} -> {kept_adult}", file=sys.stderr)
     print(f"entries {total}, with name+logo{', excluding adult' if a.exclude_adult else ', adult included'}: {len(entries)}", file=sys.stderr)
     seen_url, cand = set(), {}
     for e in entries:                                   # exact-URL duplicates, then group by name

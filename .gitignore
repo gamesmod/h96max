@@ -4,6 +4,13 @@ build/
 **/gen/
 **/out/
 release/
+!release/
+release/*
+!release/notes/
+release/notes/*
+!release/notes/0.4.2.txt
+!release/notes/0.4.3.txt
+!release/notes/0.4.4.txt
 dl/
 sdk/
 backup/

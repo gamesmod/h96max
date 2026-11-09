@@ -3,6 +3,7 @@ package org.tvbox.iptv;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -54,7 +55,8 @@ public class MainActivity extends Activity {
     static final String TAG = "TvboxIptv";
     static final String EXTRA_DEBUG_SCAN_ADULT = "org.tvbox.iptv.DEBUG_SCAN_ADULT";
     static final String EXTRA_USE_USER_PLAYLIST = "org.tvbox.iptv.USE_USER_PLAYLIST";
-    static final int INDEX_SCHEMA = 4;
+    static final String EXTRA_NATIVE_PLAYER_TEST = "tvbox_iptv_native_player_test";
+    static final int INDEX_SCHEMA = 5;
 
     ListView lv;
     final Map<String, List<String[]>> groups = new LinkedHashMap<>();
@@ -507,7 +509,15 @@ public class MainActivity extends Activity {
     void play(String url, String name, String channelId) {
         if (iptvDebugEnabled()) {
             iptvLog("playback_selected", "epg_id=" + safeLogValue(channelId) + " scheme=" + safeScheme(url));
-            probeSelectedStream(url);
+        }
+        if (nativePlayerTestEnabled()) {
+            Intent nativePlayer = new Intent(this, NativePlaybackActivity.class);
+            nativePlayer.setData(Uri.parse(url));
+            nativePlayer.putExtra("epg_id", safeLogValue(channelId));
+            nativePlayer.putExtra("title", name);
+            startActivity(nativePlayer);
+            iptvLog("playback_handoff", "target=android_mediaplayer scheme=" + safeScheme(url));
+            return;
         }
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setDataAndType(Uri.parse(url), "video/*");
@@ -527,6 +537,12 @@ public class MainActivity extends Activity {
                 Toast.makeText(this, "Нет плеера: " + e2.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    boolean nativePlayerTestEnabled() {
+        try {
+            return android.provider.Settings.Global.getInt(getContentResolver(), EXTRA_NATIVE_PLAYER_TEST, 0) == 1;
+        } catch (Exception ignored) { return false; }
     }
 
     static String safeScheme(String url) {
@@ -551,17 +567,6 @@ public class MainActivity extends Activity {
                     .invoke(null, "persist.tvbox.iptv.debug", "0");
             return "1".equals(enabled);
         } catch (Exception ignored) { return false; }
-    }
-
-    /** Только проверяет заголовки потока; адрес, тело ответа и заголовки не записываются в журнал. */
-    void probeSelectedStream(final String url) {
-        new Thread(new Runnable() {
-            @Override public void run() {
-                ProbeResult result = probeStreamBounded(url, 8000);
-                iptvLog(result.error.isEmpty() ? "stream_probe" : "stream_probe_failed",
-                        result.asLogDetail());
-            }
-        }, "iptv-stream-probe").start();
     }
 
     void startAdultCategoryProbe() {
@@ -681,7 +686,14 @@ public class MainActivity extends Activity {
     }
 
     void iptvLog(String event, String detail) {
-        if (iptvDebugEnabled()) Log.d(TAG, "event=" + event + " " + detail);
+        iptvLogStatic(this, event, detail);
+    }
+
+    static void iptvLogStatic(Context context, String event, String detail) {
+        try {
+            if (android.provider.Settings.Global.getInt(context.getContentResolver(), "tvbox_iptv_debug", 0) == 1)
+                Log.d(TAG, "event=" + event + " " + detail);
+        } catch (Exception ignored) { }
     }
 
     @Override
