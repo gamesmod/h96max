@@ -4,9 +4,19 @@
   "reviewed_at": "2026-11-09",
   "cold_boot_seconds": null,
   "hot_test": {
-    "tested_installed_version": "0.3.9 (последнее подтверждённое состояние)",
-    "candidate_installed": false,
-    "adb_available_during_candidate_review": false,
+    "tested_installed_version": "0.3.9 (последнее подтверждённое до OTA; пост-загрузочная версия не прочитана)",
+    "candidate_installed": null,
+    "adb_available_during_candidate_review": true,
+    "recovery_update": {
+      "mode": "keep",
+      "result": "DONE ok: переход в recovery для установки 0.4.4",
+      "device_sha256_matches_host": true,
+      "device_recovery_signature_verification": "VERIFY OK against installed otacerts.zip",
+      "wipe_flag_before_recovery": false,
+      "userdata_partition_in_ota": false,
+      "post_recovery_network_returned": true,
+      "post_recovery_adb_state": "unauthorized; installed version not yet readable"
+    },
     "network_capture": {
       "captured_at": null,
       "duration_seconds": null,
@@ -47,7 +57,7 @@
     "network_capture_review": "pending: захват контролируемого трафика для 0.4.4 не выполнен",
     "usb_remote_iptv_channels": "pending: полный набор кнопок и переход PAGE между каналами не проверены",
     "security_review": "pending: проверка образа на Wi-Fi credentials пройдена; полный анализ безопасности и сетевого трафика не выполнен",
-    "device_update": "pending: кандидат не установлен; очистка пользовательских данных не разрешена"
+    "device_update": "pending: OTA в режиме keep принято recovery; пост-загрузочная версия и состояние данных требуют проверки после авторизации ADB"
   },
   "log_analysis": {
     "reviewed": false,
