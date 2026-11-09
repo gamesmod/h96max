@@ -1,0 +1,57 @@
+{
+  "version": "0.4.4",
+  "device": "Panadonik H96 Max, Android 12",
+  "reviewed_at": "2026-11-09",
+  "cold_boot_seconds": null,
+  "hot_test": {
+    "tested_installed_version": "0.3.9 (последнее подтверждённое состояние)",
+    "candidate_installed": false,
+    "adb_available_during_candidate_review": false,
+    "network_capture": {
+      "captured_at": null,
+      "duration_seconds": null,
+      "packets": null,
+      "auth_cookie_or_token_patterns": null,
+      "raw_capture_retained": false,
+      "scope": "для кандидата 0.4.4 захват на приставке не выполнялся"
+    },
+    "candidate_artifacts": {
+      "source_commit": "a6672a31e3fa3d6ed76e67f844e530333eb5dad0",
+      "ota": "release/updates/emmc/tvbox-update-0.4.4-emmc.zip",
+      "ota_sha256": "2b165fd2f05ada13bc55ffd2bc61b120a00975e58668ddd26e75863b8c7c179e",
+      "ota_signature": "CMS verification successful",
+      "clean_install": "release/Panadonik-0.4.4-emmc-clean-install.zip",
+      "clean_install_sha256": "9c0f5dbc2e04496bb93602e608ac485e4def438fe707857093ce411329da87d9",
+      "clean_install_signature": "verified with existing project OTA certificate",
+      "wifi_credential_scan": "pass: system.img and vendor.img; two relevant configuration files checked",
+      "build_log_saved": false,
+      "report": "docs/release-qa/0.4.4.md"
+    }
+  },
+  "automated_tests": {
+    "status": "pass",
+    "count": 50,
+    "command": "python3 -m unittest discover -s tests -v"
+  },
+  "checks": {
+    "cold_boot_le_10s": "pending: приставка не была доступна по ADB",
+    "boot_log_review": "pending: полный лог сборки не сохранён; журналы приставки после установки не проверялись",
+    "qr_vlc": "pending: кандидат не установлен",
+    "wired_network": "pending: кандидат не установлен",
+    "wifi_network": "pending: кандидат не установлен",
+    "iptv_playback": "pending: кандидат не установлен; отображение видео и отсутствие лагов не проверены",
+    "torrent_playback": "pending: кандидат не установлен",
+    "graphics_video": "pending: кандидат не установлен",
+    "graphics_stress": "pending: кандидат не установлен",
+    "swap_disabled": "pending: состояние на кандидате не проверено",
+    "network_capture_review": "pending: захват контролируемого трафика для 0.4.4 не выполнен",
+    "usb_remote_iptv_channels": "pending: полный набор кнопок и переход PAGE между каналами не проверены",
+    "security_review": "pending: проверка образа на Wi-Fi credentials пройдена; полный анализ безопасности и сетевого трафика не выполнен",
+    "device_update": "pending: кандидат не установлен; очистка пользовательских данных не разрешена"
+  },
+  "log_analysis": {
+    "reviewed": false,
+    "untriaged_errors": null,
+    "summary": "Отдельный анализ полного лога сборки и журналов приставки для 0.4.4 ещё не выполнен."
+  }
+}
