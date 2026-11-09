@@ -55,6 +55,15 @@ class ReleaseSecurityConfigTests(unittest.TestCase):
         self.assertIn("python3 -m unittest discover -s tests -v", workflow)
         self.assertIn("--source \"автоматические тесты\" --output release/qa/test-log-analysis.md --fail-on-errors", workflow)
 
+    def test_ota_update_defaults_to_confirmed_data_cleanup(self):
+        installer = (ROOT / "apps/installer/src/org/tvbox/installer/MainActivity.java").read_text(encoding="utf-8")
+        daemon = (ROOT / "apps/tvboxd/src/org/tvbox/daemon/Main.java").read_text(encoding="utf-8")
+        self.assertIn('setPositiveButton("Продолжить с очисткой"', installer)
+        self.assertIn('"UPDATE_INSTALL " + u[0] + " wipe"', installer)
+        self.assertNotIn('"UPDATE_INSTALL " + u[0] + " keep"', installer)
+        self.assertIn('a.length != 2 || !a[1].equals("wipe")', daemon)
+        self.assertIn("обновление разрешено только с очисткой данных", daemon)
+
 
 if __name__ == "__main__":
     unittest.main()

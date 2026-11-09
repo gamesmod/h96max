@@ -11,6 +11,7 @@ release/notes/*
 !release/notes/0.4.2.txt
 !release/notes/0.4.3.txt
 !release/notes/0.4.4.txt
+!release/notes/0.4.5.txt
 dl/
 sdk/
 backup/

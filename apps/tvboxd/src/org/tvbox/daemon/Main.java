@@ -873,12 +873,13 @@ public class Main {
     /** Загружает и проверяет OTA-пакет, затем перезагружает приставку в recovery. */
     static void updateInstall(Op op, String args) throws Exception {
         String[] a = args.split(" ");
-        String src = a[0];
-        boolean wipe = a.length > 1 && a[1].equals("wipe");
-        if (a.length > 1 && !a[1].equals("keep") && !wipe) {
-            op.done(false, "неизвестный режим обновления");
+        // Обновление разрешено только с очисткой данных; режим сохранения отключён по требованию проекта.
+        if (a.length != 2 || !a[1].equals("wipe")) {
+            op.done(false, "обновление разрешено только с очисткой данных");
             return;
         }
+        String src = a[0];
+        boolean wipe = true;
         new File(OTA_DIR).mkdirs();
         File pkg = new File(OTA_PKG), tmp = new File(OTA_PKG + ".part");
         tmp.delete();
