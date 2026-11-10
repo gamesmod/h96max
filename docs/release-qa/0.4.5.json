@@ -72,8 +72,8 @@
     }
   },
   "github_actions_candidate": {
-    "run_id": 42860787222,
-    "url": "https://github.com/gamesmod/h96max/actions/runs/42860787222",
+    "run_id": 42862278182,
+    "url": "https://github.com/gamesmod/h96max/actions/runs/42862278182",
     "status": "failure",
     "failed_step": "Preflight required Actions secrets",
     "reason": "В Settings → Secrets and variables → Actions отсутствуют обязательные секреты; ключи из локальной машины не копировались",
