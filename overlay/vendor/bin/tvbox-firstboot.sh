@@ -139,7 +139,7 @@ L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
 if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initialized" ]; then
     # Атомарно записать настройки до остановки HOME; особенности запуска описаны в HANDOFF.md.
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
-    ALLOWED="org.tvbox.iptv ru.yourok.torrserve org.smarttube.stable com.ghisler.android.TotalCommander org.tvbox.links org.tvbox.installer org.tvbox.bootlog com.android.tv.settings org.tvbox.clean org.tvbox.power"
+    ALLOWED="org.tvbox.iptv ru.yourok.torrserve org.smarttube.stable com.ghisler.android.TotalCommander org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
     T=""; EXTRA=""; N=0
     # Сохранить установленные функции и их порядок; удалить дубли, игры и устаревшие плитки.
     for p in $(printf '%s' "$OLD" | sed 's/\&\#30;/ /g'); do
@@ -179,29 +179,33 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initializ
     touch "$D/launcher-tiles.initialized"
 fi
 
-# Однократно вернуть журнал загрузки в существующую раскладку, не меняя порядок пользователя.
-if pm path com.tvlauncher >/dev/null 2>&1 && pm path org.tvbox.bootlog >/dev/null 2>&1 &&
-        [ ! -e "$D/launcher-bootlog-tile-added" ] && [ -f "$L" ]; then
+# Перенести журнал загрузки внутрь диагностики и вернуть плитку антивируса без сброса порядка пользователя.
+if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-diagnostics-migrated" ] && [ -f "$L" ]; then
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
-    OLD_SPACED=$(printf '%s' "$OLD" | sed 's/\&#30;/ /g')
-    case " $OLD_SPACED " in *" org.tvbox.bootlog "*) touch "$D/launcher-bootlog-tile-added";;
-        *)
-            N=$(printf '%s' "$OLD" | sed 's/\&#30;/ /g' | wc -w)
-            if [ "$N" -lt 14 ]; then
-                T="${OLD:+$OLD&#30;}org.tvbox.bootlog"
-                REPL=$(printf '%s' "$T" | sed 's/\&/\\\&/g')
-                sed "s|<string name=\"apps_order\">[^<]*</string>|<string name=\"apps_order\">$REPL</string>|" "$L" > "$L.new"
-                u=$(stat -c %u /data/data/com.tvlauncher)
-                chown "$u:$u" "$L.new"; chmod 660 "$L.new"; mv "$L.new" "$L"; restorecon "$L"
-                am force-stop com.tvlauncher
-                am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
-                echo "tvlauncher: added boot log tile without changing user order"
-            else
-                echo "tvlauncher: full tile row; boot log tile not added"
-            fi
-            touch "$D/launcher-bootlog-tile-added";;
-    esac
+    T=""; SEEN=" "
+    for p in $(printf '%s' "$OLD" | sed 's/\&#30;/ /g'); do
+        [ "$p" = org.tvbox.bootlog ] && continue
+        pm path "$p" >/dev/null 2>&1 || continue
+        case "$SEEN" in *" $p "*) continue;; esac
+        T="${T:+$T&#30;}$p"; SEEN="$SEEN$p "
+    done
+    for p in org.tvbox.clean org.tvbox.antivirus; do
+        pm path "$p" >/dev/null 2>&1 || continue
+        case "$SEEN" in *" $p "*) continue;; esac
+        T="${T:+$T&#30;}$p"; SEEN="$SEEN$p "
+    done
+    if [ "$T" != "$OLD" ]; then
+        REPL=$(printf '%s' "$T" | sed 's/\&/\\\&/g')
+        sed "s|<string name=\"apps_order\">[^<]*</string>|<string name=\"apps_order\">$REPL</string>|" "$L" > "$L.new"
+        u=$(stat -c %u /data/data/com.tvlauncher)
+        chown "$u:$u" "$L.new"; chmod 660 "$L.new"; mv "$L.new" "$L"; restorecon "$L"
+        am force-stop com.tvlauncher
+        am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
+        echo "tvlauncher: moved boot log into diagnostics and restored antivirus tile"
+    fi
+    touch "$D/launcher-diagnostics-migrated"
 fi
+# Журнал загрузки открывается из плитки «Производительность и диагностика».
 # Удалить отдельную плитку VLC из прежних раскладок: VLC остаётся плеером для IPTV и TorrServe.
 if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-vlc-tile-removed" ] && [ -f "$L" ]; then
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)

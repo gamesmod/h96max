@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
+import java.lang.ProcessBuilder;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
@@ -64,6 +65,7 @@ public class Main {
     static final String URLS_DEFAULT = "/vendor/etc/tvbox/update-urls.txt";
     static final Object opLock = new Object();
     static volatile String busy = "";
+    static volatile Process debugSyslog;
 
     public static void main(String[] args) throws Exception {
         if (args.length == 2 && args[0].equals("client")) { client(args[1]); return; }
@@ -144,6 +146,9 @@ public class Main {
             if (cmd.equals("AV_REALTIME on") || cmd.equals("AV_REALTIME off")) { avRealtime(cmd.endsWith("on")); avStatus(op); op.done(true, "защита " + (cmd.endsWith("on") ? "включена" : "выключена")); return; }
             if (cmd.equals("PERF_NOW")) { Perf.now(op); op.done(true, "показатели"); return; }
             if (cmd.equals("PERF_FREE")) { Perf.free(op); return; }
+            if (cmd.equals("PERF_SYSLOG_STATUS")) { op.kv("SYSLOG_ACTIVE", debugSyslog != null && debugSyslog.isAlive() ? "1" : "0"); op.done(true, "журнал диагностики"); return; }
+            if (cmd.equals("PERF_SYSLOG_ON")) { startDebugSyslog(op); return; }
+            if (cmd.equals("PERF_SYSLOG_OFF")) { stopDebugSyslog(); op.done(true, "подробный журнал выключен"); return; }
             if (cmd.equals("PERF_ZRAM")) { Perf.zramStatus(op); op.done(true, "сжатие памяти"); return; }
             if (cmd.startsWith("PERF_ZRAM_SET ")) { Perf.setZram(op, cmd.substring(14).trim()); return; }
             if (cmd.equals("SD_IMAGES")) { sdImages(op); return; }
@@ -178,6 +183,25 @@ public class Main {
         } finally {
             try { s.close(); } catch (Exception ignored) { }
         }
+    }
+
+    /** Запустить журнал всех Android log buffers на локальный раздел с ограниченной ротацией; сеть не используется. */
+    static synchronized void startDebugSyslog(Op op) {
+        if (debugSyslog != null && debugSyslog.isAlive()) { op.done(true, "подробный журнал уже включён"); return; }
+        try {
+            new File(STATE).mkdirs();
+            debugSyslog = new ProcessBuilder("/system/bin/logcat", "-b", "all", "-v", "threadtime",
+                    "-f", STATE + "/syslog-debug.log", "-r", "2048", "-n", "4", "*:V")
+                    .redirectErrorStream(true).start();
+            Thread.sleep(150);
+            if (!debugSyslog.isAlive()) { debugSyslog = null; op.done(false, "logcat не запустился"); return; }
+            op.done(true, "подробный журнал включён; локальная ротация до 8 МБ");
+        } catch (Exception e) { debugSyslog = null; op.done(false, "не удалось запустить logcat: " + e.getMessage()); }
+    }
+
+    /** Остановить необязательный сбор подробных журналов. */
+    static synchronized void stopDebugSyslog() {
+        if (debugSyslog != null) { debugSyslog.destroy(); debugSyslog = null; }
     }
 
     /** Output to the client (best effort: the user may leave the screen) and to the operation log. */

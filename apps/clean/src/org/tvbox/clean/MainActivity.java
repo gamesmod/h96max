@@ -42,9 +42,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * "Производительность": temperature, CPU, GPU and RAM live with a history graph, top processes, and one button that
- * frees resources. Metrics come from tvboxd every 2 s while this screen is open. A small CSV history is stored
- * privately for seven days, with one sample per minute; no background sampler is started.
+ * «Производительность и диагностика»: метрики, журнал загрузки и подробный локальный журнал событий по запросу.
+ * Метрики опрашиваются только пока открыт экран; CSV-история хранится семь дней с шагом одна минута.
  */
 public class MainActivity extends Activity {
     static final int PERIOD_MS = 2000, KEEP = 3600 * 1000 / PERIOD_MS;
@@ -55,6 +54,8 @@ public class MainActivity extends Activity {
     Chart temp, cpu, gpu, mem;
     TextView uptime, procs;
     TextView zramInfo;
+    TextView debugLogInfo;
+    Button debugLogButton;
     volatile boolean running;
     long lastHistoryWrite, lastHistoryPrune;
     int exportRequest;
@@ -69,7 +70,7 @@ public class MainActivity extends Activity {
 
         LinearLayout head = new LinearLayout(this);
         head.setGravity(Gravity.CENTER_VERTICAL);
-        TextView title = text("Производительность", 36, Color.WHITE);
+        TextView title = text("Производительность и диагностика", 32, Color.WHITE);
         head.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
         uptime = text("", 20, 0xFF90A4AE);
         head.addView(uptime);
@@ -94,6 +95,20 @@ public class MainActivity extends Activity {
         }));
         root.addView(compression);
 
+        LinearLayout diagnostics = new LinearLayout(this);
+        diagnostics.setGravity(Gravity.CENTER_VERTICAL);
+        diagnostics.setPadding(0, 12, 0, 0);
+        debugLogInfo = text("Подробный системный журнал выключен", 18, 0xFFB0BEC5);
+        diagnostics.addView(debugLogInfo, new LinearLayout.LayoutParams(0, -2, 1));
+        diagnostics.addView(button("Журнал загрузки", new View.OnClickListener() {
+            public void onClick(View v) { openBootLog(); }
+        }));
+        debugLogButton = button("Включить подробный журнал", new View.OnClickListener() {
+            public void onClick(View v) { toggleDebugLog(); }
+        });
+        diagnostics.addView(debugLogButton);
+        root.addView(diagnostics);
+
         LinearLayout bottom = new LinearLayout(this);
         bottom.setGravity(Gravity.CENTER_VERTICAL);
         bottom.setPadding(0, 16, 0, 0);
@@ -109,6 +124,7 @@ public class MainActivity extends Activity {
         root.addView(bottom);
         setContentView(root);
         free.requestFocus();
+        refreshDebugLog();
     }
 
     @Override
@@ -385,6 +401,43 @@ public class MainActivity extends Activity {
             ui.post(new Runnable() { public void run() {
                 Toast.makeText(MainActivity.this, m.containsKey("ERROR") ? "Не сохранено: " + one(m, "ERROR")
                         : "Сохранено: " + mb + " МБ. Применится после перезагрузки.", Toast.LENGTH_LONG).show();
+            } });
+        } }).start();
+    }
+
+    /** Открыть журнал загрузки из экрана диагностики, не занимая отдельную плитку лаунчера. */
+    void openBootLog() {
+        Intent i = new Intent();
+        i.setClassName("org.tvbox.bootlog", "org.tvbox.bootlog.MainActivity");
+        try { startActivity(i); }
+        catch (Exception e) { Toast.makeText(this, "Журнал загрузки не установлен", Toast.LENGTH_LONG).show(); }
+    }
+
+    /** Запросить состояние необязательного подробного системного журнала. */
+    void refreshDebugLog() {
+        new Thread(new Runnable() { public void run() {
+            final Map<String, List<String>> m = call("PERF_SYSLOG_STATUS");
+            ui.post(new Runnable() { public void run() {
+                if (debugLogInfo == null || debugLogButton == null) return;
+                boolean active = "1".equals(one(m, "SYSLOG_ACTIVE"));
+                debugLogInfo.setText(m.containsKey("ERROR") ? "Служба диагностики недоступна"
+                        : active ? "Подробный системный журнал включён · запись в /data/vendor/tvbox" : "Подробный системный журнал выключен");
+                debugLogButton.setText(active ? "Выключить подробный журнал" : "Включить подробный журнал");
+            } });
+        } }).start();
+    }
+
+    /** Глубокий сбор запускается только по явному нажатию и ограничен ротацией файлов на приставке. */
+    void toggleDebugLog() {
+        debugLogButton.setEnabled(false);
+        new Thread(new Runnable() { public void run() {
+            Map<String, List<String>> status = call("PERF_SYSLOG_STATUS");
+            String command = "1".equals(one(status, "SYSLOG_ACTIVE")) ? "PERF_SYSLOG_OFF" : "PERF_SYSLOG_ON";
+            final Map<String, List<String>> result = call(command);
+            ui.post(new Runnable() { public void run() {
+                debugLogButton.setEnabled(true);
+                if (result.containsKey("ERROR")) Toast.makeText(MainActivity.this, "Не удалось изменить журнал: " + one(result, "ERROR"), Toast.LENGTH_LONG).show();
+                refreshDebugLog();
             } });
         } }).start();
     }

@@ -1,17 +1,15 @@
 #!/system/bin/sh
-# Boot diagnostics: kernel log + logcat errors, copied to shared storage for the "Журнал загрузки" tile.
+# Журнал загрузки: дождаться готовности общего хранилища и сохранить сводку для экрана диагностики.
 D=/cache/tvbox
 mkdir -p $D
+while [ "$(getprop sys.boot_completed)" != 1 ]; do sleep 1; done
+# После очистки userdata emulated storage может появиться с задержкой после boot_completed.
 n=0
-while [ $n -lt 120 ]; do
-    dmesg -r > $D/dmesg.txt 2>&1
-    [ "$(getprop sys.boot_completed)" = 1 ] && [ $n -gt 6 ] && break
-    n=$((n + 1))
-    sleep 5
-done
+while [ $n -lt 60 ] && [ ! -d /data/media/0 ]; do n=$((n + 1)); sleep 1; done
+dmesg -r > $D/dmesg.txt 2>&1
 logcat -d -b all '*:E' > $D/logcat-errors.txt 2>&1
 getprop > $D/props.txt
-# shared storage copy (readable by the viewer app)
+# Общее хранилище доступно приложению диагностики без root.
 S=/data/media/0/tvbox
 mkdir -p $S
 cp $D/dmesg.txt $S/dmesg.txt
