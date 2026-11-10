@@ -107,7 +107,7 @@
     "usb_remote_iptv_channels": "pending: синтетические ADB события не заменяют проверку PAGE вверх/вниз на физическом USB-пульте",
     "security_review": "pending/high risk: live 0.4.4 has ro.debuggable=1, ADB TCP 5555, SELinux Permissive, su present; vendor 98%; capture/review not completed",
     "device_update": "pending: OTA очищает пользовательские данные; отдельное согласие на очистку не получено",
-    "iptv_release_list": "fail: «Для взрослых» не первая; найдено 0 каналов 18+ при минимуме 20; отдельная сессия обновляет список"
+    "iptv_release_list": "candidate-only pass with disclosed gap: regenerated 166 channels pass Russian/duplicate/children/1080p/URL checks; adult category not first and 0/20 adult channels"
   },
   "log_analysis": {
     "reviewed": true,
@@ -116,7 +116,7 @@
   },
   "iptv_validation": {
     "candidate_only_status": "warning: disclosed 18+ inventory gap",
-    "total_channels": 133,
+    "total_channels": 166,
     "adult_channels": 0,
     "adult_minimum": 20,
     "adult_category_first": false,
@@ -124,7 +124,9 @@
     "duplicates_or_quality_variants": 0,
     "children": 0,
     "measured_quality_minimum": "1080p",
-    "private_url_check": "pass; no credential-bearing URLs reported",
-    "tagged_dev_and_stable": "blocked until the complete IPTV gate passes"
+    "private_url_check": "pass; 345 playlist URL/logo fields checked, no credentials reported",
+    "tagged_dev_and_stable": "blocked until the complete IPTV gate passes",
+    "generated_playlist_sha256": "1fa3959446426a6f073b61ccd83566437ce38b219cb25d14341ba15ac2fd9a30",
+    "generated_playlist_bytes": 35125
   }
 }
