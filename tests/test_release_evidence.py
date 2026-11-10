@@ -98,6 +98,14 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.assertIn('Using committed release notes', workflow)
         self.assertIn('release/notes/$version.txt', workflow)
 
+    def test_update_notes_keep_multiline_text_over_line_protocol(self):
+        daemon = (ROOT / "apps/tvboxd/src/org/tvbox/daemon/Main.java").read_text(encoding="utf-8")
+        installer = (ROOT / "apps/installer/src/org/tvbox/installer/MainActivity.java").read_text(encoding="utf-8")
+        self.assertIn('"NOTES64 url:"', daemon)
+        self.assertIn('Base64.encodeToString(m.get("notes").getBytes("UTF-8")', daemon)
+        self.assertIn('k.equals("NOTES64")', installer)
+        self.assertIn('Base64.decode(p[1]', installer)
+
     def test_dev_candidate_allows_only_adult_inventory_gap(self):
         issues = [
             "категория «Для взрослых» должна быть первой",

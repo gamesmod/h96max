@@ -132,7 +132,13 @@ public class MainActivity extends Activity {
         call("UPDATE_CHECK", new Sink() {
             public void line(String k, String v) {
                 if (k.equals("UPD")) found.add(v.split("\t"));
-                else if (k.equals("NOTES")) { String[] p = v.split("\t", 2); if (p.length == 2) notes.put(p[0], p[1]); }
+                else if (k.equals("NOTES64")) {
+                    String[] p = v.split("\t", 2);
+                    if (p.length == 2) {
+                        try { notes.put(p[0], new String(android.util.Base64.decode(p[1], android.util.Base64.DEFAULT), "UTF-8")); }
+                        catch (Exception ignored) { notes.put(p[0], "Описание выпуска повреждено"); }
+                    }
+                }
                 else if (k.equals("UNREACHABLE")) unreachable.append("• ").append(v.replace("\t", ": ")).append("\n");
             }
             public void end(boolean ok, String msg) {

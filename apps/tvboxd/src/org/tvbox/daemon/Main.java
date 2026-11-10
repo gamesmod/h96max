@@ -716,7 +716,11 @@ public class Main {
                 java.util.Map<String, String> m = latest(base);
                 String ver = m.get("version");
                 op.send("UPD url:" + base + "\t" + ver + "\t" + packageUrl(base, m.get("file")) + "\t" + (Long.parseLong(m.get("size")) >> 20) + " МБ\t" + (newer(ver, cur) ? "new" : "old"));
-                if (m.containsKey("notes")) op.send("NOTES url:" + base + "\t" + m.get("notes"));
+                if (m.containsKey("notes")) {
+                    // Протокол сокета построчный: кодируем заметки, чтобы переводы строк не обрезали описание выпуска.
+                    String encoded = android.util.Base64.encodeToString(m.get("notes").getBytes("UTF-8"), android.util.Base64.NO_WRAP);
+                    op.send("NOTES64 url:" + base + "\t" + encoded);
+                }
                 found++;
             } catch (Exception e) {
                 op.send("UNREACHABLE " + base + "\t" + e.getMessage());
