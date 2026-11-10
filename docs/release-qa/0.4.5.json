@@ -4,9 +4,9 @@
   "reviewed_at": "2026-11-10",
   "cold_boot_seconds": null,
   "hot_test": {
-    "tested_installed_version": "не подтверждена: после предыдущей OTA 0.4.4 ADB требует авторизации",
+    "tested_installed_version": "0.4.4; версия подтверждена через adb shell getprop ro.tvbox.release",
     "candidate_installed": false,
-    "adb_state": "устройство не отвечает по прежнему адресу; в adb devices отсутствует",
+    "adb_state": "authorized; adb shell доступен",
     "candidate_artifacts": {
       "source_commit": "12d69f32ae5b9e131e9fd2b63ce1a410776d67a9",
       "ota": "release/updates/emmc/tvbox-update-0.4.5-emmc.zip",
@@ -39,6 +39,20 @@
     "status": "pass",
     "count": 51,
     "command": "python3 -m unittest discover -s tests -v"
+  },
+  "live_device_snapshot": {
+    "captured_at": "2026-11-10",
+    "installed_version": "0.4.4",
+    "android_release": "12",
+    "boot_completed": true,
+    "uptime_seconds": 103263,
+    "disk_swap_enabled": false,
+    "logcat_review": {
+      "scope": "последние 3000 записей доступных буферов logcat",
+      "warning_error_fatal_lines": 0,
+      "fatal_exception_markers": 0,
+      "limitation": "короткие кольцевые буферы; анализ не покрывает более раннюю загрузку"
+    }
   },
   "github_actions_candidate": {
     "run_id": 42603578142,
