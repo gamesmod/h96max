@@ -8,12 +8,12 @@
     "candidate_installed": false,
     "adb_state": "authorized; adb shell доступен",
     "candidate_artifacts": {
-      "source_commit": "7e3057930fb39a5e97bc7a75443b84ddc7b8c278",
+      "source_commit": "90cb57fce640106984a84c642e47f5628c28af44",
       "ota": "release/updates/emmc/tvbox-update-0.4.5-emmc.zip",
-      "ota_sha256": "01cc847ed5dadfa7b22cf2e5edb21d5a993044483f149928b6429798668150d3",
+      "ota_sha256": "2871a21b6ba4974b7d054e47328fa8398cb04703d6e9d364fdf310ecdb51bed3",
       "ota_signature_host": "CMS verification successful",
       "clean_install": "release/Panadonik-0.4.5-emmc-clean-install.zip",
-      "clean_install_sha256": "61a1cdae371cfc500131cd730f9a5a9e75ddb53c33c3049c11ab5f74ed577e4a",
+      "clean_install_sha256": "59fd36fa9eeb963ca8f81e0bada8f741e41a657c4e5d1fe13e58082ae4197dc8",
       "clean_install_signature_host": "verified with existing project OTA certificate",
       "wifi_credential_scan": "pass: system.img and vendor.img; two relevant configuration files checked",
       "build_log_analysis": {
@@ -37,7 +37,7 @@
   },
   "automated_tests": {
     "status": "pass",
-    "count": 51,
+    "count": 54,
     "command": "python3 -m unittest discover -s tests -v"
   },
   "live_device_snapshot": {
@@ -112,7 +112,7 @@
   "log_analysis": {
     "reviewed": true,
     "untriaged_errors": 0,
-    "summary": "Свежий build log: 0 критических, 0 ошибок, 0 предупреждений; packaging log: 0/0/0; live logcat last 1200 E-level: 0 lines, но кольцевой буфер ограничен."
+    "summary": "Финальный build log после генерации IPTV: 0 критических, 0 ошибок, 0 предупреждений; packaging log: 0/0/0; live logcat last 1200 E-level: 0 lines, но кольцевой буфер ограничен."
   },
   "iptv_validation": {
     "candidate_only_status": "warning: disclosed 18+ inventory gap",
