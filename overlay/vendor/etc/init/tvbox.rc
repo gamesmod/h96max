@@ -22,6 +22,18 @@ on property:sys.boot_completed=1
     start tvbox_clock
     start tvbox_bootlog
 
+# app_process должен стартовать после подготовки APEX в пространстве имён init.
+on property:apexd.status=ready
+    start tvbox_bootscreen
+
+service tvbox_bootscreen /system/bin/app_process /system/bin org.tvbox.bootscreen.Main
+    user root
+    group root graphics audio system
+    setenv CLASSPATH /system/framework/tvbox-bootscreen.jar
+    seclabel u:r:su:s0
+    disabled
+    oneshot
+
 service tvbox_clock /system/bin/sh /vendor/bin/tvbox-clock.sh
     user root
     group root

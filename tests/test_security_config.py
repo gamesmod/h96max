@@ -14,6 +14,13 @@ SPEC.loader.exec_module(IMAGE_WIFI)
 
 
 class ReleaseSecurityConfigTests(unittest.TestCase):
+    def test_bootscreen_starts_after_apex_ready(self):
+        init = (ROOT / "overlay/vendor/etc/init/tvbox.rc").read_text(encoding="utf-8")
+        wrapper = (ROOT / "overlay/vendor/bin/tvbox-bootanimation.sh").read_text(encoding="utf-8")
+        self.assertIn("on property:apexd.status=ready\n    start tvbox_bootscreen", init)
+        self.assertIn("service tvbox_bootscreen /system/bin/app_process", init)
+        self.assertNotIn("app_process", wrapper)
+
     def test_launcher_repair_removes_duplicates_and_keeps_order(self):
         script = (ROOT / "overlay/vendor/bin/tvbox-firstboot.sh").read_text(encoding="utf-8")
         start = script.index('    ALLOWED="org.tvbox.iptv')
