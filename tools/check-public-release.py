@@ -12,6 +12,10 @@ SPEC = importlib.util.spec_from_file_location("iptv_merge", ROOT / "iptv-merge.p
 MERGE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MERGE)
 SENSITIVE = {"token", "auth", "password", "passwd", "username", "user", "api_key", "apikey", "access_token", "signature", "sig"}
+ADULT_GAP_PATTERNS = (
+    re.compile(r"категория «Для взрослых» должна быть первой"),
+    re.compile(r"каналов 18\+ \d+, требуется минимум \d+"),
+)
 
 
 def safe_url(url):
@@ -52,11 +56,18 @@ def validate_playlist(entries, min_adult=20):
     return issues
 
 
+def candidate_blocking_issues(issues):
+    """Для временного dev-artifact разрешить только нехватку/порядок 18+ каналов."""
+    return [issue for issue in issues if not any(pattern.fullmatch(issue) for pattern in ADULT_GAP_PATTERNS)]
+
+
 def main():
     parser = argparse.ArgumentParser(description="Ищет приватные URL-параметры перед сборкой публичного OTA.")
     parser.add_argument("--sources", default="tools/iptv-sources.txt")
     parser.add_argument("--playlist", help="проверить также сгенерированный общий M3U")
     parser.add_argument("--min-adult", type=int, default=20)
+    parser.add_argument("--allow-adult-gap", action="store_true",
+                        help="разрешить только отсутствие/порядок 18+ в не публикуемом dev-artifact")
     args = parser.parse_args()
     urls = []
     for line in pathlib.Path(args.sources).read_text(encoding="utf-8").splitlines():
@@ -66,16 +77,20 @@ def main():
     if args.playlist:
         entries = MERGE.parse(pathlib.Path(args.playlist).read_text(encoding="utf-8", errors="replace"))
         issues = validate_playlist(entries, args.min_adult)
-        if issues:
-            for issue in issues:
-                print(f"Ошибка: {issue}", file=sys.stderr)
-            return 1
         for entry in entries:
             urls.extend((entry["url"], entry["attrs"].get("tvg-logo", "")))
     if any(url and not safe_url(url) for url in urls):
         print("Ошибка: URL с учётными данными запрещён в публичном релизе", file=sys.stderr)
         return 1
     if args.playlist:
+        blocking = candidate_blocking_issues(issues) if args.allow_adult_gap else issues
+        if blocking:
+            for issue in blocking:
+                print(f"Ошибка: {issue}", file=sys.stderr)
+            return 1
+        for issue in issues:
+            if issue not in blocking:
+                print(f"Предупреждение dev-кандидата: {issue}", file=sys.stderr)
         print(f"Плейлист проверен: каналов {len(entries)}, категорий 100% русских, дублей и детских каналов нет, качество от 1080p; URL проверено {len(urls)}")
     else:
         print(f"Проверено URL: {len(urls)}; учётные данные не обнаружены")

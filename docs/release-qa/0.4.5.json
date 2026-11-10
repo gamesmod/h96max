@@ -45,18 +45,35 @@
     "installed_version": "0.4.4",
     "android_release": "12",
     "boot_completed": true,
-    "uptime_seconds": 106313,
+    "uptime_seconds": 110711,
     "disk_swap_enabled": false,
     "logcat_review": {
       "scope": "последние 2000 записей доступных буферов logcat после hot-теста IPTV",
       "warning_error_fatal_lines": 0,
       "fatal_exception_markers": 0,
       "limitation": "короткие кольцевые буферы; анализ не покрывает предыдущую загрузку"
+    },
+    "read_only_monitor": {
+      "sampled_at": "2026-11-10T17:09:10Z",
+      "logcat_error_lines_last_1200": 0,
+      "memory_total_mib": 3949,
+      "memory_available_mib": 2935,
+      "temperature_c": 63.8,
+      "filesystem_use_percent": {
+        "root": 64,
+        "vendor": 98
+      },
+      "ro_adb_secure": "1",
+      "ro_debuggable": "1",
+      "selinux": "Permissive",
+      "adb_tcp_port_enabled": true,
+      "su_command_present": true,
+      "network_capture_performed": false
     }
   },
   "github_actions_candidate": {
-    "run_id": 42603578142,
-    "url": "https://github.com/gamesmod/h96max/actions/runs/42603578142",
+    "run_id": 42860787222,
+    "url": "https://github.com/gamesmod/h96max/actions/runs/42860787222",
     "status": "failure",
     "failed_step": "Preflight required Actions secrets",
     "reason": "В Settings → Secrets and variables → Actions отсутствуют обязательные секреты; ключи из локальной машины не копировались",
@@ -88,13 +105,26 @@
     "swap_disabled": "pass на установленной системе 0.4.4: /proc/swaps пуст; на 0.4.5 ещё не проверено",
     "network_capture_review": "pending: контролируемый захват после установки не выполнен",
     "usb_remote_iptv_channels": "pending: синтетические ADB события не заменяют проверку PAGE вверх/вниз на физическом USB-пульте",
-    "security_review": "pending: скан system/vendor на Wi-Fi credentials пройден; сетевой аудит не выполнен; образ сообщает SELinux permissive",
+    "security_review": "pending/high risk: live 0.4.4 has ro.debuggable=1, ADB TCP 5555, SELinux Permissive, su present; vendor 98%; capture/review not completed",
     "device_update": "pending: OTA очищает пользовательские данные; отдельное согласие на очистку не получено",
     "iptv_release_list": "fail: «Для взрослых» не первая; найдено 0 каналов 18+ при минимуме 20; отдельная сессия обновляет список"
   },
   "log_analysis": {
     "reviewed": true,
     "untriaged_errors": 0,
-    "summary": "В свежем журнале сборки 136 строк: 0 критических, 0 ошибок, 0 предупреждений. В последних 2000 строках live logcat также не найдено warning/error/fatal; полный анализ после установки кандидата не выполнялся."
+    "summary": "Свежий build log: 0 критических, 0 ошибок, 0 предупреждений; packaging log: 0/0/0; live logcat last 1200 E-level: 0 lines, но кольцевой буфер ограничен."
+  },
+  "iptv_validation": {
+    "candidate_only_status": "warning: disclosed 18+ inventory gap",
+    "total_channels": 133,
+    "adult_channels": 0,
+    "adult_minimum": 20,
+    "adult_category_first": false,
+    "russian_categories": true,
+    "duplicates_or_quality_variants": 0,
+    "children": 0,
+    "measured_quality_minimum": "1080p",
+    "private_url_check": "pass; no credential-bearing URLs reported",
+    "tagged_dev_and_stable": "blocked until the complete IPTV gate passes"
   }
 }

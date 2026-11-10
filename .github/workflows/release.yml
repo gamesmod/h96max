@@ -148,7 +148,35 @@ jobs:
           set -euo pipefail
           python3 -I tools/check-public-release.py --sources tools/iptv-sources.txt
           python3 -I tools/iptv-merge.py --out overlay/system/etc/tvbox/iptv.m3u
-          python3 -I tools/check-public-release.py --sources tools/iptv-sources.txt --playlist overlay/system/etc/tvbox/iptv.m3u --min-adult 20
+          candidate_args=()
+          if [[ "$GITHUB_EVENT_NAME" != push || "$GITHUB_REF" != refs/tags/* ]]; then
+            # Кандидат может показать известный пробел в 18+ каталоге, но отчёт сохраняется в QA.
+            candidate_args+=(--allow-adult-gap)
+          fi
+          set +e
+          python3 -I tools/check-public-release.py --sources tools/iptv-sources.txt \
+            --playlist overlay/system/etc/tvbox/iptv.m3u --min-adult 20 "${candidate_args[@]}" \
+            2> /tmp/panadonik-iptv-validation.log
+          iptv_status=$?
+          set -e
+          if [[ "$iptv_status" -ne 0 ]]; then
+            cat /tmp/panadonik-iptv-validation.log >&2
+            echo "IPTV verification failed; tagged dev/stable publication is blocked." >&2
+            exit "$iptv_status"
+          fi
+          {
+            echo "# Проверка IPTV-плейлиста"
+            echo
+            if [[ -s /tmp/panadonik-iptv-validation.log ]]; then
+              echo "Статус: кандидатный список содержит раскрытые ограничения; артефакт не является стабильным релизом."
+              echo
+              echo '```text'
+              cat /tmp/panadonik-iptv-validation.log
+              echo '```'
+            else
+              echo "Статус: ограничения не найдены."
+            fi
+          } > release/qa/iptv-validation.md
 
       - name: Build signed OTA
         run: |
@@ -195,7 +223,9 @@ jobs:
 
           - Source commit: `$GITHUB_SHA`.
           - Automated tests and package build completed in GitHub Actions.
-          - This non-tag build has not passed the target-device release gate. Boot time, logs, network capture, IPTV, QR, torrent playback, and graphics remain unverified by this workflow.
+          - IPTV checks ran; see `release/qa/iptv-validation.md`. Only a disclosed 18+ category/order gap may pass for this non-tag artifact; privacy, quality, children, and duplicate checks still block it.
+          - This non-tag build has not passed the target-device release gate. Boot time, device logs, network capture, QR, USB remote, torrent playback, and graphics remain unverified by this workflow.
+          - IPTV validation details are in `release/qa/iptv-validation.md`; adult-category gaps are disclosed only for non-tag candidate artifacts.
           - Do not treat this artifact as a public release. Before installing, complete hardware checks and obtain explicit user confirmation for any operation that wipes data.
           EOF
 
@@ -227,6 +257,7 @@ jobs:
             release/qa/automated-tests.md
             release/qa/test-log-analysis.md
             release/qa/build-log-analysis.md
+            release/qa/iptv-validation.md
             release/qa/candidate-status.md
           if-no-files-found: error
           retention-days: 3

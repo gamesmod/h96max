@@ -1,6 +1,7 @@
 """Проверки разделения аппаратных gate для dev и stable выпусков."""
 import json
 import datetime
+import importlib.util
 import pathlib
 import subprocess
 import sys
@@ -10,6 +11,11 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CHECKER = ROOT / "tools/check-release-evidence.py"
+IPTV_CHECKER_SPEC = importlib.util.spec_from_file_location(
+    "check_public_release", ROOT / "tools/check-public-release.py"
+)
+IPTV_CHECKER = importlib.util.module_from_spec(IPTV_CHECKER_SPEC)
+IPTV_CHECKER_SPEC.loader.exec_module(IPTV_CHECKER)
 
 
 class ReleaseChannelEvidenceTests(unittest.TestCase):
@@ -91,6 +97,41 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
         self.assertIn('Using committed release notes', workflow)
         self.assertIn('release/notes/$version.txt', workflow)
+
+    def test_dev_candidate_allows_only_adult_inventory_gap(self):
+        issues = [
+            "категория «Для взрослых» должна быть первой",
+            "каналов 18+ 0, требуется минимум 20",
+            "найдены детские каналы",
+            "есть канал без итоговой метки измеренного качества 1080p или выше",
+        ]
+        self.assertEqual(
+            ["найдены детские каналы", "есть канал без итоговой метки измеренного качества 1080p или выше"],
+            IPTV_CHECKER.candidate_blocking_issues(issues),
+        )
+
+    def test_candidate_adult_gap_option_never_allows_private_stream_url(self):
+        sources = pathlib.Path(self.tmp.name) / "sources.txt"
+        playlist = pathlib.Path(self.tmp.name) / "candidate.m3u"
+        sources.write_text("", encoding="utf-8")
+        playlist.write_text(
+            '#EXTM3U\n#EXTINF:-1 group-title="Для взрослых",Тест (1080p)\n'
+            'http://user:secret@example.invalid/live.m3u8\n', encoding="utf-8",
+        )
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "tools/check-public-release.py"), "--sources", str(sources),
+             "--playlist", str(playlist), "--min-adult", "20", "--allow-adult-gap"],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("URL с учётными данными запрещён", result.stderr)
+        self.assertNotIn("secret", result.stderr)
+
+    def test_workflow_discloses_candidate_iptv_gap_and_blocks_tagged_release(self):
+        workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
+        self.assertIn("candidate_args+=(--allow-adult-gap)", workflow)
+        self.assertIn("IPTV verification failed; tagged dev/stable publication is blocked.", workflow)
+        self.assertIn("release/qa/iptv-validation.md", workflow)
 
     def test_nightly_candidates_never_publish_and_tag_runs_require_hardware_gate(self):
         workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
