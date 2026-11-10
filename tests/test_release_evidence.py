@@ -106,6 +106,14 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.assertIn('k.equals("NOTES64")', installer)
         self.assertIn('Base64.decode(p[1]', installer)
 
+    def test_long_update_description_keeps_cleanup_buttons_visible(self):
+        installer = (ROOT / "apps/installer/src/org/tvbox/installer/MainActivity.java").read_text(encoding="utf-8")
+        self.assertIn('int maxHeight = Math.min(dp(560)', installer)
+        self.assertIn('content.setPadding(dp(24), dp(4), dp(24), dp(4))', installer)
+        self.assertIn('.setView(content)', installer)
+        self.assertIn('.setPositiveButton("Продолжить с очисткой"', installer)
+        self.assertIn('confirmCmd("Подтвердить очистку и обновление?"', installer)
+
     def test_dev_candidate_allows_only_adult_inventory_gap(self):
         issues = [
             "категория «Для взрослых» должна быть первой",

@@ -162,10 +162,23 @@ public class MainActivity extends Activity {
     }
 
     void chooseMode(final String[] u, String note) {
+        String description = (note != null ? note.replace("## ", "").replace("\n- ", "\n• ") + "\n\n" : "")
+            + "Источник: " + u[2] + ", " + u[3] + "\n\n"
+            + "Обновление выполняется с очисткой пользовательских данных. Приложения, настройки, торренты и файлы будут удалены. "
+            + "Приставка перезагрузится, recovery проверит подпись пакета и установит его.";
+        // Ограничиваем высоту прокручиваемого описания, чтобы кнопки подтверждения всегда оставались видимыми.
+        ScrollView scroll = new ScrollView(this);
+        scroll.setFillViewport(false);
+        TextView details = text(description, 16, TEXT, false);
+        details.setLineSpacing(0, 1.15f);
+        scroll.addView(details, new ScrollView.LayoutParams(-1, -2));
+        int maxHeight = Math.min(dp(560), (int) (getResources().getDisplayMetrics().heightPixels * 0.58f));
+        LinearLayout content = new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setPadding(dp(24), dp(4), dp(24), dp(4));
+        content.addView(scroll, new LinearLayout.LayoutParams(-1, maxHeight));
         new AlertDialog.Builder(this).setTitle("Выпуск " + u[1])
-            .setMessage((note != null ? note + "\n\n" : "") + "Источник: " + u[2] + ", " + u[3] + "\n\n"
-                + "Обновление выполняется с очисткой пользовательских данных. Приложения, настройки, торренты и файлы будут удалены. "
-                + "Приставка перезагрузится, recovery проверит подпись пакета и установит его.")
+            .setView(content)
             .setNegativeButton("Отмена", null)
             .setPositiveButton("Продолжить с очисткой", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface d, int w) {
