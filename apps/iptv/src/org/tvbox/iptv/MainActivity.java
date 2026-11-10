@@ -29,14 +29,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -497,13 +501,76 @@ public class MainActivity extends Activity {
         });
     }
 
-    /**
-     * Передаём VLC только выбранный поток: чтение плейлиста выполняется при старте системы, VLC не индексирует
-     * сотни соседних адресов при каждом выборе канала.
-     */
+    /** Передаём VLC выбранную категорию, чтобы PAGE вверх/вниз переключали соседние каналы. */
     void playGroup(List<String[]> chans, int pos) {
+        if (chans == null || chans.isEmpty() || pos < 0 || pos >= chans.size()) return;
         String[] ch = chans.get(pos);
+        if (!nativePlayerTestEnabled() && playVlcPlaylist(chans, pos, ch[1])) return;
         play(ch[0], ch[1], ch[3]);
+    }
+
+    /** Открывает в VLC временный плейлист только текущей категории, начиная с выбранного канала. */
+    boolean playVlcPlaylist(List<String[]> chans, int pos, String title) {
+        File playlist = new File(getCacheDir(), "iptv-" + UUID.randomUUID().toString().replace("-", "") + ".m3u");
+        int written = 0;
+        try {
+            OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(playlist), StandardCharsets.UTF_8);
+            try {
+                out.write("#EXTM3U\n");
+                for (int offset = 0; offset < chans.size(); offset++) {
+                    String[] channel = chans.get((pos + offset) % chans.size());
+                    String url = channel[0] == null ? "" : channel[0].trim();
+                    if (!isPlayableUrl(url)) continue;
+                    out.write("#EXTINF:-1");
+                    writeM3uAttribute(out, "tvg-id", valueAt(channel, 3));
+                    writeM3uAttribute(out, "tvg-name", valueAt(channel, 4));
+                    writeM3uAttribute(out, "tvg-logo", valueAt(channel, 2));
+                    writeM3uAttribute(out, "group-title", valueAt(channel, 5));
+                    out.write("," + m3uText(valueAt(channel, 1)) + "\n" + url + "\n");
+                    written++;
+                }
+            } finally {
+                out.close();
+            }
+            if (written == 0) throw new IOException("в категории нет доступных URL");
+            Uri uri = Uri.parse("content://org.tvbox.iptv.playlists/" + playlist.getName());
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, "application/x-mpegURL");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.putExtra("title", title);
+            intent.setPackage(VLC);
+            startActivity(intent);
+            iptvLog("playback_handoff", "target=vlc category_playlist channels=" + written);
+            return true;
+        } catch (Exception e) {
+            playlist.delete();
+            iptvLog("playback_playlist_failed", "error=" + e.getClass().getSimpleName());
+            return false;
+        }
+    }
+
+    boolean isPlayableUrl(String url) {
+        try {
+            String scheme = Uri.parse(url).getScheme();
+            if (scheme == null) return false;
+            scheme = scheme.toLowerCase(java.util.Locale.ROOT);
+            return "http".equals(scheme) || "https".equals(scheme) || "rtsp".equals(scheme)
+                    || "rtmp".equals(scheme) || "rtmps".equals(scheme) || "udp".equals(scheme)
+                    || "rtp".equals(scheme) || "mms".equals(scheme);
+        } catch (Exception ignored) { return false; }
+    }
+
+    String valueAt(String[] channel, int index) {
+        return channel != null && channel.length > index ? channel[index] : "";
+    }
+
+    void writeM3uAttribute(OutputStreamWriter out, String key, String value) throws IOException {
+        String safe = m3uText(value).replace("\"", "");
+        if (!safe.isEmpty()) out.write(" " + key + "=\"" + safe + "\"");
+    }
+
+    String m3uText(String value) {
+        return value == null ? "" : value.replace("\r", " ").replace("\n", " ").replace("\u0000", "").trim();
     }
 
     void play(String url, String name, String channelId) {

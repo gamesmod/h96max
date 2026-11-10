@@ -17,6 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".NativePlaybackActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <provider android:name=".PlaylistProvider" android:authorities="org.tvbox.iptv.playlists"
+            android:exported="false" android:grantUriPermissions="true"/>
         <receiver android:name=".BootReceiver" android:enabled="true" android:exported="false">
             <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED"/></intent-filter>
         </receiver>
