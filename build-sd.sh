@@ -3,6 +3,8 @@
 # Output: build/out-emmc/regions/*.bin.gz + build/out-emmc/manifest.txt (offset_sector size file md5)
 set -euo pipefail
 R=$(cd "$(dirname "$0")" && pwd)
+source "$R/tools/required-apps.sh"
+tvbox_require_apks || { echo "Сборка остановлена: комплект приложений неполный" >&2; exit 1; }
 T=$R/tools
 SRC=$R/dl/a12/Image          # unpacked vendor update.img
 LP=$SRC/lp                   # unpacked super partitions (pristine)

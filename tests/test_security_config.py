@@ -1,6 +1,7 @@
 """Регрессионные проверки базовых настроек безопасности образа."""
 import importlib.util
 import pathlib
+import subprocess
 import tempfile
 import unittest
 from unittest import mock
@@ -13,6 +14,16 @@ SPEC.loader.exec_module(IMAGE_WIFI)
 
 
 class ReleaseSecurityConfigTests(unittest.TestCase):
+    def test_build_rejects_missing_required_applications(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                ["bash", "-c", 'R="$1"; source "$2"; tvbox_require_apks', "--",
+                 directory, str(ROOT / "tools/required-apps.sh")],
+                capture_output=True, text=True, check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("org.videolan.vlc.apk", result.stderr)
+
     def test_zram_cannot_be_enabled_from_project(self):
         script = (ROOT / "overlay/vendor/bin/tvbox-zram.sh").read_text(encoding="utf-8")
         ui = (ROOT / "apps/clean/src/org/tvbox/clean/MainActivity.java").read_text(encoding="utf-8")
