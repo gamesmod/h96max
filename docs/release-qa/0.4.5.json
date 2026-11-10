@@ -8,12 +8,12 @@
     "candidate_installed": false,
     "adb_state": "authorized; adb shell доступен",
     "candidate_artifacts": {
-      "source_commit": "90cb57fce640106984a84c642e47f5628c28af44",
+      "source_commit": "efda5a5df6ed301ee18a7b460b5ee24ccad6a2f5",
       "ota": "release/updates/emmc/tvbox-update-0.4.5-emmc.zip",
-      "ota_sha256": "2871a21b6ba4974b7d054e47328fa8398cb04703d6e9d364fdf310ecdb51bed3",
+      "ota_sha256": "f98b00a7fed968f7333f0508036b5219675dececac8d704f93e8d84b480bb706",
       "ota_signature_host": "CMS verification successful",
       "clean_install": "release/Panadonik-0.4.5-emmc-clean-install.zip",
-      "clean_install_sha256": "59fd36fa9eeb963ca8f81e0bada8f741e41a657c4e5d1fe13e58082ae4197dc8",
+      "clean_install_sha256": "d507d4966ee7fb91b8b3936d3fc8b5ce00c93fe28ab09afdf7bcd86e46bdfa4e",
       "clean_install_signature_host": "verified with existing project OTA certificate",
       "wifi_credential_scan": "pass: system.img and vendor.img; two relevant configuration files checked",
       "build_log_analysis": {
@@ -26,6 +26,14 @@
       },
       "ota_wipes_userdata_after_success": true
     },
+    "installer_ui_hot_test": {
+      "tested_system_version": "0.4.4",
+      "multiline_release_notes": "pass: complete candidate description displayed and scrollable",
+      "cleanup_actions_visible": "pass: continue and cancel buttons remain visible with long notes",
+      "full_candidate_system_installed": false,
+      "ota_started": false,
+      "data_cleanup_consent": "pending separate user confirmation"
+    },
     "network_capture": {
       "captured_at": null,
       "duration_seconds": null,
@@ -37,7 +45,7 @@
   },
   "automated_tests": {
     "status": "pass",
-    "count": 54,
+    "count": 56,
     "command": "python3 -m unittest discover -s tests -v"
   },
   "live_device_snapshot": {
