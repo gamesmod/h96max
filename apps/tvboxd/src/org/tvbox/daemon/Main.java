@@ -857,9 +857,15 @@ public class Main {
     }
 
     /** base/latest.txt: key=value lines (version, file, sha256, size, notes). */
-    /** Проверяет, что источник указывает на прямые ассеты последнего GitHub Release. */
+    /** GitHub хранит файлы выпуска непосредственно под каталогом latest или конкретного тега. */
     static boolean githubReleaseBase(String base) {
-        return base.contains("github.com/") && base.contains("/releases/latest/download/");
+        try {
+            URL url = new URL(base);
+            if (!"https".equalsIgnoreCase(url.getProtocol()) || !"github.com".equalsIgnoreCase(url.getHost())) return false;
+            return url.getPath().matches("/[^/]+/[^/]+/releases/(latest/download|download/[^/]+)/");
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     static String latestUrl(String base) {
