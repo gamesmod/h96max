@@ -8,12 +8,12 @@
     "candidate_installed": false,
     "adb_state": "authorized; adb shell доступен",
     "candidate_artifacts": {
-      "source_commit": "12d69f32ae5b9e131e9fd2b63ce1a410776d67a9",
+      "source_commit": "7e3057930fb39a5e97bc7a75443b84ddc7b8c278",
       "ota": "release/updates/emmc/tvbox-update-0.4.5-emmc.zip",
-      "ota_sha256": "af9a0818f8cb78953602c3b32006fccdaa2b64a46dd46fcb6100bdeab52724b3",
+      "ota_sha256": "01cc847ed5dadfa7b22cf2e5edb21d5a993044483f149928b6429798668150d3",
       "ota_signature_host": "CMS verification successful",
       "clean_install": "release/Panadonik-0.4.5-emmc-clean-install.zip",
-      "clean_install_sha256": "de5e9764ce6b9296bb24ae0f714a7aa1e538b5a8652b4b8716ab56daff4bd3a0",
+      "clean_install_sha256": "61a1cdae371cfc500131cd730f9a5a9e75ddb53c33c3049c11ab5f74ed577e4a",
       "clean_install_signature_host": "verified with existing project OTA certificate",
       "wifi_credential_scan": "pass: system.img and vendor.img; two relevant configuration files checked",
       "build_log_analysis": {
@@ -32,7 +32,7 @@
       "packets": null,
       "auth_cookie_or_token_patterns": null,
       "raw_capture_retained": false,
-      "scope": "кандидат 0.4.5 на приставке не установлен"
+      "scope": "системный кандидат 0.4.5 на приставке не установлен; контролируемый захват не выполнялся"
     }
   },
   "automated_tests": {
@@ -45,13 +45,13 @@
     "installed_version": "0.4.4",
     "android_release": "12",
     "boot_completed": true,
-    "uptime_seconds": 103263,
+    "uptime_seconds": 106313,
     "disk_swap_enabled": false,
     "logcat_review": {
-      "scope": "последние 3000 записей доступных буферов logcat",
+      "scope": "последние 2000 записей доступных буферов logcat после hot-теста IPTV",
       "warning_error_fatal_lines": 0,
       "fatal_exception_markers": 0,
-      "limitation": "короткие кольцевые буферы; анализ не покрывает более раннюю загрузку"
+      "limitation": "короткие кольцевые буферы; анализ не покрывает предыдущую загрузку"
     }
   },
   "github_actions_candidate": {
@@ -81,19 +81,20 @@
     "qr_vlc": "pending: версия 0.4.5 не установлена",
     "wired_network": "pending: версия 0.4.5 не установлена",
     "wifi_network": "pending: версия 0.4.5 не установлена",
-    "iptv_playback": "pending: видимая картинка и воспроизведение без лагов не проверены",
+    "iptv_playback": "частично: VLC воспроизвёл поток из плейлиста текущей категории; видимая плавность на экране и пропуски кадров не измерены",
     "torrent_playback": "pending: версия 0.4.5 не установлена",
     "graphics_video": "pending: версия 0.4.5 не установлена",
     "graphics_stress": "pending: версия 0.4.5 не установлена",
-    "swap_disabled": "pending: состояние на кандидате не проверено",
+    "swap_disabled": "pass на установленной системе 0.4.4: /proc/swaps пуст; на 0.4.5 ещё не проверено",
     "network_capture_review": "pending: контролируемый захват после установки не выполнен",
-    "usb_remote_iptv_channels": "pending: кнопки пульта и переключение каналов не проверены",
-    "security_review": "pending: скан образа на Wi-Fi credentials пройден; анализ устройства и сети не выполнен",
-    "device_update": "pending: OTA 0.4.5 удаляет пользовательские данные; отдельное согласие не получено, ADB требует авторизации"
+    "usb_remote_iptv_channels": "pending: синтетические ADB события не заменяют проверку PAGE вверх/вниз на физическом USB-пульте",
+    "security_review": "pending: скан system/vendor на Wi-Fi credentials пройден; сетевой аудит не выполнен; образ сообщает SELinux permissive",
+    "device_update": "pending: OTA очищает пользовательские данные; отдельное согласие на очистку не получено",
+    "iptv_release_list": "fail: «Для взрослых» не первая; найдено 0 каналов 18+ при минимуме 20; отдельная сессия обновляет список"
   },
   "log_analysis": {
-    "reviewed": false,
-    "untriaged_errors": null,
-    "summary": "Лог сборки разобран: ошибок нет. Журналы приставки после установки 0.4.5 ещё не доступны."
+    "reviewed": true,
+    "untriaged_errors": 0,
+    "summary": "В свежем журнале сборки 136 строк: 0 критических, 0 ошибок, 0 предупреждений. В последних 2000 строках live logcat также не найдено warning/error/fatal; полный анализ после установки кандидата не выполнялся."
   }
 }
