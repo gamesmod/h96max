@@ -14,3 +14,22 @@ https://raw.githubusercontent.com/Sanuyyq/iptv-ot-sanaeye/master/neisvesno.m3u8
 https://iptv-org.github.io/iptv/countries/ru.m3u
 https://iptv-org.github.io/iptv/languages/rus.m3u
 https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8 group=Russia
+# Дополнительные публичные каталоги: ссылки ниже проходят те же проверки, что и все остальные.
+# Четыре тематических плейлиста FreeCastHub; исходная политика проекта исключает подписные каналы.
+https://raw.githubusercontent.com/freecasthub/public-iptv/main/news.m3u
+https://raw.githubusercontent.com/freecasthub/public-iptv/main/sports.m3u
+https://raw.githubusercontent.com/freecasthub/public-iptv/main/weather.m3u
+https://raw.githubusercontent.com/freecasthub/public-iptv/main/education.m3u
+# Streamline / Doubo: русскоязычные и тематические списки; возможны пересечения с iptv-org.
+https://raw.githubusercontent.com/streamline-iptv/iptv-playlists/dist/countries/ru.m3u
+https://raw.githubusercontent.com/streamline-iptv/iptv-playlists/dist/languages/rus.m3u
+https://raw.githubusercontent.com/streamline-iptv/iptv-playlists/dist/categories/news.m3u
+https://raw.githubusercontent.com/streamline-iptv/iptv-playlists/dist/categories/sports.m3u
+https://raw.githubusercontent.com/streamline-iptv/iptv-playlists/dist/categories/music.m3u
+https://raw.githubusercontent.com/streamline-iptv/iptv-playlists/dist/categories/movies.m3u
+https://raw.githubusercontent.com/streamline-iptv/iptv-playlists/dist/categories/documentary.m3u
+https://raw.githubusercontent.com/streamline-iptv/iptv-playlists/dist/categories/entertainment.m3u
+# Публичные каталоги, где издатели описывают происхождение потоков.
+https://biskyt.github.io/legalFreeIPTVplaylist/live.m3u
+https://shahrukhalid.github.io/nexonic-iptv/playlists/quality/1080p.m3u
+https://www.tdtchannels.com/lists/tv.m3u8
