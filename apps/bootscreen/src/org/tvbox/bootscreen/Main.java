@@ -126,7 +126,9 @@ public class Main {
             if (!z.getName().startsWith("thermal_zone")) continue;
             try {
                 double c = Double.parseDouble(readOne(z.getPath() + "/temp"));
-                if (c > 0 && c < 200) return String.format("Температура: %.1f °C", c > 1000 ? c / 1000 : c);
+                // Значение sysfs обычно задано в тысячных долях градуса.
+                if (c > 1000) c /= 1000;
+                if (c > 0 && c < 200) return String.format("Температура: %.1f °C", c);
             } catch (Exception e) { }
         }
         return "Температура: нет данных";
