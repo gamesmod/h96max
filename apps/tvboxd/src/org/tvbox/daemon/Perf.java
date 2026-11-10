@@ -3,7 +3,6 @@ package org.tvbox.daemon;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -107,31 +106,9 @@ class Perf {
         }
     }
 
-    /** Persist only; boot applies it before zram has any pages. Never swapoff under a running workload. */
+    /** Настройка сжатой подкачки отключена по требованию пользователя. */
     static synchronized void setZram(Main.Op op, String value) {
-        long max = meminfo()[0] / 1024;
-        if (!value.matches("[0-9]{1,6}")) { op.done(false, "укажите объём в МБ"); return; }
-        int mb = Integer.parseInt(value);
-        if (max <= 0 || mb > max) { op.done(false, "объём должен быть от 0 до " + max + " МБ"); return; }
-        if (!new File("/sys/block/zram0/disksize").exists()) { op.done(false, "zRAM недоступен в ядре"); return; }
-        File tmp = new File(Main.STATE, "zram-mb.new");
-        try {
-            new File(Main.STATE).mkdirs();
-            try (FileOutputStream out = new FileOutputStream(tmp)) {
-                tmp.setReadable(false, false);
-                tmp.setReadable(true, true);
-                tmp.setWritable(false, false);
-                tmp.setWritable(true, true);
-                out.write((mb + "\n").getBytes("UTF-8"));
-                out.getFD().sync();
-            }
-            if (!tmp.renameTo(ZRAM_CONFIG)) throw new java.io.IOException("не удалось сохранить");
-            zramStatus(op);
-            op.done(true, "сохранено; применится после перезагрузки");
-        } catch (Exception e) {
-            tmp.delete();
-            op.done(false, "не удалось сохранить zRAM: " + e.getMessage());
-        }
+        op.done(false, "сжатая подкачка отключена");
     }
 
     /** "rssMB name" of the biggest processes by resident memory. */

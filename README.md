@@ -119,7 +119,7 @@ USB-приёмник микрофонного пульта определяет�
 
 Логи загрузки подтверждают обнаружение USB-аудиоустройства. Нажатие кнопки и разговор с установленной Алисой нужно проверить на приставке; сохранённые логи сделаны без установленного пакета Алисы. Микрофон Samsung UE70TU7090 работает внутри его Tizen-системы и не передаётся приставке через HDMI.
 
-В плитке **Производительность** настройка zRAM не используется в этой сборке; дисковый swap отключён.
+В плитке **Производительность и диагностика** настройка zRAM удалена по требованию пользователя. Сжатая и дисковая подкачка отключены; на обновлённой живой системе их состояние проверяется отдельно после каждой загрузки.
 
 ## Наши приложения
 
@@ -130,7 +130,7 @@ USB-приёмник микрофонного пульта определяет�
 | ТВ-каналы | `apps/iptv` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/iptv) | IPTV-плейлист и запуск каналов во VLC |
 | Установка | `apps/installer` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/installer) | OTA по сети/носителю; установка и резервирование eMMC |
 | Антивирус | `apps/antivirus` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/antivirus) | Hypatia и проверка по запросу |
-| Производительность | `apps/clean` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/clean) | Освобождение памяти, метрики и настройка zRAM |
+| Производительность и диагностика | `apps/clean` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/clean) | Освобождение памяти, метрики и журналы |
 | Питание | `apps/power` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/power) | Выключение, сон, перезагрузка и переход в recovery |
 | Журнал загрузки | `apps/bootlog` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/bootlog) | Просмотр журналов загрузки |
 | Ссылки | `apps/links` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/links) | QR TorrServer/VLC и отдельный запуск VLC на приставке |

@@ -13,6 +13,17 @@ SPEC.loader.exec_module(IMAGE_WIFI)
 
 
 class ReleaseSecurityConfigTests(unittest.TestCase):
+    def test_zram_cannot_be_enabled_from_project(self):
+        script = (ROOT / "overlay/vendor/bin/tvbox-zram.sh").read_text(encoding="utf-8")
+        ui = (ROOT / "apps/clean/src/org/tvbox/clean/MainActivity.java").read_text(encoding="utf-8")
+        perf = (ROOT / "apps/tvboxd/src/org/tvbox/daemon/Perf.java").read_text(encoding="utf-8")
+        build = (ROOT / "build-sd.sh").read_text(encoding="utf-8")
+        self.assertNotRegex(script, r"(?m)^\s*(?:mkswap|swapon)\b")
+        self.assertNotIn('PERF_ZRAM_SET ', ui)
+        self.assertIn('op.done(false, "сжатая подкачка отключена")', perf)
+        self.assertIn('property:persist.sys.zram_enabled=1/,+1d', build)
+        self.assertIn('persist.sys.zram_enabled=0/', build)
+
     def test_adb_requires_host_key(self):
         build = (ROOT / "build-sd.sh").read_text(encoding="utf-8")
         self.assertIn("$MNT/system/build.prop", build)

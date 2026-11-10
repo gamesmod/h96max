@@ -53,7 +53,6 @@ public class MainActivity extends Activity {
     final Handler ui = new Handler();
     Chart temp, cpu, gpu, mem;
     TextView uptime, procs;
-    TextView zramInfo;
     TextView debugLogInfo;
     Button debugLogButton;
     volatile boolean running;
@@ -83,17 +82,11 @@ public class MainActivity extends Activity {
         root.addView(row(temp, cpu), new LinearLayout.LayoutParams(-1, 0, 1));
         root.addView(row(gpu, mem), new LinearLayout.LayoutParams(-1, 0, 1));
 
-        LinearLayout compression = new LinearLayout(this);
-        compression.setGravity(Gravity.CENTER_VERTICAL);
-        zramInfo = text("Сжатие памяти: загрузка…", 20, 0xFFB0BEC5);
-        compression.addView(zramInfo, new LinearLayout.LayoutParams(0, -2, 1));
-        compression.addView(button("Сжатие памяти…", new View.OnClickListener() {
-            public void onClick(View v) { configureZram(); }
-        }));
-        compression.addView(button("История 7 дней", new View.OnClickListener() {
+        LinearLayout historyRow = new LinearLayout(this);
+        historyRow.addView(button("История 7 дней", new View.OnClickListener() {
             public void onClick(View v) { showHistory(); }
         }));
-        root.addView(compression);
+        root.addView(historyRow);
 
         LinearLayout diagnostics = new LinearLayout(this);
         diagnostics.setGravity(Gravity.CENTER_VERTICAL);
@@ -150,11 +143,6 @@ public class MainActivity extends Activity {
 
     void show(Map<String, List<String>> m) {
         if (m.containsKey("ERROR")) { uptime.setText("служба tvboxd недоступна: " + one(m, "ERROR")); return; }
-        if (m.containsKey("ZRAM_ACTIVE_MB")) {
-            String active = one(m, "ZRAM_ACTIVE_MB"), configured = one(m, "ZRAM_CONFIG_MB");
-            zramInfo.setText("zRAM: " + (active.equals("0") ? "выключено" : active + " МБ · в ОЗУ " + one(m, "ZRAM_RAM_MB") + " МБ")
-                    + (active.equals(configured) ? "" : " · после перезагрузки: " + configured + " МБ"));
-        }
         float t = f(one(m, "TEMP"));
         temp.add(t, String.format("%.1f °C", t), t < 75 ? GREEN : t < 85 ? YELLOW : RED, "");
         float c = f(one(m, "CPU"));
@@ -347,62 +335,6 @@ public class MainActivity extends Activity {
                 ui.post(new Runnable() { public void run() { Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show(); } });
             }
         }).start();
-    }
-
-    void configureZram() {
-        new Thread(new Runnable() {
-            public void run() {
-                final Map<String, List<String>> m = call("PERF_ZRAM");
-                ui.post(new Runnable() { public void run() {
-                    if (isFinishing()) return;
-                    if (m.containsKey("ERROR") || !m.containsKey("ZRAM_MAX_MB")) {
-                        Toast.makeText(MainActivity.this, "Настройка недоступна: " + one(m, "ERROR"), Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    final int max = (int) f(one(m, "ZRAM_MAX_MB"));
-                    LinearLayout content = new LinearLayout(MainActivity.this);
-                    content.setOrientation(LinearLayout.VERTICAL);
-                    content.setPadding(40, 24, 40, 24);
-                    content.addView(text("Сжатая подкачка в ОЗУ (LZ4). 0 — выключено.\n"
-                            + "Размер задаёт предел данных, а не резервирует всю память.\n"
-                            + "Сжатие расходует процессор. Применение после перезагрузки.", 20, 0xFFB0BEC5));
-                    final TextView value = text("", 28, Color.WHITE);
-                    content.addView(value);
-                    final SeekBar size = new SeekBar(MainActivity.this);
-                    size.setMax(max);
-                    size.setKeyProgressIncrement(128);
-                    size.setProgress(Math.min(max, (int) f(one(m, "ZRAM_CONFIG_MB"))));
-                    value.setText(size.getProgress() + " / " + max + " МБ");
-                    size.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                        public void onProgressChanged(SeekBar bar, int n, boolean user) { value.setText(n == 0 ? "Выключено · 0 / " + max + " МБ" : n + " / " + max + " МБ"); }
-                        public void onStartTrackingTouch(SeekBar bar) { }
-                        public void onStopTrackingTouch(SeekBar bar) { }
-                    });
-                    content.addView(size);
-                    AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
-                            .setTitle("Сжатие памяти · объём zRAM").setView(content)
-                            .setNegativeButton("Отмена", null)
-                            .setNeutralButton("Выключить", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface d, int which) { saveZram(0); }
-                            })
-                            .setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface d, int which) { saveZram(size.getProgress()); }
-                            }).create();
-                    dialog.show();
-                    size.requestFocus();
-                } });
-            }
-        }).start();
-    }
-
-    void saveZram(final int mb) {
-        new Thread(new Runnable() { public void run() {
-            final Map<String, List<String>> m = call("PERF_ZRAM_SET " + mb);
-            ui.post(new Runnable() { public void run() {
-                Toast.makeText(MainActivity.this, m.containsKey("ERROR") ? "Не сохранено: " + one(m, "ERROR")
-                        : "Сохранено: " + mb + " МБ. Применится после перезагрузки.", Toast.LENGTH_LONG).show();
-            } });
-        } }).start();
     }
 
     /** Открыть журнал загрузки из экрана диагностики, не занимая отдельную плитку лаунчера. */

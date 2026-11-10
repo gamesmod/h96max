@@ -264,6 +264,11 @@ sudo install -m 0755 $R/overlay/vendor/bin/tvbox-restore-wifi.sh $MNT/bin/tvbox-
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-startup-summary.sh $MNT/bin/tvbox-startup-summary.sh
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-clock.sh $MNT/bin/tvbox-clock.sh
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-zram.sh $MNT/bin/tvbox-zram.sh
+# Удалить штатный запуск подкачки и отключить флаг vendor при каждой загрузке.
+sudo sed -i '/^on sys-boot-completed-set \&\& property:persist.sys.zram_enabled=1/,+1d' "$MNT/etc/init/hw/init.rk30board.rc"
+lbl u:object_r:vendor_configs_file:s0 "$MNT/etc/init/hw/init.rk30board.rc"
+sudo sed -i 's/^persist\.sys\.zram_enabled=.*/persist.sys.zram_enabled=0/' "$MNT/build.prop"
+grep -q '^persist\.sys\.zram_enabled=0$' "$MNT/build.prop" || echo 'persist.sys.zram_enabled=0' | sudo tee -a "$MNT/build.prop" >/dev/null
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-bootlog.sh $MNT/bin/tvbox-bootlog.sh
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-wipecheck.sh $MNT/bin/tvbox-wipecheck.sh
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-sdboot.sh $MNT/bin/tvbox-sdboot.sh
