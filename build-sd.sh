@@ -46,7 +46,7 @@ python3 -I $T/bootimg.py edit $SRC/boot.img $W/boot.img \
 else
 python3 -I $T/bootimg.py edit $SRC/boot.img $W/boot.img \
     --cmd-sub "androidboot.boot_devices=ff520000.dwmmc|androidboot.boot_devices=$BOOTDEV" \
-    --cmd-sub "androidboot.wificountrycode=HK|androidboot.wificountrycode=US" \
+    --cmd-sub "androidboot.wificountrycode=HK|" \
     --cmd-append "printk.devkmsg=on" \
     --rd-put fstab.rk30board=$W/fstab.sd
 fi
@@ -126,7 +126,7 @@ ro.setupwizard.mode=DISABLED
 persist.sys.timezone=Europe/Moscow
 persist.sys.locale=ru-RU
 persist.sys.usb.config=adb
-ro.tvbox.release=0.4.5
+ro.tvbox.release=0.4.6
 EOF
 echo "ro.tvbox.build_date=$(date +%F)" | sudo tee -a $MNT/etc/build.prop >/dev/null
 umnt
