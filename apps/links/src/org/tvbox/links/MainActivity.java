@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
     // Последние два поля: пакет приложения на приставке и его короткое имя.
     static final String[][] SERVICES = {
         {"TorrServer", "8090", "", ""},
-        {"VLC — удалённый доступ", "8080", "org.videolan.vlc", "VLC"}
+        {"VLC — удалённый доступ", "8443", "org.videolan.vlc", "VLC"}
     };
     final List<String[]> addresses = new ArrayList<>(), services = new ArrayList<>();
     Spinner network, service;
@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
         url = text("", 26, 0xFF4FC3F7);
         url.setTextIsSelectable(true);
         root.addView(url);
-        TextView help = text("QR содержит адрес выбранной службы. Его открывает приложение на устройстве, которое сканирует код. Для VLC нужен включённый удалённый интерфейс.", 16, 0xFFB0BEC5);
+        TextView help = text("QR открывает выбранную службу. Для VLC включите удалённый доступ, примите сертификат и введите одноразовый код.", 16, 0xFFB0BEC5);
         root.addView(help);
         setContentView(root);
         AdapterView.OnItemSelectedListener change = new AdapterView.OnItemSelectedListener() {
@@ -125,7 +125,7 @@ public class MainActivity extends Activity {
             hint.setText("Выберите службу с доступным сетевым адресом.");
             return;
         }
-        final String link="http://"+host+":"+port+"/";
+        final String link=(pkg.equals("org.videolan.vlc") ? "https://" : "http://")+host+":"+port+"/";
         url.setText(link);
         int size=Math.min(image.getWidth(),image.getHeight())-dp(16);
         if(size>0) {

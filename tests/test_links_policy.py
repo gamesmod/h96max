@@ -12,7 +12,7 @@ class LinksLaunchPolicyTests(unittest.TestCase):
         rows = re.findall(r'\{"([^\"]+)",\s*"(\d+)",\s*"([^\"]*)",\s*"([^\"]*)"\}', SOURCE)
         self.assertEqual(rows, [
             ("TorrServer", "8090", "", ""),
-            ("VLC — удалённый доступ", "8080", "org.videolan.vlc", "VLC"),
+            ("VLC — удалённый доступ", "8443", "org.videolan.vlc", "VLC"),
         ])
         self.assertIn("String pkg=services.get(s)[2];", SOURCE)
         self.assertIn("String appName=services.get(s)[3];", SOURCE)
