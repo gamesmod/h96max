@@ -145,18 +145,18 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initializ
     for p in $(printf '%s' "$OLD" | sed 's/\&\#30;/ /g'); do
         case "$p" in com.agateau.tinywheels.android|org.supertux.supertux2|dev.imranr.obtainium) continue;; esac
         pm path "$p" >/dev/null 2>&1 || continue
-        case " $T $EXTRA " in *" $p "*) continue;; esac
+        case " $(printf '%s' "$T" | sed 's/&#30;/ /g') $EXTRA " in *" $p "*) continue;; esac
         case " $ALLOWED " in *" $p "*) T="${T:+$T&#30;}$p"; N=$((N+1));; *) EXTRA="${EXTRA:+$EXTRA }$p";; esac
     done
     # Добавить отсутствующие штатные плитки в описанном порядке (по умолчанию 10; лаунчер поддерживает 14).
     for p in $ALLOWED; do
         pm path "$p" >/dev/null 2>&1 || continue
-        case " $T " in *" $p "*) ;; *)
+        case " $(printf '%s' "$T" | sed 's/&#30;/ /g') " in *" $p "*) ;; *)
             if [ "$N" -lt 14 ]; then T="${T:+$T&#30;}$p"; N=$((N+1)); fi;; esac
     done
     # После штатных функций сохранить не более одной пользовательской плитки.
     for p in $EXTRA; do
-        case " $T " in *" $p "*) ;; *) if [ "$N" -lt 14 ]; then T="${T:+$T&#30;}$p"; N=$((N+1)); fi;; esac
+        case " $(printf '%s' "$T" | sed 's/&#30;/ /g') " in *" $p "*) ;; *) if [ "$N" -lt 14 ]; then T="${T:+$T&#30;}$p"; N=$((N+1)); fi;; esac
     done
     if [ "$T" != "$OLD" ] || [ ! -f "$L" ]; then
         mkdir -p "${L%/*}"

@@ -14,6 +14,21 @@ SPEC.loader.exec_module(IMAGE_WIFI)
 
 
 class ReleaseSecurityConfigTests(unittest.TestCase):
+    def test_launcher_repair_removes_duplicates_and_keeps_order(self):
+        script = (ROOT / "overlay/vendor/bin/tvbox-firstboot.sh").read_text(encoding="utf-8")
+        start = script.index('    ALLOWED="org.tvbox.iptv')
+        end = script.index('    if [ "$T" != "$OLD" ]', start)
+        fragment = script[start:end]
+        command = ('pm() { return 0; }\n'
+                   "OLD='org.tvbox.iptv&#30;org.tvbox.links&#30;org.tvbox.iptv'\n"
+                   + fragment + '\nprintf "%s" "$T"\n')
+        result = subprocess.run(["sh", "-c", command], capture_output=True, text=True, check=True)
+        tiles = result.stdout.split("&#30;")
+        self.assertEqual(tiles[:2], ["org.tvbox.iptv", "org.tvbox.links"])
+        self.assertEqual(len(tiles), len(set(tiles)))
+        self.assertIn("ru.yourok.torrserve", tiles)
+        self.assertIn("org.smarttube.stable", tiles)
+
     def test_build_rejects_missing_required_applications(self):
         with tempfile.TemporaryDirectory() as directory:
             result = subprocess.run(
