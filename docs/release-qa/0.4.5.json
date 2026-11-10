@@ -4,16 +4,16 @@
   "reviewed_at": "2026-11-10",
   "cold_boot_seconds": null,
   "hot_test": {
-    "tested_installed_version": "0.4.4; версия подтверждена через adb shell getprop ro.tvbox.release",
+    "tested_installed_version": "до OTA подтверждена 0.4.4; после OTA пользователь сообщил о рабочем столе, но версия системы не прочитана",
     "candidate_installed": false,
-    "adb_state": "authorized; adb shell доступен",
+    "adb_state": "no device enumerated: пользователь подключил USB A-to-A; adb devices пуст, lsusb не показывает приставку, rkdeveloptool не обнаружил Rockchip в loader mode; по Wi-Fi адрес пока не предоставлен",
     "candidate_artifacts": {
       "source_commit": "efda5a5df6ed301ee18a7b460b5ee24ccad6a2f5",
       "ota": "release/updates/emmc/tvbox-update-0.4.5-emmc.zip",
-      "ota_sha256": "f98b00a7fed968f7333f0508036b5219675dececac8d704f93e8d84b480bb706",
+      "ota_sha256": "2c0772e702f576c6d46dd938a18607577089edeaefb82de18c3a336e16b29fda",
       "ota_signature_host": "CMS verification successful",
       "clean_install": "release/Panadonik-0.4.5-emmc-clean-install.zip",
-      "clean_install_sha256": "d507d4966ee7fb91b8b3936d3fc8b5ce00c93fe28ab09afdf7bcd86e46bdfa4e",
+      "clean_install_sha256": "1e04a519a11f3bd69067d79c5b8716d13fec80cbec423b90bd0848a286a64fe9",
       "clean_install_signature_host": "verified with existing project OTA certificate",
       "wifi_credential_scan": "pass: system.img and vendor.img; two relevant configuration files checked",
       "build_log_analysis": {
@@ -30,9 +30,9 @@
       "tested_system_version": "0.4.4",
       "multiline_release_notes": "pass: complete candidate description displayed and scrollable",
       "cleanup_actions_visible": "pass: continue and cancel buttons remain visible with long notes",
-      "full_candidate_system_installed": false,
-      "ota_started": false,
-      "data_cleanup_consent": "pending separate user confirmation"
+      "full_candidate_system_installed": "user reports desktop after OTA recovery; exact version not independently confirmed",
+      "ota_started": true,
+      "data_cleanup_consent": "confirmed by user in installer UI; tvboxd logged UPDATE_INSTALL ... wipe"
     },
     "network_capture": {
       "captured_at": null,
@@ -40,8 +40,10 @@
       "packets": null,
       "auth_cookie_or_token_patterns": null,
       "raw_capture_retained": false,
-      "scope": "системный кандидат 0.4.5 на приставке не установлен; контролируемый захват не выполнялся"
-    }
+      "scope": "post-OTA traffic capture not performed; device is not reachable from build host"
+    },
+    "ota_result_user_report": "пользователь подтвердил очистку в интерфейсе; tvboxd зарегистрировал UPDATE_INSTALL ... wipe, OTA скачан, checksum и подпись проверены, recovery подготовлен; затем пользователь видел установку, логотип и рабочий стол. Версия не подтверждена: USB A-to-A не перечисляется хостом и ADB по сети недоступен.",
+    "usb_connection_observation": "пользователь сообщил о физическом подключении USB A-to-A; на хосте нет нового USB-устройства, ADB и Rockchip Loader не видят приставку"
   },
   "automated_tests": {
     "status": "pass",
@@ -101,20 +103,20 @@
     }
   },
   "checks": {
-    "cold_boot_le_10s": "pending: версия 0.4.5 не установлена",
-    "boot_log_review": "pending: журналы приставки после установки не прочитаны",
-    "qr_vlc": "pending: версия 0.4.5 не установлена",
-    "wired_network": "pending: версия 0.4.5 не установлена",
-    "wifi_network": "pending: версия 0.4.5 не установлена",
+    "cold_boot_le_10s": "pending: boot duration after OTA not measured",
+    "boot_log_review": "pending: post-OTA device logs unavailable over ADB",
+    "qr_vlc": "pending: post-OTA system version not independently confirmed",
+    "wired_network": "not tested: user reports Wi-Fi-only connection",
+    "wifi_network": "user reports Wi-Fi-only operation; address/connectivity from build host not verified",
     "iptv_playback": "частично: VLC воспроизвёл поток из плейлиста текущей категории; видимая плавность на экране и пропуски кадров не измерены",
-    "torrent_playback": "pending: версия 0.4.5 не установлена",
-    "graphics_video": "pending: версия 0.4.5 не установлена",
-    "graphics_stress": "pending: версия 0.4.5 не установлена",
-    "swap_disabled": "pass на установленной системе 0.4.4: /proc/swaps пуст; на 0.4.5 ещё не проверено",
-    "network_capture_review": "pending: контролируемый захват после установки не выполнен",
-    "usb_remote_iptv_channels": "pending: синтетические ADB события не заменяют проверку PAGE вверх/вниз на физическом USB-пульте",
+    "torrent_playback": "pending: post-OTA system version not independently confirmed",
+    "graphics_video": "pending: post-OTA system version not independently confirmed",
+    "graphics_stress": "pending: post-OTA system version not independently confirmed",
+    "swap_disabled": "pending post-OTA; before OTA /proc/swaps was empty on 0.4.4",
+    "network_capture_review": "pending: no controlled post-OTA capture; device not reachable",
+    "usb_remote_iptv_channels": "pending: not physically verified",
     "security_review": "pending/high risk: live 0.4.4 has ro.debuggable=1, ADB TCP 5555, SELinux Permissive, su present; vendor 98%; capture/review not completed",
-    "device_update": "pending: OTA очищает пользовательские данные; отдельное согласие на очистку не получено",
+    "device_update": "user confirmed cleanup in installer UI; OTA reached recovery and user reports desktop after reboot; exact installed version not independently verified",
     "iptv_release_list": "candidate-only pass with disclosed gap: regenerated 166 channels pass Russian/duplicate/children/1080p/URL checks; adult category not first and 0/20 adult channels"
   },
   "log_analysis": {
