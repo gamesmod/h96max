@@ -15,9 +15,11 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   release:
+    if: ${{ github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/') }}
     # Можно задать собственную метку большего GitHub-hosted runner через Actions variable.
     runs-on: ${{ vars.RELEASE_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 360
@@ -177,6 +179,7 @@ jobs:
               echo "Статус: ограничения не найдены."
             fi
           } > release/qa/iptv-validation.md
+          cp overlay/system/etc/tvbox/iptv.m3u release/qa/iptv-candidate.m3u
 
       - name: Build signed OTA
         run: |
@@ -191,6 +194,8 @@ jobs:
           test "$build_status" -eq 0
           test ! -e secrets/wifi.env
           python3 tools/check-image-wifi-secrets.py build/work/system.img build/work/vendor.img
+          debugfs -R 'dump /system/etc/tvbox/iptv.m3u /tmp/iptv-in-image.m3u' build/work/system.img
+          cmp overlay/system/etc/tvbox/iptv.m3u /tmp/iptv-in-image.m3u
           mkdir -p release/obtainium
           cp apps/antivirus/out/TvboxAntivirus.apk release/obtainium/Panadonik-antivirus.apk
           cp apps/bootlog/out/TvboxBootLog.apk release/obtainium/Panadonik-bootlog.apk
@@ -204,15 +209,6 @@ jobs:
           cd release/updates/emmc
           sha256sum "tvbox-update-$version-emmc.zip" latest-emmc.txt > SHA256SUMS
 
-      - name: Require target-device release evidence
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-        run: |
-          set -euo pipefail
-          version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
-          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then channel=dev; else channel=stable; fi
-          cp "docs/release-qa/$version.json" release/qa/device-evidence.json
-          python3 tools/check-release-evidence.py --file "docs/release-qa/$version.json" --version "$version" --channel "$channel"
-
       - name: Record candidate-only status (non-tag build)
         if: ${{ github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/') }}
         run: |
@@ -221,11 +217,11 @@ jobs:
           cat > release/qa/candidate-status.md <<EOF
           # Panadonik $version — build candidate
 
-          - Source commit: `$GITHUB_SHA`.
+          - Source commit: $GITHUB_SHA.
           - Automated tests and package build completed in GitHub Actions.
-          - IPTV checks ran; see `release/qa/iptv-validation.md`. Only a disclosed 18+ category/order gap may pass for this non-tag artifact; privacy, quality, children, and duplicate checks still block it.
+          - IPTV checks ran; see release/qa/iptv-validation.md. Only a disclosed 18+ category/order gap may pass for this non-tag artifact; privacy, quality, children, and duplicate checks still block it.
           - This non-tag build has not passed the target-device release gate. Boot time, device logs, network capture, QR, USB remote, torrent playback, and graphics remain unverified by this workflow.
-          - IPTV validation details are in `release/qa/iptv-validation.md`; adult-category gaps are disclosed only for non-tag candidate artifacts.
+          - IPTV validation details are in release/qa/iptv-validation.md; adult-category gaps are disclosed only for non-tag candidate artifacts.
           - Do not treat this artifact as a public release. Before installing, complete hardware checks and obtain explicit user confirmation for any operation that wipes data.
           EOF
 
@@ -238,7 +234,7 @@ jobs:
             release/qa/*.md
             release/qa/device-evidence.json
           if-no-files-found: ignore
-          retention-days: 90
+          retention-days: 3
 
       - name: Upload signed build candidate (nightly/manual run)
         if: ${{ (github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')) && success() }}
@@ -258,9 +254,66 @@ jobs:
             release/qa/test-log-analysis.md
             release/qa/build-log-analysis.md
             release/qa/iptv-validation.md
+            release/qa/iptv-candidate.m3u
             release/qa/candidate-status.md
           if-no-files-found: error
           retention-days: 3
+
+  promote:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run automated release tests
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg python3-pil
+          python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/promotion-tests.log
+          python3 tools/analyze-release-logs.py /tmp/promotion-tests.log --source "автоматические тесты" --output /tmp/promotion-tests-analysis.md --fail-on-errors
+
+      - name: Select and verify candidate run
+        id: candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
+          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then tag_version="${GITHUB_REF_NAME#dev-v}"; else tag_version="${GITHUB_REF_NAME#v}"; fi
+          test "$tag_version" = "$version"
+          python3 -c 'import json,re,sys; d=json.load(open(sys.argv[1])); c=d["candidate"]; run=c["actions_run_id"]; sha=c["source_commit"]; assert type(run) is int and run > 0 and isinstance(sha,str) and re.fullmatch(r"[0-9a-f]{40}",sha); print(run,sha)' "docs/release-qa/$version.json" > /tmp/candidate-selection
+          read -r run_id source_sha < /tmp/candidate-selection
+          git merge-base --is-ancestor "$source_sha" "$GITHUB_SHA"
+          git diff --quiet "$source_sha" "$GITHUB_SHA" -- . ':(exclude)docs/release-qa/**'
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id" > /tmp/candidate-run.json
+          python3 -I tools/check-candidate-run.py --run /tmp/candidate-run.json --source-sha "$source_sha"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Download exact candidate artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: panadonik-candidate-${{ steps.candidate.outputs.source_sha }}
+          run-id: ${{ steps.candidate.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: release
+
+      - name: Verify candidate and target-device evidence
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
+          if [[ "$GITHUB_REF_NAME" == dev-v* ]]; then channel=dev; else channel=stable; fi
+          (cd release/updates/emmc && sha256sum --check SHA256SUMS)
+          (cd release && sha256sum --check "Panadonik-$version-emmc-clean-install.zip.sha256")
+          openssl dgst -sha256 -verify <(openssl x509 -in "release/Panadonik-$version-ota-cert.pem" -pubkey -noout) -signature "release/Panadonik-$version-emmc-clean-install.zip.sig" "release/Panadonik-$version-emmc-clean-install.zip"
+          python3 -I tools/check-public-release.py --sources tools/iptv-sources.txt --playlist release/qa/iptv-candidate.m3u --min-adult 20
+          cp "docs/release-qa/$version.json" release/qa/device-evidence.json
+          python3 tools/check-release-evidence.py --file "docs/release-qa/$version.json" --version "$version" --channel "$channel" --ota "release/updates/emmc/tvbox-update-$version-emmc.zip"
 
       - name: Publish GitHub Release
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
@@ -272,6 +325,7 @@ jobs:
           title="Panadonik $version"
           release_args=()
           if [[ "$channel" == dev ]]; then title+=" (dev)"; release_args+=(--prerelease); fi
+          python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print("## Анализ безопасности\n\n" + d["security_analysis"]["summary"])' "docs/release-qa/$version.json" > /tmp/promotion-release-notes.md
           gh release create "$GITHUB_REF_NAME" \
             "release/updates/emmc/tvbox-update-$version-emmc.zip" \
             release/updates/emmc/latest-emmc.txt \
@@ -286,4 +340,4 @@ jobs:
             release/qa/build-log-analysis.md \
             release/qa/device-evidence.json \
             --title "$title" \
-            --generate-notes "${release_args[@]}"
+            --notes-file /tmp/promotion-release-notes.md --generate-notes "${release_args[@]}"

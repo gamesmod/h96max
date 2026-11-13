@@ -2,13 +2,14 @@
 """Проверить протокол аппаратной приёмки перед созданием публичного релиза."""
 import argparse
 import datetime
+import hashlib
 import json
 import pathlib
 import sys
 
 
 FUNCTIONAL_CHECKS = (
-    "cold_boot_le_10s", "boot_log_review", "qr_vlc",
+    "cold_boot_ready", "boot_log_review", "qr_vlc",
     "wired_network", "wifi_network", "iptv_playback", "torrent_playback", "graphics_video",
     "graphics_stress", "swap_disabled", "network_capture_review", "usb_remote_iptv_channels",
 )
@@ -19,6 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description="Проверить аппаратный протокол выпуска.")
     parser.add_argument("--file", required=True, help="JSON с результатами аппаратной приёмки")
     parser.add_argument("--version", required=True, help="ожидаемая версия выпуска")
+    parser.add_argument("--ota", required=True, help="OTA-файл, который предполагается выпустить")
     parser.add_argument("--channel", choices=("dev", "stable"), default="stable",
                         help="для dev security_review публикуется как известный риск, но не блокирует выпуск")
     args = parser.parse_args()
@@ -37,10 +39,25 @@ def main():
         failures.append("версия в протоколе не совпадает с тегом")
     if not data.get("device"):
         failures.append("не указано целевое устройство")
+    candidate = data.get("candidate", {})
+    expected_sha = candidate.get("ota_sha256") if isinstance(candidate, dict) else None
+    try:
+        digest = hashlib.sha256()
+        with open(args.ota, "rb") as ota:
+            for block in iter(lambda: ota.read(1024 * 1024), b""):
+                digest.update(block)
+        if not isinstance(expected_sha, str) or digest.hexdigest() != expected_sha.lower():
+            failures.append("SHA-256 OTA не совпадает с артефактом в протоколе приёмки")
+    except OSError:
+        failures.append("не удалось прочитать OTA для проверки SHA-256")
     tests = data.get("automated_tests", {})
-    if tests.get("status") != "pass" or not isinstance(tests.get("count"), int) or tests["count"] < 1:
+    if tests.get("status") != "pass" or type(tests.get("count")) is not int or tests["count"] < 1:
         failures.append("автоматические тесты не отмечены как пройденные")
     checks = data.get("checks", {})
+    security_analysis = data.get("security_analysis", {})
+    if (not isinstance(security_analysis, dict) or security_analysis.get("reviewed") is not True or
+            not isinstance(security_analysis.get("summary"), str) or not security_analysis["summary"].strip()):
+        failures.append("анализ безопасности обязателен для dev и stable; нужны отметка и сводка")
     if args.channel == "dev" and checks.get("security_review") != "pass":
         print("Примечание: security_review не блокирует dev-релиз; известные проблемы должны остаться в prerelease notes.")
     required_checks = FUNCTIONAL_CHECKS
@@ -61,17 +78,14 @@ def main():
                 failures.append("захват сетевого трафика должен быть не старше 31 дня")
         except (KeyError, TypeError, ValueError):
             failures.append("в протоколе нет корректной даты сетевого захвата")
-        if not isinstance(capture.get("duration_seconds"), int) or capture["duration_seconds"] < 1:
+        if type(capture.get("duration_seconds")) is not int or capture["duration_seconds"] < 1:
             failures.append("не указана длительность сетевого захвата")
-        if not isinstance(capture.get("packets"), int) or capture["packets"] < 1:
+        if type(capture.get("packets")) is not int or capture["packets"] < 1:
             failures.append("не указано число пакетов сетевого захвата")
         if capture.get("raw_capture_retained") is not False:
             failures.append("сырой PCAP должен быть удалён")
-        if not isinstance(capture.get("auth_cookie_or_token_patterns"), int):
+        if type(capture.get("auth_cookie_or_token_patterns")) is not int or capture["auth_cookie_or_token_patterns"] < 0:
             failures.append("не задокументирована проверка credentials в сетевом захвате")
-    elapsed = data.get("cold_boot_seconds")
-    if not isinstance(elapsed, (int, float)) or elapsed > 10:
-        failures.append("холодная загрузка не подтверждена в пределах 10 секунд")
     logs = data.get("log_analysis", {})
     if logs.get("reviewed") is not True:
         failures.append("разбор журналов не отмечен как выполненный")

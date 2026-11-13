@@ -1,6 +1,6 @@
 # rk3318-android: исторический снимок сборки (снято 2026-10-26)
 
-> Текущее состояние: только eMMC OTA, CI через GitHub Actions, Wi-Fi credentials не вшиваются. См. README.md и SESSION-HANDOFF.md.
+> Архивный снимок, не инструкция для текущей сборки. SD-образ исключён из проекта; старые SD-команды, отключение ADB-авторизации и состав ПО ниже не применять. Актуальные команды и условия — `docs/LUNA-WORKFLOW.md`, статус — в `docs/release-qa/`.
 
 ## Метод сборки (хост)
 - Исходник: вендорский A12 `RK3318_userdebug_H96_Max_V12_12_20221117.1447` → `dl/a12/Image` (распакован `tools/rkunpack.py`), super распакован в `dl/a12/Image/lp/` (`tools/lpunpack.py`).

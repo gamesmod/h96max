@@ -82,10 +82,10 @@ def main():
         if not findings:
             report.write("Совпадений с критическими ошибками, ошибками или предупреждениями не найдено.\n")
         else:
-            report.write("Сырые журналы не включены. URL, IPv4 и распространённые значения секретов скрыты.\n\n")
-            report.write("| Уровень | Строка | Повторов | Фрагмент |\n|---|---:|---:|---|\n")
-            for level, number, occurrences, snippet in findings[:200]:
-                report.write(f"| {level} | {number} | {occurrences} | `{snippet.replace('|', '&#124;')}` |\n")
+            report.write("Фрагменты журнала не публикуются: разберите указанные строки в приватном исходном файле.\n\n")
+            report.write("| Уровень | Строка | Повторов |\n|---|---:|---:|\n")
+            for level, number, occurrences, _ in findings[:200]:
+                report.write(f"| {level} | {number} | {occurrences} |\n")
             if len(findings) > 200:
                 report.write(f"\nПоказаны первые 200 из {len(findings)} совпадений.\n")
         report.write("\nТребуется ручная проверка каждого предупреждения и ошибки перед выпуском.\n")

@@ -30,6 +30,24 @@ def getprop(name):
     return shell(f"getprop {name}")
 
 
+def select_adb_device(serial, listing):
+    """Проверить наличие выбранного устройства, не раскрывая его идентификатор."""
+    devices = []
+    for line in listing.splitlines()[1:]:
+        fields = line.split()
+        if len(fields) >= 2 and fields[1] == "device":
+            devices.append(fields[0])
+    if not devices:
+        raise ValueError("Приставка не найдена через ADB. Проверьте USB, отладку и `adb devices`.")
+    if serial:
+        if serial not in devices:
+            raise ValueError("Выбранное ADB-устройство недоступно или не авторизовано.")
+        return serial
+    if len(devices) != 1:
+        raise ValueError(f"Найдено устройств: {len(devices)}. Укажите --serial (значение не попадёт в отчёт).")
+    return devices[0]
+
+
 def safe_value(value):
     value = re.sub(r"(?i)(ssid|password|passwd|psk|token|serial|mac|ip|bssid)\s*[:=]\s*\S+", r"\1=<скрыто>", value)
     value = re.sub(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", "<адрес скрыт>", value)
@@ -74,20 +92,30 @@ def traffic_capture(interface, seconds):
     """Capture briefly, summarize protocol indicators, and always delete the PCAP."""
     fd, path = tempfile.mkstemp(prefix="h96-traffic-", suffix=".pcap")
     os.close(fd)
+    proc = None
     try:
         cmd = ["tcpdump", "-i", interface, "-nn", "-s", "256", "-U", "-w", path]
         proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         time.sleep(seconds)
+        if proc.poll() is not None:
+            raise OSError("tcpdump завершился до окончания захвата")
         proc.terminate()
         try:
-            proc.wait(timeout=5)
+            code = proc.wait(timeout=5)
         except subprocess.TimeoutExpired:
             proc.kill()
             proc.wait()
+            raise OSError("tcpdump не завершился штатно")
+        if code != 0:
+            raise OSError("tcpdump завершился с ошибкой")
         read = subprocess.run(["tcpdump", "-nn", "-r", path], text=True,
                               stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
                               timeout=20, check=False)
+        if read.returncode != 0:
+            raise OSError("не удалось прочитать захват")
         lines = read.stdout.splitlines()
+        if not lines:
+            raise OSError("захват не содержит пакетов")
         ports = {"HTTP/80": 0, "DNS/53": 0, "TLS/443": 0, "other": 0}
         for line in lines:
             if ".80:" in line or "> 80" in line:
@@ -98,18 +126,26 @@ def traffic_capture(interface, seconds):
                 ports["TLS/443"] += 1
             else:
                 ports["other"] += 1
-        payload = subprocess.run(["tcpdump", "-A", "-nn", "-r", path], text=True,
-                                 stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-                                 timeout=20, check=False).stdout
+        payload_result = subprocess.run(["tcpdump", "-A", "-nn", "-r", path], text=True,
+                                        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                                        timeout=20, check=False)
+        if payload_result.returncode != 0:
+            raise OSError("не удалось прочитать содержимое захвата")
+        payload = payload_result.stdout
         markers = sum(bool(re.search(pattern, payload, re.I)) for pattern in
                       (r"authorization:\s*(?:basic|bearer)", r"cookie:",
                        r"set-cookie:", r"(?:password|passwd|psk|token)\s*[:=]"))
         return len(lines), ports, markers
     finally:
         try:
-            os.unlink(path)
-        except FileNotFoundError:
-            pass
+            if proc is not None and proc.poll() is None:
+                proc.kill()
+                proc.wait()
+        finally:
+            try:
+                os.unlink(path)
+            except FileNotFoundError:
+                pass
 
 
 def main():
@@ -119,20 +155,16 @@ def main():
     ap.add_argument("--controlled-network", action="store_true", help="подтвердить, что приставка и сеть находятся в контролируемом тестовом сегменте")
     ap.add_argument("--capture-seconds", type=int, default=30, help="длительность захвата, 5–120 секунд (по умолчанию 30)")
     ns = ap.parse_args()
-    adb_args = ["-s", ns.serial] if ns.serial else []
     global adb
     original_adb = adb
+    try:
+        device = select_adb_device(ns.serial, original_adb(["devices"]))
+    except ValueError as error:
+        print(error)
+        return 2
     def selected(args, timeout=15):
-        return original_adb([*adb_args, *args], timeout)
+        return original_adb(["-s", device, *args], timeout)
     adb = selected
-
-    devices = [x.split()[0] for x in adb([*adb_args, "devices"]).splitlines()[1:] if "\tdevice" in x]
-    if not devices:
-        print("Приставка не найдена через ADB. Проверьте USB, отладку и `adb devices`.")
-        return 2
-    if not ns.serial and len(devices) > 1:
-        print(f"Найдено устройств: {len(devices)}. Укажите --serial (значение не попадёт в отчёт).")
-        return 2
     if ns.capture_interface and (not ns.controlled_network or not 5 <= ns.capture_seconds <= 120):
         print("Для захвата укажите --controlled-network и длительность от 5 до 120 секунд.")
         return 2
@@ -152,7 +184,7 @@ def main():
             temps.append(n / 1000 if n > 1000 else float(n))
     disk = shell("df -h /data /system /vendor 2>/dev/null")
     errors = shell("logcat -d -t 1200 -v brief *:E", timeout=25)
-    error_lines = [safe_value(x) for x in errors.splitlines() if x.strip() and not re.search(r"(?i)password|passwd|\bpsk\b|ssid|token=", x)]
+    error_lines = [x for x in errors.splitlines() if x.strip() and not x.startswith("---------")]
 
     if not uptime:
         findings.append(("КРИТИЧНО", "Не удалось прочитать время работы устройства; ADB-команды возвращают неполные данные. Переподключите ADB и повторите сбор.", "Сначала проверьте `adb devices`, затем USB/сеть отладки."))
@@ -171,7 +203,7 @@ def main():
                     if (p := re.search(r"\s(\d+)%\s", line))):
         findings.append(("ВЫСОКИЙ", "Один из проверенных разделов почти заполнен.", "Проверьте размер пользовательских данных и кэш; не удаляйте данные без просмотра списка и подтверждения."))
     if error_lines:
-        findings.append(("ПРОВЕРИТЬ", f"В выборке logcat найдено строк с уровнем Error: {len(error_lines)}.", "Просмотрите очищенные примеры ниже и проверьте повторяемость ошибки и затронутое приложение."))
+        findings.append(("ПРОВЕРИТЬ", f"В выборке logcat найдено строк с уровнем Error: {len(error_lines)}.", "Разберите приватный журнал и проверьте повторяемость ошибки и затронутое приложение."))
     posture, security_findings = security_posture()
     findings.extend(security_findings)
     if not findings:
@@ -193,9 +225,7 @@ def main():
     for level, evidence, advice in findings:
         print(f"- [{level}] {evidence}\n  Рекомендация: {advice}")
     if error_lines:
-        print("\nПримеры очищенных ошибок (не более 8):")
-        for line in error_lines[-8:]:
-            print("  " + line)
+        print("\nСодержимое строк ошибок не выводится; для разбора используйте приватный журнал.")
     print("\nПроверка безопасности Android:")
     for name, value in posture.items():
         print(f"  {name}: {safe_value(value) if value else 'не задано/недоступно'}")

@@ -120,9 +120,9 @@
     "iptv_release_list": "candidate-only pass with disclosed gap: regenerated 166 channels pass Russian/duplicate/children/1080p/URL checks; adult category not first and 0/20 adult channels"
   },
   "log_analysis": {
-    "reviewed": true,
-    "untriaged_errors": 0,
-    "summary": "Финальный build log после генерации IPTV: 0 критических, 0 ошибок, 0 предупреждений; packaging log: 0/0/0; live logcat last 1200 E-level: 0 lines, но кольцевой буфер ограничен."
+    "reviewed": false,
+    "untriaged_errors": null,
+    "summary": "Документальный аудит: прежний нулевой счётчик ограниченного буфера не подтверждает разбор описанной в 0.4.5.md паники Binder. Полная аппаратная проверка текущего артефакта не выполнена."
   },
   "iptv_validation": {
     "candidate_only_status": "warning: disclosed 18+ inventory gap",
@@ -138,5 +138,18 @@
     "tagged_dev_and_stable": "blocked until the complete IPTV gate passes",
     "generated_playlist_sha256": "1fa3959446426a6f073b61ccd83566437ce38b219cb25d14341ba15ac2fd9a30",
     "generated_playlist_bytes": 35125
+  },
+  "historical_log_analysis": {
+    "reviewed": true,
+    "untriaged_errors": 0,
+    "summary": "Финальный build log после генерации IPTV: 0 критических, 0 ошибок, 0 предупреждений; packaging log: 0/0/0; live logcat last 1200 E-level: 0 lines, но кольцевой буфер ограничен."
+  },
+  "documentation_audit": {
+    "date": "2026-11-10",
+    "scope": "repository documents and local validators; no device/router/GitHub revalidation",
+    "source_head": "286643954b2509c2d48e60f9782268caee68fc9d",
+    "automated_tests_observed": 59,
+    "historical_snapshots_note": "live_device_snapshot, hot_test, automated_tests и checks содержат снимки прежних проверок; current MD описывает последующие частичные действия; не повышать аппаратные статусы без доказательств для финального артефакта.",
+    "release_user_confirmation": "not obtained by this audit"
   }
 }

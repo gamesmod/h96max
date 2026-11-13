@@ -1,0 +1,54 @@
+{
+  "version": "0.4.6",
+  "device": "Panadonik H96 Max / RK3328, Android 12",
+  "reviewed_at": "2026-11-11",
+  "source_commit": "d6c57a3e252e8b894fa5dfb16833f2527195459f",
+  "source_state": "незакоммиченные изменения IPTV-фильтра и документации; см. 0.4.6.md",
+  "candidate": {
+    "ota_sha256": "132f55fc7bea1e91abc8d7dcb510db253d124ef8dfe0a7a437ec62b16695c41f",
+    "playlist_sha256": "e1b9e0f33f65d350397a9db17d9a35577d8ab057bc6691e4d9cd12a63f7c1bc1",
+    "installed": false
+  },
+  "cold_boot_seconds": null,
+  "automated_tests": {
+    "status": "pass",
+    "count": 63,
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests",
+    "scope": "локальная копия исходников второго кандидата после сборки, 2026-11-11; 63 теста, анализ журнала без ошибок и предупреждений"
+  },
+  "checks": {
+    "cold_boot_ready": "pending: нет приёмки для этого артефакта",
+    "boot_log_review": "pending: нет приёмки для этого артефакта",
+    "qr_vlc": "pending: нет приёмки для этого артефакта",
+    "wired_network": "pending: нет приёмки для этого артефакта",
+    "wifi_network": "pending: нет приёмки для этого артефакта",
+    "iptv_playback": "pending: нет приёмки для этого артефакта",
+    "torrent_playback": "pending: нет приёмки для этого артефакта",
+    "graphics_video": "pending: нет приёмки для этого артефакта",
+    "graphics_stress": "pending: нет приёмки для этого артефакта",
+    "swap_disabled": "pending: нет приёмки для этого артефакта",
+    "network_capture_review": "pending: нет приёмки для этого артефакта",
+    "usb_remote_iptv_channels": "pending: нет приёмки для этого артефакта",
+    "security_review": "pending: нет приёмки для этого артефакта"
+  },
+  "hot_test": {
+    "tested_installed_version": "0.4.5; целостность после горячих изменений не подтверждена",
+    "candidate_installed": false,
+    "network_capture": {
+      "captured_at": null,
+      "duration_seconds": null,
+      "packets": null,
+      "auth_cookie_or_token_patterns": null,
+      "raw_capture_retained": null
+    }
+  },
+  "log_analysis": {
+    "reviewed": false,
+    "untriaged_errors": null,
+    "summary": "Журнал сборки проанализирован; журналы и трафик целевого устройства для нового кандидата не проверены."
+  },
+  "security_analysis": {
+    "reviewed": false,
+    "summary": "Полный анализ безопасности и контролируемого сетевого трафика для кандидата не выполнен."
+  }
+}

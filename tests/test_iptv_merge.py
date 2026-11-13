@@ -5,6 +5,7 @@ import datetime
 import json
 import shutil
 import subprocess
+import sys
 import unittest
 import tempfile
 from unittest import mock
@@ -253,12 +254,82 @@ class ReleaseLogAnalysisTests(unittest.TestCase):
         self.assertNotIn("private", text)
         self.assertNotIn("secret", text)
 
+    def test_published_report_never_includes_log_fragments(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            log = pathlib.Path(tmp) / "raw.log"
+            report = pathlib.Path(tmp) / "report.md"
+            log.write_text("E/Test: 2001:db8::17 bare.example.invalid Cookie: unusual-secret\n", encoding="utf-8")
+            result = subprocess.run([sys.executable, str(ROOT / "tools/analyze-release-logs.py"),
+                                     str(log), "--output", str(report)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0)
+            output = report.read_text(encoding="utf-8")
+            self.assertIn("| Ошибка | 1 | 1 |", output)
+            for secret in ("2001:db8::17", "bare.example.invalid", "unusual-secret"):
+                self.assertNotIn(secret, output)
+
 
 class PublicReleaseSecurityTests(unittest.TestCase):
     def test_urls_with_credentials_or_sensitive_query_keys_are_rejected(self):
         self.assertTrue(PUBLIC_CHECK.safe_url("https://example.invalid/live.m3u"))
         self.assertFalse(PUBLIC_CHECK.safe_url("https://user:pass@example.invalid/live"))
         self.assertFalse(PUBLIC_CHECK.safe_url("https://example.invalid/live?token=secret"))
+
+    def test_filter_excludes_sensitive_stream_and_logo_before_selection(self):
+        entries = [
+            {"name": "One", "url": "https://example.invalid/live?token=secret", "attrs": {"tvg-logo": "https://example.invalid/logo"}},
+            {"name": "One", "url": "https://example.invalid/safe", "attrs": {"tvg-logo": "https://example.invalid/logo"}},
+            {"name": "Two", "url": "https://example.invalid/two", "attrs": {"tvg-logo": "https://example.invalid/logo?password=secret"}},
+        ]
+        self.assertEqual(MERGE.public_entries(entries), [entries[1]])
+        self.assertFalse(PUBLIC_CHECK.safe_url("http://[invalid"))
+
+    def test_vlc_options_reject_secrets_and_unsupported_fields(self):
+        self.assertTrue(MERGE.safe_vlc_option("#EXTVLCOPT:http-user-agent=VLC/3.0"))
+        self.assertTrue(MERGE.safe_vlc_option("#EXTVLCOPT:http-referrer=https://example.invalid/"))
+        for option in ("#EXTVLCOPT:http-referrer=https://example.invalid/?token=secret",
+                       "#EXTVLCOPT:http-cookie=secret",
+                       "#EXTVLCOPT:http-user-agent=VLC token=secret",
+                       "#EXTVLCOPT:http-referrer=file:///etc/passwd"):
+            with self.subTest(option=option):
+                self.assertFalse(MERGE.safe_vlc_option(option))
+                entry = {"name": "One", "url": "https://example.invalid/live",
+                         "attrs": {"tvg-logo": "https://example.invalid/logo"}, "opts": [option]}
+                self.assertEqual(MERGE.public_entries([entry]), [])
+
+    def test_release_checker_rejects_sensitive_vlc_option_without_echoing_it(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            sources = pathlib.Path(tmp) / "sources.txt"
+            playlist = pathlib.Path(tmp) / "list.m3u"
+            sources.write_text("", encoding="utf-8")
+            playlist.write_text('#EXTM3U\n#EXTINF:-1 group-title="Для взрослых",One (1080p)\n'
+                                '#EXTVLCOPT:http-referrer=https://example.invalid/?token=secret\n'
+                                'https://example.invalid/live\n', encoding="utf-8")
+            result = subprocess.run([sys.executable, str(ROOT / "tools/check-public-release.py"),
+                                     "--sources", str(sources), "--playlist", str(playlist),
+                                     "--min-adult", "1"], capture_output=True, text=True, check=False)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("опция VLC", result.stderr)
+            self.assertNotIn("secret", result.stderr + result.stdout)
+
+    def test_merge_checks_safe_alternative_instead_of_sensitive_duplicate(self):
+        playlist = ('#EXTM3U\n'
+                    '#EXTINF:-1 tvg-logo="https://example.invalid/logo" group-title="News",One\n'
+                    'https://example.invalid/live?token=secret\n'
+                    '#EXTINF:-1 tvg-logo="https://example.invalid/logo" group-title="News",One\n'
+                    'https://example.invalid/safe\n')
+        with tempfile.TemporaryDirectory() as tmp:
+            sources = pathlib.Path(tmp) / "sources.txt"
+            output = pathlib.Path(tmp) / "out.m3u"
+            sources.write_text("https://example.invalid/list\n", encoding="utf-8")
+            with mock.patch.object(MERGE.sys, "argv", ["iptv-merge", "--sources", str(sources),
+                                                      "--out", str(output), "--exclude-adult"]), \
+                 mock.patch.object(MERGE, "fetch", return_value=(200, "", playlist.encode(), "")), \
+                 mock.patch.object(MERGE, "logo_ok", return_value=True), \
+                 mock.patch.object(MERGE, "stream_resolution", return_value=1080) as probe:
+                MERGE.main()
+            probe.assert_called_once_with("https://example.invalid/safe")
+            self.assertEqual(MERGE.parse(output.read_text(encoding="utf-8"))[0]["url"],
+                             "https://example.invalid/safe")
 
     def test_public_playlist_accepts_russian_unique_full_hd_channels(self):
         entries = [

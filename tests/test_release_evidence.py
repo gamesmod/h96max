@@ -1,6 +1,7 @@
 """Проверки разделения аппаратных gate для dev и stable выпусков."""
 import json
 import datetime
+import hashlib
 import importlib.util
 import pathlib
 import subprocess
@@ -16,6 +17,9 @@ IPTV_CHECKER_SPEC = importlib.util.spec_from_file_location(
 )
 IPTV_CHECKER = importlib.util.module_from_spec(IPTV_CHECKER_SPEC)
 IPTV_CHECKER_SPEC.loader.exec_module(IPTV_CHECKER)
+CANDIDATE_SPEC = importlib.util.spec_from_file_location("candidate_run", ROOT / "tools/check-candidate-run.py")
+CANDIDATE_CHECKER = importlib.util.module_from_spec(CANDIDATE_SPEC)
+CANDIDATE_SPEC.loader.exec_module(CANDIDATE_CHECKER)
 
 
 class ReleaseChannelEvidenceTests(unittest.TestCase):
@@ -23,11 +27,14 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.evidence = pathlib.Path(self.tmp.name) / "evidence.json"
+        self.ota = pathlib.Path(self.tmp.name) / "candidate.zip"
+        self.ota.write_bytes(b"tested OTA")
         self.data = {
             "version": "9.9.9",
             "device": "test device",
+            "candidate": {"ota_sha256": hashlib.sha256(b"tested OTA").hexdigest()},
             "automated_tests": {"status": "pass", "count": 1},
-            "cold_boot_seconds": 8,
+            "security_analysis": {"reviewed": True, "summary": "Анализ выполнен; риск раскрыт."},
             "hot_test": {"network_capture": {
                 "captured_at": datetime.date.today().isoformat(),
                 "duration_seconds": 15,
@@ -37,7 +44,7 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
             }},
             "checks": {
                 name: "pass" for name in (
-                    "cold_boot_le_10s", "boot_log_review", "qr_vlc",
+                    "cold_boot_ready", "boot_log_review", "qr_vlc",
                     "wired_network", "wifi_network", "iptv_playback", "torrent_playback",
                     "graphics_video", "graphics_stress", "swap_disabled", "network_capture_review",
                     "usb_remote_iptv_channels",
@@ -50,7 +57,7 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.evidence.write_text(json.dumps(self.data), encoding="utf-8")
         return subprocess.run(
             [sys.executable, str(CHECKER), "--file", str(self.evidence), "--version", "9.9.9",
-             "--channel", channel], capture_output=True, text=True, check=False,
+             "--channel", channel, "--ota", str(self.ota)], capture_output=True, text=True, check=False,
         )
 
     def test_dev_gate_does_not_block_on_security_review(self):
@@ -59,6 +66,40 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("(dev)", result.stdout)
         self.assertIn("security_review не блокирует", result.stdout)
+
+    def test_rejects_rebuilt_or_missing_ota(self):
+        self.ota.write_bytes(b"different OTA")
+        result = self.run_checker("dev")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("SHA-256 OTA", result.stderr)
+        self.ota.unlink()
+        result = self.run_checker("dev")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("не удалось прочитать OTA", result.stderr)
+
+    def test_candidate_run_requires_successful_matching_source_and_allowed_event(self):
+        sha = "a" * 40
+        run = {"head_sha": sha, "status": "completed", "conclusion": "success",
+               "path": ".github/workflows/release.yml", "event": "push", "head_branch": "candidate/test"}
+        self.assertTrue(CANDIDATE_CHECKER.valid_candidate(run, sha))
+        for field, value in (("head_sha", "b" * 40), ("conclusion", "failure"),
+                             ("status", "in_progress"), ("path", ".github/workflows/ci.yml"),
+                             ("event", "pull_request"), ("head_branch", "master")):
+            with self.subTest(field=field):
+                altered = dict(run, **{field: value})
+                self.assertFalse(CANDIDATE_CHECKER.valid_candidate(altered, sha))
+        for event in ("schedule", "workflow_dispatch"):
+            self.assertTrue(CANDIDATE_CHECKER.valid_candidate(dict(run, event=event), sha))
+
+    def test_dev_requires_security_analysis_even_when_risk_is_allowed(self):
+        self.data["checks"]["security_review"] = "fail"
+        for analysis in ({"reviewed": False, "summary": "risk"},
+                         {"reviewed": True, "summary": "  "}, {}):
+            with self.subTest(analysis=analysis):
+                self.data["security_analysis"] = analysis
+                result = self.run_checker("dev")
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("анализ безопасности", result.stderr)
 
     def test_stable_gate_still_requires_security_review(self):
         self.data["checks"]["security_review"] = "fail"
@@ -86,6 +127,27 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("не старше 31 дня", result.stderr)
         self.assertIn("сырой PCAP", result.stderr)
+
+    def test_boot_duration_does_not_block_release(self):
+        self.data["cold_boot_seconds"] = 50
+        self.assertEqual(self.run_checker("dev").returncode, 0)
+
+    def test_cold_boot_readiness_is_required(self):
+        self.data["checks"]["cold_boot_ready"] = "pending"
+        result = self.run_checker("dev")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("cold_boot_ready", result.stderr)
+
+    def test_network_capture_counts_must_be_valid_integers(self):
+        capture = self.data["hot_test"]["network_capture"]
+        for field, value in (("duration_seconds", True), ("packets", True),
+                             ("auth_cookie_or_token_patterns", False),
+                             ("auth_cookie_or_token_patterns", -1)):
+            with self.subTest(field=field, value=value):
+                old = capture[field]
+                capture[field] = value
+                self.assertEqual(self.run_checker("dev").returncode, 1)
+                capture[field] = old
 
     def test_local_release_builder_refreshes_metadata_and_obtainium_apks(self):
         script = (ROOT / "tools/build-release.sh").read_text(encoding="utf-8")

@@ -882,11 +882,17 @@ public class Main {
         java.util.Map<String, String> m = new java.util.HashMap<>();
         HttpURLConnection c = (HttpURLConnection) new URL(latestUrl(base)).openConnection();
         c.setConnectTimeout(8_000); c.setReadTimeout(15_000);
-        try (BufferedReader r = new BufferedReader(new InputStreamReader(c.getInputStream(), "UTF-8"))) {
-            for (String l; (l = r.readLine()) != null; ) {
-                int eq = l.indexOf('=');
-                if (eq > 0) m.put(l.substring(0, eq).trim(), l.substring(eq + 1).trim().replace("\\n", "\n"));
+        try {
+            int status = c.getResponseCode();
+            if (status < 200 || status >= 300) throw new java.io.IOException("HTTP " + status);
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(c.getInputStream(), "UTF-8"))) {
+                for (String l; (l = r.readLine()) != null; ) {
+                    int eq = l.indexOf('=');
+                    if (eq > 0) m.put(l.substring(0, eq).trim(), l.substring(eq + 1).trim().replace("\\n", "\n"));
+                }
             }
+        } finally {
+            c.disconnect();
         }
         for (String k : new String[]{"version", "file", "sha256", "size"})
             if (!m.containsKey(k)) throw new Exception("latest.txt без " + k);

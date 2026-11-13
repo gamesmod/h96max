@@ -20,6 +20,37 @@ ADULT_NAME_TAG = re.compile(r"18\+|xxx|adult|эрот|взросл|porn|порн
 CHILD_CHANNEL = re.compile(r"\b(?:kids?|children?|cartoons?|animation|boomerang|nick(?:elodeon)?|junior|baby|disney)\b|cartoonito|дет(?:ские|ский|ям)|мульт(?:фильм|иман|ик)|теленян|мультиланд|дисней", re.I)
 QUAL = re.compile(r"(?<![\w])(?:hd|fhd|uhd|4k|sd|hq|orig(?:inal)?|50\s?fps|60\s?fps|\d{3,4}p|h\.?265|hevc|backup|резерв)(?![\w])", re.I)
 RESOLUTION = re.compile(r"(?<!\d)(\d{3,4})\s*p?(?!\d)", re.I)
+SENSITIVE = {"token", "auth", "password", "passwd", "username", "user", "api_key", "apikey", "access_token", "signature", "sig"}
+
+def safe_url(url):
+    try:
+        parts = urllib.parse.urlsplit(url)
+        return not (parts.username or parts.password or any(
+            key.lower() in SENSITIVE for key, _ in urllib.parse.parse_qsl(parts.query, keep_blank_values=True)))
+    except ValueError:
+        return False
+
+def safe_vlc_option(option):
+    """Допускать только необходимые VLC-поля без явных учётных данных."""
+    key, sep, value = option.partition("=")
+    if not sep or not value or "\r" in value or "\n" in value:
+        return False
+    key = key.lower()
+    if key == "#extvlcopt:http-referrer":
+        try:
+            parts = urllib.parse.urlsplit(value)
+            return parts.scheme in ("http", "https") and bool(parts.hostname) and safe_url(value)
+        except ValueError:
+            return False
+    if key == "#extvlcopt:http-user-agent":
+        return not re.search(r"(?i)(?:password|passwd|token|authorization|cookie|api[_-]?key|username)\s*[:=]", value)
+    return False
+
+def public_entries(entries):
+    """Не проверять и не включать адреса с учётными данными или токенами."""
+    return [entry for entry in entries if safe_url(entry["url"]) and
+            safe_url(entry["attrs"].get("tvg-logo", "")) and
+            all(safe_vlc_option(option) for option in entry.get("opts", []))]
 
 def fetch(url, limit=262144, timeout=8, rng=False):
     h = {"User-Agent": UA}
@@ -374,7 +405,9 @@ def main():
         print(f"dedupe and child filter: {len(ent)} -> {len(out)} channels", file=sys.stderr)
         return
     entries = []
-    for line in open(a.sources, encoding="utf-8"):
+    with open(a.sources, encoding="utf-8") as source_file:
+        source_lines = source_file.readlines()
+    for line in source_lines:
         line = line.strip()
         if not line or line.startswith("#"): continue
         parsed = parse_source_line(line)
@@ -393,6 +426,9 @@ def main():
         entries += got
     total = len(entries)
     entries = [e for e in entries if e["name"] and e["attrs"].get("tvg-logo", "").startswith("http")]
+    before_sensitive = len(entries)
+    entries = public_entries(entries)
+    print(f"исключено записей с чувствительными URL: {before_sensitive - len(entries)}", file=sys.stderr)
     before_children = len(entries)
     entries = [e for e in entries if not is_child_channel(e)]
     print(f"детские каналы исключены: {before_children - len(entries)}", file=sys.stderr)
