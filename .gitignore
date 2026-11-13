@@ -20,6 +20,7 @@ secrets/
 logs/
 fblog/
 diagnostics/
+/error.log
 monitor/
 a9cfg/
 a9fw/
