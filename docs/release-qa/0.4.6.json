@@ -337,7 +337,7 @@
     "boot_execution_verified": false,
     "candidate_built": true,
     "old_init_sha256": "b3931fc3a764a8b9cc356a71849cde5a2fc0fc3ac80f919f96b3999e500300f4",
-    "new_init_sha256": "03802803562390c16d48b6988cfd4a1cbb4f5458cd5e83683cec13fe6303be5f",
+    "new_init_sha256": "fac78b476bf043ee71fca14faaf90eb165b67302a46243474fb091581a6fd890",
     "frequency_transition_errors_resolved": false,
     "tests": 84,
     "candidate": {
@@ -348,7 +348,6 @@
       "vendor_sha256": "426ed62dbb26f49a0567e744ef68ce45cc6529378db241f524734dce07f5c091",
       "ota_signature": "pass: previous certificate; mkota CMS verification",
       "checksums_and_metadata": "pass",
-      "final_init_matches_hot_file": true,
       "final_init_selinux": "u:object_r:vendor_configs_file:s0",
       "wifi_scan_seven_ext4": "pass: known configuration locations",
       "static_playlist_check": "pass; source playlist from previous candidate, runtime unverified",
@@ -357,7 +356,32 @@
       "installed": false,
       "hardware_acceptance": "pending",
       "published": false,
-      "later_concurrent_changes_included": false
+      "later_concurrent_changes_included": false,
+      "init_sha256": "03802803562390c16d48b6988cfd4a1cbb4f5458cd5e83683cec13fe6303be5f",
+      "final_init_matches_hot_file_at_build": true,
+      "final_init_matches_current_hot_file": false,
+      "contains_permissions_followup": false
+    },
+    "latest_revision_candidate_built": false,
+    "permissions_followup": {
+      "date": "2026-11-14",
+      "old_target_owner": "system:system",
+      "old_target_mode": "0666",
+      "new_target_owner": "mediacodec:system",
+      "new_target_mode": "0660",
+      "applied_hot": true,
+      "init_file_applied_hot": true,
+      "boot_execution_verified": false,
+      "status_before_and_after": "0x401",
+      "probe": "O_WRONLY|O_NOFOLLOW open only; no write",
+      "root_open": "pass",
+      "mediacodec_uid_1046_open": "pass",
+      "shell_open": "EACCES",
+      "ordinary_uid_10000_open": "EACCES",
+      "selinux_scope": "Current system is permissive; this proves DAC only, not enforcing acceptance",
+      "targeted_tests": 4,
+      "candidate_contains_this_change": false,
+      "full_source_test_snapshot": "pending immutable commit test"
     }
   }
 }
