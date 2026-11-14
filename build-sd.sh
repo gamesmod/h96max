@@ -328,6 +328,9 @@ sudo install -m 0644 $R/overlay-wifi/TvboxWifiOverlay.apk $MNT/overlay/TvboxWifi
 lbl u:object_r:vendor_overlay_file:s0 $MNT/overlay $MNT/overlay/TvboxWifiOverlay.apk
 # hardcoded eMMC baseparameter node -> by-name (resolves to SD)
 sudo sed -i 's#/dev/block/mmcblk2p4#/dev/block/by-name/baseparameter#g' $MNT/etc/init/hw/init.rk3328.rc
+# Android init opens write targets with O_NOFOLLOW; the vendor DDR alias is a symlink.
+sudo python3 -I $T/patch-ddr-init.py $MNT/etc/init/hw/init.rk3328.rc
+lbl u:object_r:vendor_configs_file:s0 $MNT/etc/init/hw/init.rk3328.rc
 grep -n 'baseparameter' $MNT/etc/init/hw/init.rk3328.rc
 # lock eMMC RPMB nodes (OP-TEE then uses SD "security" partition)
 printf '\n/dev/mmcblk*rpmb          0000   root       root\n' | sudo tee -a $MNT/etc/ueventd.rc >/dev/null

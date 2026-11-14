@@ -327,5 +327,18 @@
     "hardware_acceptance": "pending",
     "traffic_analysis": "pending",
     "published": false
+  },
+  "ddr_init_fix": {
+    "date": "2026-11-14",
+    "scope": "hot init file on 0.4.5; not full 0.4.6 acceptance",
+    "report": "boot-audit-2026-11-14.md",
+    "implemented": true,
+    "file_applied_on_device": true,
+    "boot_execution_verified": false,
+    "candidate_built": false,
+    "old_init_sha256": "b3931fc3a764a8b9cc356a71849cde5a2fc0fc3ac80f919f96b3999e500300f4",
+    "new_init_sha256": "03802803562390c16d48b6988cfd4a1cbb4f5458cd5e83683cec13fe6303be5f",
+    "frequency_transition_errors_resolved": false,
+    "tests": 84
   }
 }
