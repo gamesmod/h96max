@@ -54,6 +54,23 @@ for p in com.agateau.tinywheels.android org.supertux.supertux2 app.flicky; do
 done
 pm uninstall --user 0 com.ghisler.tcplugins.wifitransfer >/dev/null 2>&1 || true
 appops set dev.imranr.obtainium REQUEST_INSTALL_PACKAGES allow
+# Obtainium v1.7.4: getAppStorageDir()/app_data, один JSON на пакет.
+# Добавлять только отсутствующие записи; не менять выбранные пользователем источники.
+O=/sdcard/Android/data/dev.imranr.obtainium/files/app_data
+if pm path dev.imranr.obtainium >/dev/null 2>&1; then
+    for seed in /product/tvbox/obtainium-seed/*.json; do
+        [ -f "$seed" ] || continue
+        [ -e "$O/${seed##*/}" ] && continue
+        # Остановить только Obtainium перед первой записью, не трогать плееры.
+        if [ "${OBTAINIUM_STOPPED:-0}" != 1 ]; then
+            am force-stop dev.imranr.obtainium
+            mkdir -p "$O" || break
+            OBTAINIUM_STOPPED=1
+        fi
+        cp "$seed" "$O/${seed##*/}.tmp" && mv "$O/${seed##*/}.tmp" "$O/${seed##*/}"
+    done
+    unset OBTAINIUM_STOPPED
+fi
 # VLC нужен полный доступ к файлам для локальных папок и USB-накопителей.
 appops set org.videolan.vlc MANAGE_EXTERNAL_STORAGE allow
 # Hypatia сканирует общие файлы пользователя.

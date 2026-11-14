@@ -50,5 +50,30 @@
   "security_analysis": {
     "reviewed": false,
     "summary": "Полный анализ безопасности и контролируемого сетевого трафика для кандидата не выполнен."
+  },
+  "obtainium_preconfiguration": {
+    "date": "2026-11-14",
+    "source_commit": "260197129a1b6105cecb9ebdcabe006a2a0a2b8f",
+    "source_files_sha256": {
+      "obtainium-apps.json": "591f8594a603743b1f26b41f34ebe4fa0a3a40a4098e5fc8380fc5ced0f0e746",
+      "tools/prepare-obtainium.py": "02a8ad5f445af4b0afdb4ab9ab10e722b1778dc1c4b8bb5c1addb02b64c889ff",
+      "overlay/vendor/bin/tvbox-firstboot.sh": "b7a9fa958d259a6da8b23b71d96b2da3f1aabad5e4fec57cd147f458e1aafabf",
+      "build-sd.sh": "28d5adbc254df0b04d3a455f4ddd99698a9c4309f7d3abdad3cab12d5a808204"
+    },
+    "local_tests": 82,
+    "shell_syntax": "pass",
+    "diff_check": "pass",
+    "required_third_party_apks": 10,
+    "configured_records": 17,
+    "device_release": "0.4.5",
+    "installed_obtainium": "1.7.4",
+    "device_action": "Added missing app_data records over explicit ADB transport; existing Obtainium self record preserved; 16 added records compared byte-for-byte",
+    "ui_refresh_and_update_install": "pending",
+    "full_image_rebuilt": false,
+    "limitations": [
+      "No player interrupted; Obtainium UI was not opened",
+      "Native TorrServer service and system WebView remain firmware/OTA components; Obtainium APK inventory does not demonstrate their independent updateability",
+      "No release or hardware acceptance claimed"
+    ]
   }
 }

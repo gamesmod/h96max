@@ -3,37 +3,43 @@
     "id": "org.videolan.vlc",
     "url": "https://f-droid.org/packages/org.videolan.vlc",
     "author": "VideoLAN",
-    "name": "VLC"
+    "name": "VLC",
+    "additionalSettings": "{}"
   },
   {
     "id": "ru.yourok.torrserve",
     "url": "https://f-droid.org/packages/ru.yourok.torrserve",
     "author": "yourok",
-    "name": "TorrServe"
+    "name": "TorrServe",
+    "additionalSettings": "{}"
   },
   {
     "id": "com.tvlauncher",
     "url": "https://github.com/wiiguy/lightweight_androidtv_launcher",
     "author": "wiiguy",
-    "name": "TV Launcher"
+    "name": "TV Launcher",
+    "additionalSettings": "{}"
   },
   {
     "id": "dev.imranr.obtainium",
     "url": "https://github.com/ImranR98/Obtainium",
     "author": "ImranR98",
-    "name": "Obtainium"
+    "name": "Obtainium",
+    "additionalSettings": "{}"
   },
   {
     "id": "org.smarttube.stable",
     "url": "https://github.com/yuliskov/SmartTube",
     "author": "yuliskov",
-    "name": "SmartTube"
+    "name": "SmartTube",
+    "additionalSettings": "{\"apkFilterRegEx\":\"(?i)stable.*arm64.*\\\\.apk$\"}"
   },
   {
     "id": "org.maintainteam.hypatia",
-    "url": "https://apt.izzysoft.de/fdroid/index/apk/org.maintainteam.hypatia",
+    "url": "https://github.com/MaintainTeam/Hypatia",
     "author": "MaintainTeam",
-    "name": "Hypatia"
+    "name": "Hypatia",
+    "additionalSettings": "{}"
   },
   {
     "id": "org.tvbox.antivirus",
@@ -83,5 +89,37 @@
     "author": "gamesmod",
     "name": "Panadonik — Питание",
     "additionalSettings": "{\"apkFilterRegEx\":\"^Panadonik-power\\\\.apk$\",\"autoApkFilterByArch\":false}"
+  },
+  {
+    "id": "com.ghisler.android.TotalCommander",
+    "url": "https://raw.githubusercontent.com/chrisgch/tca/master/fdroid/repo?appId=com.ghisler.android.TotalCommander",
+    "author": "C. Ghisler",
+    "name": "Total Commander",
+    "overrideSource": "FDroidRepo",
+    "additionalSettings": "{\"appIdOrName\":\"com.ghisler.android.TotalCommander\"}"
+  },
+  {
+    "id": "com.ghisler.tcplugins.FTP",
+    "url": "https://raw.githubusercontent.com/chrisgch/tca/master/fdroid/repo?appId=com.ghisler.tcplugins.FTP",
+    "author": "C. Ghisler",
+    "name": "Total Commander — FTP",
+    "overrideSource": "FDroidRepo",
+    "additionalSettings": "{\"appIdOrName\":\"com.ghisler.tcplugins.FTP\"}"
+  },
+  {
+    "id": "com.ghisler.tcplugins.LAN",
+    "url": "https://raw.githubusercontent.com/chrisgch/tca/master/fdroid/repo?appId=com.ghisler.tcplugins.LAN",
+    "author": "C. Ghisler",
+    "name": "Total Commander — LAN",
+    "overrideSource": "FDroidRepo",
+    "additionalSettings": "{\"appIdOrName\":\"com.ghisler.tcplugins.LAN\"}"
+  },
+  {
+    "id": "com.ghisler.tcplugins.SFTP",
+    "url": "https://raw.githubusercontent.com/chrisgch/tca/master/fdroid/repo?appId=com.ghisler.tcplugins.SFTP",
+    "author": "C. Ghisler",
+    "name": "Total Commander — SFTP",
+    "overrideSource": "FDroidRepo",
+    "additionalSettings": "{\"appIdOrName\":\"com.ghisler.tcplugins.SFTP\"}"
   }
 ]

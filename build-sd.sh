@@ -100,6 +100,9 @@ log "product: open WebView (com.android.webview, LineageOS prebuilt)"
 sudo mkdir -p $MNT/app/webview $MNT/tvbox/apk
 sudo install -m 0644 $R/dl/webview/webview-arm64.apk $MNT/app/webview/webview.apk
 sudo install -m 0644 $R/obtainium-apps.json $MNT/tvbox/obtainium-apps.json
+python3 "$R/tools/prepare-obtainium.py" "$R/obtainium-apps.json" "$W/obtainium-seed"
+sudo mkdir -p "$MNT/tvbox/obtainium-seed"
+sudo install -m 0644 "$W/obtainium-seed/"*.json "$MNT/tvbox/obtainium-seed/"
 for a in $R/dl/apk/*.apk; do
     case "${a##*/}" in
         com.tvlauncher.apk) continue ;;
