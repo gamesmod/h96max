@@ -381,7 +381,16 @@
       "selinux_scope": "Current system is permissive; this proves DAC only, not enforcing acceptance",
       "targeted_tests": 4,
       "candidate_contains_this_change": false,
-      "full_source_test_snapshot": "pending immutable commit test"
+      "full_source_tests": {
+        "source_commit": "08ce6f806f1effefa0466565b11c9b34ba4e35dc",
+        "count": 86,
+        "status": "pass",
+        "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -v",
+        "snapshot": "isolated git archive with link to existing local SDK/JDK",
+        "log_sha256": "67e2ac0b23f047b55c22502c6ceb9f846a17660cdefc1b30f4eb5517c5f0c795",
+        "initial_attempt": "2 environment errors without SDK/JDK; repeated after adding existing SDK link",
+        "bash_json_diff_checks": "pass"
+      }
     }
   }
 }
