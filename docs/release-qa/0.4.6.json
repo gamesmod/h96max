@@ -75,5 +75,21 @@
       "Native TorrServer service and system WebView remain firmware/OTA components; Obtainium APK inventory does not demonstrate their independent updateability",
       "No release or hardware acceptance claimed"
     ]
+  },
+  "smarttube_removal": {
+    "date": "2026-11-14",
+    "source_parent": "5edb874ddc7057003d444e7e27e6c49b0cd8dc2e",
+    "target_release": "0.4.6",
+    "code": "implemented",
+    "installed_release": "0.4.5",
+    "device_package_and_data": "absent_verified",
+    "obtainium_record": "removed_verified",
+    "import_sha256": "e6cc114f81387fae11e47ebe5d30fba581398663e53d3a2443cc06478997276d",
+    "tests_worktree": 82,
+    "tests_index_snapshot": 81,
+    "new_ota": "not_built",
+    "hardware_acceptance": "pending",
+    "traffic_analysis": "pending",
+    "published": false
   }
 }

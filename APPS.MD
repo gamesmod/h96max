@@ -26,7 +26,6 @@ APK-компоненты, которые входят в собираемый р
 | VLC | `org.videolan.vlc` | Внешний видеоплеер для IPTV и TorrServe. | [VideoLAN VLC for Android](https://github.com/videolan/vlc-android); Obtainium. |
 | TorrServe | `ru.yourok.torrserve` | Сервер и воспроизведение торрентов; веб-интерфейс приставки на порту 8090. | [YouROK/TorrServe](https://github.com/YouROK/TorrServe); Obtainium. |
 | TV Launcher | `com.tvlauncher` | Главный экран Android TV и плитки приложений. | [wiiguy/lightweight_androidtv_launcher](https://github.com/wiiguy/lightweight_androidtv_launcher); Obtainium. |
-| SmartTube | `org.smarttube.stable` | Клиент YouTube для Android TV. | [yuliskov/SmartTube](https://github.com/yuliskov/SmartTube); Obtainium. |
 | Obtainium | `dev.imranr.obtainium` | Получение обновлений приложений из их источников. | [ImranR98/Obtainium](https://github.com/ImranR98/Obtainium); источники приложений импортируются из `/sdcard/tvbox/obtainium-apps.json`. |
 | Hypatia | `org.maintainteam.hypatia` | Антивирусный сканер и служба защиты; управляется плиткой «Антивирус». | [MaintainTeam/Hypatia](https://github.com/MaintainTeam/Hypatia); приложение и базы обновляются отдельно. |
 | Total Commander | `com.ghisler.android.TotalCommander` | Отдельный файловый менеджер с плагинами LAN/FTP/SFTP; QR-модуль его не запускает. | [Страница приложения](https://www.ghisler.com/android.htm); сторонний репозиторий плагинов приведён в [`apps-sources.md`](apps-sources.md). |

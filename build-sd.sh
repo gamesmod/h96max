@@ -103,13 +103,10 @@ sudo install -m 0644 $R/obtainium-apps.json $MNT/tvbox/obtainium-apps.json
 python3 "$R/tools/prepare-obtainium.py" "$R/obtainium-apps.json" "$W/obtainium-seed"
 sudo mkdir -p "$MNT/tvbox/obtainium-seed"
 sudo install -m 0644 "$W/obtainium-seed/"*.json "$MNT/tvbox/obtainium-seed/"
-for a in $R/dl/apk/*.apk; do
-    case "${a##*/}" in
-        com.tvlauncher.apk) continue ;;
-        tcandroidwifi45.apk|com.ghisler.tcplugins.wifitransfer.apk) echo "skip removed Total Commander WiFi Transfer plugin"; continue ;;
-        com.agateau.tinywheels.android.apk|org.supertux.supertux2.apk|app.flicky.apk) echo "skip removed APK ${a##*/}"; continue ;;
-    esac
-    sudo install -m 0644 $a $MNT/tvbox/apk/
+# Устанавливать только согласованный состав, а не все APK из локального кеша.
+for name in "${TVBOX_REQUIRED_APKS[@]}"; do
+    [[ "$name" == com.tvlauncher.apk ]] && continue
+    sudo install -m 0644 "$R/dl/apk/$name" "$MNT/tvbox/apk/"
 done
 # TV Launcher is a system app (no native libs): installing it at first boot made the system start HOME while the
 # package was still frozen by the installer ("Package com.tvlauncher is currently frozen!" x52, ~3 s black screen)

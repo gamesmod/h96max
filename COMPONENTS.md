@@ -20,7 +20,6 @@
 | `dev.imranr.obtainium` (Obtainium) | 1.7.4 | [официальный GitHub-релиз](https://github.com/ImranR98/Obtainium/releases/tag/v1.7.4), arm64-v8a APK | `f9216f721a7713b75929e0806bc18586f8fcf7328fbbff99b6aef1debb9eef80` | `b353601f6a1d5fd6603ae2f50be80cf301367b86b6ab8b1f66243da96cd57362` |
 | `com.tvlauncher` (TV Launcher) | 1.6.2 | [F-Droid APK](https://f-droid.org/repo/com.tvlauncher_10602.apk); [исходники](https://github.com/wiiguy/lightweight_androidtv_launcher) | `7afde83f96ccf30d1bc69ca06692d385800d2d9a14dd5f7d85fb4ad4f3c5c210` | `9e9f185a5b3cfb6ff65ac2907d3180c150483705ba129787c60667088647a767` |
 | `org.maintainteam.hypatia` (Hypatia, антивирус-движок) | 3.18 | https://apt.izzysoft.de/fdroid/repo/org.maintainteam.hypatia_318.apk (IzzyOnDroid) | `d0e31c8dbb338e61220373be61ee524c8476f39aa2d59517984fe45c5e7576c3` | `1b008d64bb95ab4774d68b87f22b8be9a272f4924df52029d7e6183835d918cc` |
-| `org.smarttube.stable` (SmartTube) | 32.68 | https://github.com/yuliskov/SmartTube/releases (файл `smarttube_stable.apk`, релиз 32.68) | `45a36e62110bcb866527ba8e9ab876f4122e1143647bbd0a97362d13803f6b94` | `109735aa24fe85e2e1623ebb3b1ecc4bf4263f4c6374e4411d646bfa2eda482a` |
 | Total Commander + LAN/FTP/SFTP | 3.62d / 3.60 / 3.0 / 2.94 | https://raw.githubusercontent.com/chrisgch/tca/master/fdroid/repo (репозиторий разработчика) | см. apps-sources.md | `e50eb216a57d5eb0b1e67802e783df7b587bdbdc379e3e296f89b49ed32f00fd` (требуемый) |
 
 Совпадение VLC, TorrServe, TV Launcher, Pixel Wheels с F-Droid проверено по sha256 против **подписанного**
@@ -31,7 +30,7 @@
 - Домашнее приложение: `com.tvlauncher/.MainActivity` (TV Launcher 1.6.2 из F-Droid).
 - Порядок: `/data/data/com.tvlauncher/shared_prefs/selected_apps.xml`, ключ `apps_order`; разделитель пакетов — U+001E, сериализуется как `&#30;`; лимит приложения — 14 плиток.
 - После чистой установки `overlay/vendor/bin/tvbox-firstboot.sh` один раз останавливает HOME, убирает игры/устаревшие записи и добавляет штатные плитки в исходном порядке. Маркер `/data/vendor/tvbox/launcher-tiles.initialized` блокирует повторную правку: пользователь может менять порядок и набор, обычная перезагрузка их не сбрасывает. Очистка данных возвращает исходную раскладку.
-- Порядок по умолчанию: IPTV, TorrServe, SmartTube, Total Commander, Ссылки, Установка, Журнал загрузки, Настройки Android, Производительность, Питание. Obtainium открывается из пункта «Обновления приложений» внутри плитки «Установка». VLC остаётся зависимостью ТВ-каналов и TorrServer, но отдельной плиткой не выводится. Антивирус также исключён из домашнего ряда, приложение остаётся в списке приложений.
+- Порядок по умолчанию: IPTV, TorrServe, Total Commander, Ссылки, Установка, Журнал загрузки, Настройки Android, Производительность, Питание. Obtainium открывается из пункта «Обновления приложений» внутри плитки «Установка». VLC остаётся зависимостью ТВ-каналов и TorrServer, но отдельной плиткой не выводится. Антивирус также исключён из домашнего ряда, приложение остаётся в списке приложений.
 
 ## 3. Системные компоненты из сторонних источников
 | Что | Версия | Источник | SHA-256 |

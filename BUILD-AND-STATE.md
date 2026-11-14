@@ -20,7 +20,7 @@
 - Samba и Termux убраны 2026-10-27 (безопасность + ресурсы): архив, конфиг и APK в dl/apk-removed/.
 - Kodi убран 2026-10-27 (пользователь предпочитает VLC): APK и настройки IPTV в dl/apk-removed/; build-sd.sh отключает vendor xbmc_copy_folder и гранты Kodi в preinstall.sh.
 - IPTV: своя плитка «ТВ-каналы» `org.tvbox.iptv` (apps/iptv, `./build.sh`) — плейлист из бывших настроек Kodi, кэш в files/, каналы открываются в VLC.
-- Пользовательские (из /product/tvbox/apk, ставит tvbox-firstboot.sh): TorrServe `ru.yourok.torrserve`, SmartTube `org.smarttube.stable` (YouTube, 2026-10-27), VLC `org.videolan.vlc`, Obtainium `dev.imranr.obtainium` (+ REQUEST_INSTALL_PACKAGES). Старый клиент Flicky удаляется для пользователя.
+- Пользовательские (из /product/tvbox/apk, ставит tvbox-firstboot.sh): TorrServe `ru.yourok.torrserve`, VLC `org.videolan.vlc`, Obtainium `dev.imranr.obtainium` (+ REQUEST_INSTALL_PACKAGES). Старый клиент Flicky удаляется для пользователя.
 - Свои: «Питание» `org.tvbox.power` (/system/priv-app, REBOOT/SHUTDOWN), «Все настройки» `org.tvbox.allsettings`, «Журнал загрузки» `org.tvbox.bootlog` (читает /sdcard/tvbox/).
 - WebView: `com.android.webview` (LineageOS prebuilt, /product/app/webview).
 - Службы (vendor/etc/init/tvbox.rc): tvbox-emmc-ro.sh (eMMC force_ro при загрузке с SD), tvbox_bootlog (dmesg/logcat → /sdcard/tvbox), tvbox_firstboot, torrserver :8090 (/data/vendor/torrserver), adb tcp 5555.

@@ -43,13 +43,13 @@ for apk in /product/tvbox/apk/*.apk; do
     [ -f "$apk" ] || continue
     pkg=$(basename "$apk" .apk)
     # Flicky и игры удалены из выпуска: не ставить старый APK с /product перед его удалением ниже.
-    case "$pkg" in app.flicky|com.agateau.tinywheels.android|org.supertux.supertux2) continue;; esac
+    case "$pkg" in org.smarttube.stable|org.smarttube.beta|com.liskovsoft.smarttubetv|app.flicky|com.agateau.tinywheels.android|org.supertux.supertux2) continue;; esac
     if ! pm path "$pkg" >/dev/null 2>&1; then
         echo "install $pkg: $(pm install -r "$apk" 2>&1)"
     fi
 done
-# В сборке без игр удалить их копии, оставшиеся в /data от прежних выпусков.
-for p in com.agateau.tinywheels.android org.supertux.supertux2 app.flicky; do
+# Удалить исключённые приложения вместе с данными прежних установок.
+for p in com.agateau.tinywheels.android org.supertux.supertux2 app.flicky org.smarttube.stable org.smarttube.beta com.liskovsoft.smarttubetv; do
     if pm path "$p" >/dev/null 2>&1; then pm uninstall --user 0 "$p"; fi
 done
 pm uninstall --user 0 com.ghisler.tcplugins.wifitransfer >/dev/null 2>&1 || true
@@ -57,6 +57,13 @@ appops set dev.imranr.obtainium REQUEST_INSTALL_PACKAGES allow
 # Obtainium v1.7.4: getAppStorageDir()/app_data, один JSON на пакет.
 # Добавлять только отсутствующие записи; не менять выбранные пользователем источники.
 O=/sdcard/Android/data/dev.imranr.obtainium/files/app_data
+# Удалить источники исключённого видеоклиента, включая старую копию ручного импорта.
+for p in org.smarttube.stable org.smarttube.beta com.liskovsoft.smarttubetv; do
+    rm -f "$O/$p.json"
+done
+if [ -f /product/tvbox/obtainium-apps.json ]; then
+    cp /product/tvbox/obtainium-apps.json /sdcard/tvbox/obtainium-apps.json
+fi
 if pm path dev.imranr.obtainium >/dev/null 2>&1; then
     for seed in /product/tvbox/obtainium-seed/*.json; do
         [ -f "$seed" ] || continue
@@ -103,24 +110,11 @@ if pm path org.videolan.vlc >/dev/null 2>&1 && ! grep -q network_caching_value $
     chown $u:$u ${V%/*} $V; chmod 771 ${V%/*}; chmod 660 $V; restorecon -R ${V%/*}
     echo "vlc: network caching 3000 ms"
 fi
-# Без настроек SmartTube выбирает 4K60 VP9, которое тормозит на этом RK3328. Один раз задать предел 1080p30 AVC.
-# Формат PlayerData.restoreState проекта yuliskov/SmartTube: поля разделены %OB%; поле 9 — ExoFormatItem, 12 — буфер.
-S=/data/data/org.smarttube.stable/files/app_prefs/video_player_data
-if pm path org.smarttube.stable >/dev/null 2>&1 && [ ! -e $S ]; then
-    am force-stop org.smarttube.stable
-    mkdir -p ${S%/*}
-    printf '%s' '0%OB%3%OB%null%OB%1%OB%false%OB%true%OB%true%OB%0%OB%null%OB%0,0,null,avc,1920,1080,30.0,null,true,-1,false%OB%null%OB%null%OB%0' > $S
-    u=$(stat -c %u /data/data/org.smarttube.stable)
-    chown $u:$u /data/data/org.smarttube.stable/files ${S%/*} $S; chmod 700 /data/data/org.smarttube.stable/files ${S%/*}; chmod 600 $S
-    restorecon -R /data/data/org.smarttube.stable/files
-    echo "smarttube: video preset 1080p30 avc"
-fi
 # Выдать штатным приложениям необходимые разрешения заранее, чтобы запросы не появлялись на экране ТВ.
 # Микрофон разрешается только Алисе, если она установлена; камера, геолокация и телефон приложениям не разрешены.
 g() { pm path $1 >/dev/null 2>&1 || return 0; shift_pkg=$1; shift; for perm in "$@"; do pm grant $shift_pkg android.permission.$perm 2>/dev/null; done; }
 g org.videolan.vlc READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE BLUETOOTH_CONNECT
 g ru.yourok.torrserve READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE
-g org.smarttube.stable READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE
 g org.maintainteam.hypatia READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE
 # Алиса получает доступ к микрофону только если пользователь установил приложение.
 g com.yandex.aliceapp RECORD_AUDIO
@@ -156,7 +150,7 @@ L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
 if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initialized" ]; then
     # Атомарно записать настройки до остановки HOME; особенности запуска описаны в HANDOFF.md.
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
-    ALLOWED="org.tvbox.iptv ru.yourok.torrserve org.smarttube.stable com.ghisler.android.TotalCommander org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
+    ALLOWED="org.tvbox.iptv ru.yourok.torrserve com.ghisler.android.TotalCommander org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
     T=""; EXTRA=""; N=0
     # Сохранить установленные функции и их порядок; удалить дубли, игры и устаревшие плитки.
     for p in $(printf '%s' "$OLD" | sed 's/\&\#30;/ /g'); do
@@ -165,7 +159,7 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initializ
         case " $(printf '%s' "$T" | sed 's/&#30;/ /g') $EXTRA " in *" $p "*) continue;; esac
         case " $ALLOWED " in *" $p "*) T="${T:+$T&#30;}$p"; N=$((N+1));; *) EXTRA="${EXTRA:+$EXTRA }$p";; esac
     done
-    # Добавить отсутствующие штатные плитки в описанном порядке (по умолчанию 10; лаунчер поддерживает 14).
+    # Добавить отсутствующие штатные плитки в описанном порядке (по умолчанию 9; лаунчер поддерживает 14).
     for p in $ALLOWED; do
         pm path "$p" >/dev/null 2>&1 || continue
         case " $(printf '%s' "$T" | sed 's/&#30;/ /g') " in *" $p "*) ;; *)

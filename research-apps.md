@@ -18,7 +18,7 @@
 | Just Player | 1M+ | 2.7k | 13 | да | ExoPlayer, самый лёгкий, без библиотеки; v0.217 (11.09.26) |
 
 Тема 4PDA о нашей приставке (H96 MAX RK3318, стр. 1191–1205): почти всё о прошивках и Wi‑Fi;
-из приложений — SmartTube, MX Player, лаунчер Projectivy; связка «торрент + VLC 1080p» упирается в блок питания 1 А.
+из приложений — MX Player, лаунчер Projectivy; связка «торрент + VLC 1080p» упирается в блок питания 1 А.
 Тема «must have» 4PDA — 2016 года (Android 5): MX Player, Ace Stream, HD VideoBox, Perfect Player, X-plore — устарело.
 
 **Вывод:** VLC — правильный основной плеер (популярен, открыт, всеяден, без рекламы).
@@ -54,7 +54,6 @@ OTT Navigator (бесплатный, нет в Play, APK).
 
 ## 4. Добавить
 
-- **SmartTube** (★35.6k, YouTube без Google, без рекламы) — по решению пользователя к установке.
 - **Плитка «Очистка ресурсов»** по аналогии с кнопкой на A9 — своё приложение (убить фоновые процессы, сбросить кэши).
 - По желанию: TV Bro (★1.8k, браузер под пульт) — если нужен браузер.
 
@@ -62,6 +61,6 @@ OTT Navigator (бесплатный, нет в Play, APK).
 
 - 4PDA: [Видеоплееры (Андроид)](https://4pda.to/forum/index.php?showtopic=1071076) (все 40 стр.), [H96 MAX RK3318](https://4pda.to/forum/index.php?showtopic=952710) (стр. 1191–1205), [Каталог программ для приставок](https://4pda.to/forum/index.php?showtopic=740069), [Набор must have](https://4pda.to/forum/index.php?showtopic=758998)
 - Google Play (число установок, 2026-10-27): VLC, MX Player, Kodi, Vimu, Just Player, Nova, mpv-android, TiviMate, Televizo
-- GitHub (звёзды, релизы): videolan/vlc-android, xbmc/xbmc, mpv-android, moneytoo/Player, anilbeesetti/nextplayer, nova-video-player/aos-AVP, YouROK/TorrServer, YouROK/TorrServe, yumata/lampa, yuliskov/SmartTube, Droid-ify/client, NeoApplications/Neo-Store, zhanghai/MaterialFiles, truefedex/tv-bro, oxyroid/M3UAndroid (archived), termux/termux-app
+- GitHub (звёзды, релизы): videolan/vlc-android, xbmc/xbmc, mpv-android, moneytoo/Player, anilbeesetti/nextplayer, nova-video-player/aos-AVP, YouROK/TorrServer, YouROK/TorrServe, yumata/lampa, Droid-ify/client, NeoApplications/Neo-Store, zhanghai/MaterialFiles, truefedex/tv-bro, oxyroid/M3UAndroid (archived), termux/termux-app
 - F-Droid: TV Launcher, Luncher, IPTV Mine Pro, TV Viewer, KnightStalker
 - Обзоры: [unstore.io](https://unstore.io/discover/best-apps-for-android-tv-media-players-android/), [free-codecs.com](https://www.free-codecs.com/guides/the-best-video-player-for-android-tv.htm), [beebom](https://gadgets.beebom.com/guides/best-android-video-players), [DTV+](https://dtv.plus/players/), [antifriz.tv IPTV 2026](https://antifriz.tv/blog/top-10-iptv-pleerov-dlya-android-tv-i-samsunglg-chto-vybrat-v-2026), [gisuser IPTV](https://gisuser.com/2026/04/best-iptv-player-apps-for-android-tv/)

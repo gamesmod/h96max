@@ -34,7 +34,7 @@ class ReleaseSecurityConfigTests(unittest.TestCase):
         self.assertEqual(tiles[:2], ["org.tvbox.iptv", "org.tvbox.links"])
         self.assertEqual(len(tiles), len(set(tiles)))
         self.assertIn("ru.yourok.torrserve", tiles)
-        self.assertIn("org.smarttube.stable", tiles)
+        self.assertNotIn("org.smarttube.stable", tiles)
 
     def test_build_rejects_missing_required_applications(self):
         with tempfile.TemporaryDirectory() as directory:

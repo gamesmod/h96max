@@ -8,7 +8,6 @@ TVBOX_REQUIRED_APKS=(
     com.ghisler.tcplugins.SFTP.apk
     dev.imranr.obtainium.apk
     org.maintainteam.hypatia.apk
-    org.smarttube.stable.apk
     org.videolan.vlc.apk
     ru.yourok.torrserve.apk
 )

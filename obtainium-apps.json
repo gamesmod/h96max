@@ -28,13 +28,6 @@
     "additionalSettings": "{}"
   },
   {
-    "id": "org.smarttube.stable",
-    "url": "https://github.com/yuliskov/SmartTube",
-    "author": "yuliskov",
-    "name": "SmartTube",
-    "additionalSettings": "{\"apkFilterRegEx\":\"(?i)stable.*arm64.*\\\\.apk$\"}"
-  },
-  {
     "id": "org.maintainteam.hypatia",
     "url": "https://github.com/MaintainTeam/Hypatia",
     "author": "MaintainTeam",
