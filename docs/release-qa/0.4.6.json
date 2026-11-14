@@ -51,6 +51,242 @@
     "reviewed": false,
     "summary": "Полный анализ безопасности и контролируемого сетевого трафика для кандидата не выполнен."
   },
+  "ci_inputs_lfs_audit": {
+    "date": "2026-11-13",
+    "source_commit": "260197129a1b6105cecb9ebdcabe006a2a0a2b8f",
+    "scope": "Локальная подготовка входов CI; не сборка OTA и не аппаратная приёмка",
+    "status": "clean_archive_prepared_locally; storage_and_rights_pending",
+    "original_archive": {
+      "path": "/tmp/h96max-release-inputs.tar.zst",
+      "size_bytes": 2941278896,
+      "sha256": "a57a66ee2dfc3013edb58b1e06c123a4e3426cffcadd55e695e78b05815385db"
+    },
+    "minimal_archive": {
+      "path": "/tmp/h96max-release-inputs-minimal.tar.zst",
+      "size_bytes": 1611677418,
+      "sha256": "004b22a12a536bdea403a598edf94cf7f5a8e8853ab2bda598ec7f869063f1ad",
+      "regular_files": 33
+    },
+    "input_provenance": {
+      "original_firmware_sha256": "e93ccc90e5a41fbc430c1f9b3f4621989945ff5a6e9685de6d228f5e7cc5ad58",
+      "stock_members_matched": 12,
+      "stock_logical_partitions_matched": 7
+    },
+    "validation": {
+      "tar_stream_and_local_hashes": "pass",
+      "wifi_known_locations_seven_ext4": "pass",
+      "private_key_scan": "fail: 16 complete PEM blocks accepted by openssl pkey in stock /system/preinstall/NetFlix.apk; purpose unclassified",
+      "tests": 79,
+      "shell_json_whitespace": "pass",
+      "packaging_fixture_and_overwrite_protection": "pass",
+      "reject_stock_private_keys_before_tar_creation": "pass"
+    },
+    "limitations": [
+      "Archives are private temporary tmpfs files, mode 0600; not approved inputs",
+      "Redistribution rights not established; repository visibility public confirmed via GitHub plugin",
+      "Account plan, remaining LFS storage and bandwidth not available",
+      "Tokens and personal data have not been exhaustively excluded"
+    ],
+    "lfs_uploaded": false,
+    "workflow_modified": false,
+    "candidate_started": false,
+    "clean_clone_test": "pending",
+    "proposed_private_repository": "gamesmod/h96max-ci-inputs; awaiting agreement",
+    "signing_keys": "Existing project keys retained separately, mode 0600, ignored by Git; not modified",
+    "cleanup_followup": {
+      "policy_sha256": "8e793197e4ca74ff471b3eefd551505f1c3292b63b14c550688570f548d8da15",
+      "partitions": {
+        "system": {
+          "original_sha256": "7835008cf0bdddd47a9797d625904d38dc33deb5fe0ad2f4f8217a484db04068",
+          "prepared_sha256": "6acd12357dabf1b2ac9d2d522b68f9bb53871399019e9cb204c7fb52bbd146c3",
+          "removed_apks": [
+            "/system/app/katniss/katniss.apk",
+            "/system/app/chrome_hcy/chrome_hcy.apk",
+            "/system/app/GooglePrintRecommendationService/GooglePrintRecommendationService.apk",
+            "/system/app/RKHcyUpdate/RKHcyUpdate.apk",
+            "/system/app/ProductTest/ProductTest.apk",
+            "/system/app/RKHcyDeviceTest/RKHcyDeviceTest.apk",
+            "/system/priv-app/StressTest/StressTest.apk",
+            "/system/app/33118V12/33118V12.apk",
+            "/system/app/SimpleAllApp/SimpleAllApp.apk",
+            "/system/app/PinyinIME/PinyinIME.apk",
+            "/system/app/ExactCalculator/ExactCalculator.apk",
+            "/system/app/WifiDisplay/WifiDisplay.apk",
+            "/system/app/HidAudio/HidAudio.apk",
+            "/system/priv-app/DLNA/DLNA.apk",
+            "/system/priv-app/MediaCenter/MediaCenter.apk",
+            "/system/app/SkySetupWizard/SkySetupWizard.apk",
+            "/system/priv-app/ShowDebug/ShowDebug.apk",
+            "/system/priv-app/DynamicSystemInstallationService/DynamicSystemInstallationService.apk",
+            "/system/preinstall/APKPure.apk",
+            "/system/preinstall/AirScreen64.apk",
+            "/system/preinstall/Amazon_Prime_Video.apk",
+            "/system/preinstall/KDMC2.apk",
+            "/system/preinstall/NetFlix.apk",
+            "/system/preinstall/TikTok.apk",
+            "/system/preinstall/aptoidetv.apk",
+            "/system/preinstall/emotnstore.apk"
+          ],
+          "ext4_check": "pass",
+          "free_blocks_zeroed": true
+        },
+        "system_ext": {
+          "original_sha256": "50e07efc34f67738fc61dbe2abc06fe90914db792b6d79b77fd50e3349ea9e23",
+          "prepared_sha256": "8a12ed7d1f2090af8993ba18da6cc820b86b927907e383d191468a724cdb84d7",
+          "removed_apks": [
+            "/priv-app/GoogleFeedback/GoogleFeedback.apk",
+            "/priv-app/GoogleServicesFramework/GoogleServicesFramework.apk"
+          ],
+          "ext4_check": "pass",
+          "free_blocks_zeroed": true
+        },
+        "vendor": {
+          "original_sha256": "e47a0d0dfca608d6b36ade17b57ef209de7e1a961a4432fa7a299dcf511e9880",
+          "prepared_sha256": "5f66925410be1bfca9191f55e3cef9161f96796939ad129d5397860a8e94f9d1",
+          "removed_apks": [],
+          "ext4_check": "pass",
+          "free_blocks_zeroed": true
+        },
+        "vendor_dlkm": {
+          "original_sha256": "57827d1fc0e5051913a329203cb976377680bcd24880170d88a367368690c1bc",
+          "prepared_sha256": "4378bb3706c42af9cf1a59aa08cd2925a9a242871b9c7a46c2ec4dbd5d0e7d5a",
+          "removed_apks": [],
+          "ext4_check": "pass",
+          "free_blocks_zeroed": true
+        },
+        "odm": {
+          "original_sha256": "286f42fc45f0c09c15f97179cbb2aeaf501767c145a833c48b048990307c0171",
+          "prepared_sha256": "e89a93992b1a6ac0ce1b817d713822354fb11d5612af53a7833b5b777431f853",
+          "removed_apks": [],
+          "ext4_check": "pass",
+          "free_blocks_zeroed": true
+        },
+        "odm_dlkm": {
+          "original_sha256": "0d093c9e80c53d7b8686abd78f50ccf5834f4f81de0752a724b2dd423e5b4a65",
+          "prepared_sha256": "c732a8fd33339fefdb64b0c6fc03392dda173af3e4e8083160563d95d1143c2e",
+          "removed_apks": [],
+          "ext4_check": "pass",
+          "free_blocks_zeroed": true
+        },
+        "product": {
+          "original_sha256": "42e7e190788c98730c55d417af9f12aa333e926e2d807541cab0804fa44b892b",
+          "prepared_sha256": "ac615a17d8aefaac2bfacedcb953b3eb2eaaa1fbe7a704e3042db26a7cac27f8",
+          "removed_apks": [
+            "/app/GoogleCalendarSyncAdapter/GoogleCalendarSyncAdapter.apk",
+            "/app/GoogleContactsSyncAdapter/GoogleContactsSyncAdapter.apk",
+            "/app/GoogleLocationHistory/GoogleLocationHistory.apk",
+            "/app/LatinImeGoogle/LatinImeGoogle.apk",
+            "/app/SpeechServicesByGoogle/SpeechServicesByGoogle.apk",
+            "/app/TrichromeLibrary/TrichromeLibrary.apk",
+            "/app/WebViewGoogle/WebViewGoogle.apk",
+            "/app/YouTube/YouTube.apk",
+            "/app/com.google.mainline.telemetry/com.google.mainline.telemetry.apk",
+            "/priv-app/AndroidAutoStub/AndroidAutoStub.apk",
+            "/priv-app/CarrierServices/CarrierServices.apk",
+            "/priv-app/ConfigUpdater/ConfigUpdater.apk",
+            "/priv-app/GmsCore/GmsCore.apk",
+            "/priv-app/GmsCore/m/independent/AndroidPlatformServices.apk",
+            "/priv-app/GoogleOneTimeInitializer/GoogleOneTimeInitializer.apk",
+            "/priv-app/GooglePartnerSetup/GooglePartnerSetup.apk",
+            "/priv-app/GoogleRestore/GoogleRestore.apk",
+            "/priv-app/PhoneskyTv/PhoneskyTv.apk",
+            "/priv-app/Wellbeing/Wellbeing.apk",
+            "/overlay/GmsConfigOverlayCommon.apk",
+            "/overlay/GmsConfigOverlayComms.apk",
+            "/overlay/GmsConfigOverlayGSA.apk",
+            "/overlay/GmsConfigOverlayGeotz.apk"
+          ],
+          "ext4_check": "pass",
+          "free_blocks_zeroed": true
+        }
+      },
+      "archive": "/tmp/h96max-release-inputs-clean.tar.zst",
+      "archive_sha256": "811c729f8eca464ae3df8c8c3e6edfc6fa91d43cefdd2c2e0d12e39a40d44c1e",
+      "archive_size_bytes": 861200366,
+      "tar_integrity": "pass",
+      "private_key_pem_scan": "pass",
+      "originals_unchanged": true,
+      "date": "2026-11-14",
+      "source_commit": "260197129a1b6105cecb9ebdcabe006a2a0a2b8f",
+      "source_state": "local uncommitted changes",
+      "source_sha256": {
+        "build-sd.sh": "76b669d428cad31bbbda6d22487b101b7dc2177f5ddcb97bdd62d23716edd96d",
+        "tools/package-ci-inputs.sh": "77ea082431400b1721d7a4238e5f74511a1ca9f77285d951f04d1518a17e8c6b",
+        "tools/prepare-ci-partitions.py": "b45ac2a3c3a93f3f0276a23d30da66218dd1742bf1eeddb30d3b3cb5f2d0f087",
+        "tools/unused-stock-apps.txt": "8e793197e4ca74ff471b3eefd551505f1c3292b63b14c550688570f548d8da15",
+        "tests/test_ci_partition_cleanup.py": "ac22b09cdf80e67244fbf8521419c2cf3e52e80c6ec0311f4cf5a9fee6dacee3"
+      },
+      "tests": {
+        "count": 80,
+        "status": "pass",
+        "scope": "local sources including ext4 cleanup integration test"
+      },
+      "wifi_known_paths": "pass",
+      "publication_status": "not uploaded; redistribution rights and private repository agreement pending",
+      "limitations": [
+        "PEM and known Wi-Fi-path scans are not exhaustive secret/personal-data audits",
+        "No target-device or full OTA build validation"
+      ]
+    }
+  },
+  "local_ota_followup": {
+    "checked_at": "2026-11-14T10:10:35.099374+00:00",
+    "scope": "local OTA over LAN without GitHub, prepared but not installed",
+    "source_base_commit": "260197129a1b6105cecb9ebdcabe006a2a0a2b8f",
+    "source_state": "isolated copy of local uncommitted changes; selected earlier QA playlist",
+    "source_manifest_sha256": "1c67b578ffb1a99fc1530b761906dfbc475d7139d8eeef7d96315721244762cb",
+    "work_directory": "/home/dsadm/h96max/build/local-ota-046-gqvzuf_m",
+    "ota": {
+      "ota_path": "/home/dsadm/h96max/build/local-ota-046-gqvzuf_m/release/updates/emmc/tvbox-update-0.4.6-emmc.zip",
+      "ota_size_bytes": 935681305,
+      "ota_sha256": "a4054c6fb9ca6e4072118c21e9fee40dece11be64878d308adc7bd2b5eeb6b51",
+      "ota_signature_existing_certificate": "pass",
+      "metadata_version_size_sha256": "pass",
+      "local_http_full_download_checksum": "pass",
+      "scope": "computer loopback only, not target-device download",
+      "device_installation": "pending; no ADB connection and no data-reset consent"
+    },
+    "checks": {
+      "build": "pass",
+      "tests": {
+        "status": "pass",
+        "count": 80
+      },
+      "apk_signatures_existing_certificate": "pass",
+      "ota_and_clean_install_checksums": "pass",
+      "build_log_analysis": "pass: 0 critical, 0 errors, 0 warnings",
+      "final_test_log_analysis": "pass: 0 critical, 0 errors, 0 warnings",
+      "unused_app_paths_absent": "pass",
+      "required_sideload_apks_exact_match": "pass",
+      "launcher_webview_framework_present": "pass",
+      "final_ext4_wifi_known_paths": "pass",
+      "image_iptv_sha256": "e1b9e0f33f65d350397a9db17d9a35577d8ab057bc6691e4d9cd12a63f7c1bc1",
+      "image_iptv_static_validation": "pass",
+      "device_functions": "pending",
+      "device_network_capture_security_review": "pending",
+      "installed_signature_trust": "pending",
+      "wifi_after_data_reset": "pending",
+      "post_install_sanity": "pending"
+    },
+    "test_setup_note": "First isolated test attempt lacked .github configs (10 file-not-found errors); configs copied unchanged, all 80 tests then passed. Both logs retained privately.",
+    "connection": {
+      "adb_devices": 0,
+      "usb_rockchip_detected": false,
+      "adb_mdns_services": 0,
+      "installed_version": null
+    },
+    "data_reset_consent": false,
+    "installed": false,
+    "network_server_exposed": false,
+    "github_used": false,
+    "git_commit_created": false,
+    "blockers": [
+      "No target device visible; user connection scenario requested",
+      "No full hot functional acceptance or controlled device traffic capture",
+      "Wi-Fi and ADB recovery after reset not verified",
+      "Explicit separate data-reset consent not obtained"
+    ]
+  },
   "obtainium_preconfiguration": {
     "date": "2026-11-14",
     "source_commit": "260197129a1b6105cecb9ebdcabe006a2a0a2b8f",

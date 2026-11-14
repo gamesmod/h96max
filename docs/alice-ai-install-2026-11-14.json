@@ -1,0 +1,58 @@
+{
+  "recorded_at_utc": "2026-11-14T10:16:58.467847+00:00",
+  "source_commit": "5edb874ddc7057003d444e7e27e6c49b0cd8dc2e",
+  "device_release": "0.4.5",
+  "package": "com.yandex.aliceapp",
+  "version_name": "26.28.1.universal.rustore",
+  "version_code": 262812935,
+  "source": "https://www.rustore.ru/catalog/app/com.yandex.aliceapp",
+  "acquisition": "Installed by temporary official RuStore 1.114.0.3; pulled from pm path after installation",
+  "installer_package_observed": "ru.vk.store",
+  "apk_path": "dl/apk/com.yandex.aliceapp.apk",
+  "size_bytes": 139046694,
+  "sha256": "b9ed841e98af6cc50912ffa0f82bad3b61ba7710c23d35720a69f796fdc89594",
+  "signer_certificate_sha256": "aca405ded8b25cb2e8c6da69425d2b4307d087c1276fc06ad5942731ccc51dba",
+  "signature_verified": true,
+  "signature_scheme": "v3",
+  "min_sdk": 28,
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "installed_device_abi": "arm64-v8a",
+  "temporary_rustore_removed": true,
+  "launch": "am start -W: Status ok, COLD, TotalTime 2470 ms; location onboarding displayed, location request skipped",
+  "voice_remote_acceptance": "not tested",
+  "firmware_integration": "not implemented; APK stored for future integration",
+  "publication": "not performed; APK is local and ignored by Git",
+  "followup_diagnostics": {
+    "date_utc": "2026-11-14T10:24:13.827666+00:00",
+    "source_commit": "ab58742ef6eaa5319a0618a3819756093cc16dfa",
+    "user_report": "Voice input does not work; interface extremely slow",
+    "microphone_before": "RECORD_AUDIO not granted; appops ignore",
+    "microphone_after": "Permission granted; appops foreground; tapping in-app listen button produced audio policy curActiveCount 1",
+    "assistant_before": "assistant and voice_interaction_service empty",
+    "assistant_after": "Assigned ASSISTANT role; AliceInteractionService bound",
+    "voice_recognition": "User speech and physical remote button not confirmed",
+    "graphics_before": {
+      "frames": 127,
+      "legacy_janky_percent": 100,
+      "median_ms": 250,
+      "p90_ms": 500
+    },
+    "optimization": "Full AOT speed compilation; host command timed out after 180s; subsequently no dex2oat process and package reports status=speed reason=cmdline",
+    "graphics_after_cold_start": {
+      "frames": 38,
+      "legacy_janky_percent": 100,
+      "median_ms": 300,
+      "p90_ms": 550
+    },
+    "performance_status": "unresolved; AOT did not establish improvement",
+    "memory_available_kb_before": 2532960,
+    "usb_microphone_present": true,
+    "unrelated_activity": "Concurrent QA capture and OTA download observed; not modified",
+    "firmware_modified": false
+  }
+}

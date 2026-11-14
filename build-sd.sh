@@ -81,21 +81,23 @@ mnt() { sudo mount -o loop,rw $W/$1.img $MNT; }
 umnt() { sync; for i in 1 2 3 4 5; do sudo umount $MNT && return 0; sleep 2; done; sudo umount -l $MNT; }
 lbl() { sudo setfattr -h -n security.selinux -v "$1" "${@:2}"; }
 
+# Общая политика для конечной прошивки и очищенных исходных разделов CI.
+remove_unused_stock_apps() {
+    local selected=$1 partition path
+    while read -r partition path; do
+        [[ -z "$partition" || "$partition" == \#* ]] && continue
+        [[ "$partition" == "$selected" ]] || continue
+        [[ "$path" == /* && "$path" != *..* && "$path" != / ]] || return 1
+        if [ -e "$MNT$path" ]; then sudo rm -rf -- "$MNT$path"; fi
+    done < "$R/tools/unused-stock-apps.txt"
+}
+
 grow product 1200M; grow system_ext 200M; grow vendor 256M; grow system 1600M; grow odm 8M
 if [ -z "${VANILLA:-}" ]; then
 
 log "debloat: product"
 mnt product
-for d in app/GoogleCalendarSyncAdapter app/GoogleContactsSyncAdapter app/GoogleLocationHistory \
-         app/LatinImeGoogle app/SpeechServicesByGoogle app/TrichromeLibrary app/WebViewGoogle \
-         app/YouTube app/com.google.mainline.telemetry \
-         priv-app/AndroidAutoStub priv-app/CarrierServices priv-app/ConfigUpdater priv-app/GmsCore \
-         priv-app/GoogleOneTimeInitializer priv-app/GooglePartnerSetup priv-app/GoogleRestore \
-         priv-app/PhoneskyTv priv-app/Wellbeing \
-         overlay/GmsConfigOverlayCommon.apk overlay/GmsConfigOverlayComms.apk \
-         overlay/GmsConfigOverlayGSA.apk overlay/GmsConfigOverlayGeotz.apk; do
-    [ -e $MNT/$d ] && sudo rm -rf $MNT/$d || echo "  (absent) $d"
-done
+remove_unused_stock_apps product
 log "product: open WebView (com.android.webview, LineageOS prebuilt)"
 sudo mkdir -p $MNT/app/webview $MNT/tvbox/apk
 sudo install -m 0644 $R/dl/webview/webview-arm64.apk $MNT/app/webview/webview.apk
@@ -139,9 +141,7 @@ umnt
 
 log "debloat: system_ext"
 mnt system_ext
-for d in priv-app/GoogleFeedback priv-app/GoogleServicesFramework; do
-    [ -e $MNT/$d ] && sudo rm -rf $MNT/$d || echo "  (absent) $d"
-done
+remove_unused_stock_apps system_ext
 umnt
 
 log "debloat: system"
@@ -167,7 +167,7 @@ else
     exit 1
 fi
 # vendor "preinstall" bundle (TikTok, Netflix, Prime, Aptoide, APKPure, AirScreen, KDMC, store) installed at first boot
-[ -d $MNT/system/preinstall ] && sudo rm -rf $MNT/system/preinstall
+# Полный preinstall удаляется общей политикой remove_unused_stock_apps system ниже.
 # power menu tile (apps/power, privileged: REBOOT/SHUTDOWN/DEVICE_POWER)
 sudo mkdir -p $MNT/system/priv-app/TvboxPower
 sudo install -m 0644 $R/apps/power/out/TvboxPower.apk $MNT/system/priv-app/TvboxPower/TvboxPower.apk
@@ -245,12 +245,7 @@ lbl u:object_r:bootanim_exec:s0 $MNT/system/bin/bootanimation
 lbl u:object_r:system_file:s0 $MNT/system/bin/bootanimation.orig
 # Keep the native renderer's original graphics user and SELinux domain.
 lbl u:object_r:system_file:s0 $MNT/system/etc/init/bootanim.rc
-for d in app/katniss app/chrome_hcy app/GooglePrintRecommendationService app/RKHcyUpdate \
-         app/ProductTest app/RKHcyDeviceTest priv-app/StressTest \
-         app/33118V12 app/SimpleAllApp app/PinyinIME app/ExactCalculator app/WifiDisplay app/HidAudio \
-         priv-app/DLNA priv-app/MediaCenter app/SkySetupWizard priv-app/ShowDebug priv-app/DynamicSystemInstallationService; do
-    [ -e $MNT/system/$d ] && sudo rm -rf $MNT/system/$d || echo "  (absent) $d"
-done
+remove_unused_stock_apps system
 umnt
 
 fi # VANILLA skips debloat/apps
