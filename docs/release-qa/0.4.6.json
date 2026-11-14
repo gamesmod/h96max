@@ -335,10 +335,29 @@
     "implemented": true,
     "file_applied_on_device": true,
     "boot_execution_verified": false,
-    "candidate_built": false,
+    "candidate_built": true,
     "old_init_sha256": "b3931fc3a764a8b9cc356a71849cde5a2fc0fc3ac80f919f96b3999e500300f4",
     "new_init_sha256": "03802803562390c16d48b6988cfd4a1cbb4f5458cd5e83683cec13fe6303be5f",
     "frequency_transition_errors_resolved": false,
-    "tests": 84
+    "tests": 84,
+    "candidate": {
+      "source_commit": "23efa5e88c0329b575928f1a6d509d69595709e1",
+      "path": "build/ddr-candidate-046-j5g_0vd8/release/updates/emmc/tvbox-update-0.4.6-emmc.zip",
+      "size_bytes": 912511599,
+      "sha256": "1c9671b7bb1e0f6632a444ddfc81971ba0c7409150c87c75f8ebead8bb2d46e0",
+      "vendor_sha256": "426ed62dbb26f49a0567e744ef68ce45cc6529378db241f524734dce07f5c091",
+      "ota_signature": "pass: previous certificate; mkota CMS verification",
+      "checksums_and_metadata": "pass",
+      "final_init_matches_hot_file": true,
+      "final_init_selinux": "u:object_r:vendor_configs_file:s0",
+      "wifi_scan_seven_ext4": "pass: known configuration locations",
+      "static_playlist_check": "pass; source playlist from previous candidate, runtime unverified",
+      "tests": 84,
+      "packaging_retry": "Initial /tmp quota exceeded; packaging/signing repeated with private disk TMPDIR without rebuilding partitions",
+      "installed": false,
+      "hardware_acceptance": "pending",
+      "published": false,
+      "later_concurrent_changes_included": false
+    }
   }
 }
