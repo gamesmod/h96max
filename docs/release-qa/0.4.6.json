@@ -411,5 +411,24 @@
       "tests/test_obtainium.py": "eab8004fe102d257b23f0b047cf3e607e94fbd62d60ad7f5cfbaa558142fdc76",
       "overlay/vendor/bin/tvbox-firstboot.sh": "d1956b40cf10a60ae2d17a54f5def0c777e046531e7d8e0d6efd9b7614b20502"
     }
+  },
+  "source_validation_2026_11_22": {
+    "source_commit": "083cefbe19a1e7a01568b846d41165f88c80662f",
+    "snapshot": "isolated git archive with existing SDK link",
+    "tests": 103,
+    "status": "pass",
+    "test_log_sha256": "260aea8c84b2e69745d0bee9f959a881cfe1e4bafb121d384643bbcd7b60dca4",
+    "bash_syntax": "pass",
+    "obtainium_json": "pass",
+    "diff_check": "pass",
+    "test_log_analysis": {
+      "critical": 0,
+      "errors": 0,
+      "warnings": 0
+    },
+    "adb_devices": 0,
+    "usb_target_detected": false,
+    "installed_artifact_currently_verified": false,
+    "release_acceptance": "pending"
   }
 }
