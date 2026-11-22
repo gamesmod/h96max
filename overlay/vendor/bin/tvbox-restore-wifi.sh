@@ -1,6 +1,8 @@
 #!/system/bin/sh
 # Восстановить сохранённый Wi‑Fi-профиль только при первой загрузке с eMMC.
 # Файл содержит пароли; команды и журналы не должны выводить его содержимое.
+# При OTA приоритет имеет приватный профиль из cache, а не старый профиль SD.
+[ ! -s /data/vendor/tvbox/ota-connectivity/data-restored ] || exit 0
 case "$(cat /proc/cmdline 2>/dev/null)" in *androidboot.boot_devices=ff500000*) exit 0;; esac
 SD=/dev/block/mmcblk0p15
 MNT=/mnt/tvbox_emmc

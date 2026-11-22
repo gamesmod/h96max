@@ -962,6 +962,21 @@ public class Main {
         sh("chmod 644 " + OTA_PKG);
         // "с очисткой": recovery cannot install and wipe in one run, so update-binary marks misc after a successful
         // install and tvbox-wipecheck.sh clears userdata on the next boot (nothing is wiped if the update fails)
+        // Root-private cache handoff survives the requested userdata reset.
+        // Pass arguments directly; never interpolate archive metadata into shell code.
+        if (wipe) {
+            Process connectivity = new ProcessBuilder("/system/bin/sh",
+                    "/vendor/bin/tvbox-ota-connectivity.sh", "prepare", ver,
+                    sha256File(pkg)).redirectErrorStream(true).start();
+            try (InputStream output = connectivity.getInputStream()) {
+                byte[] discard = new byte[4096];
+                while (output.read(discard) != -1) { /* no private values in logs */ }
+            }
+            if (connectivity.waitFor() != 0) {
+                op.done(false, "не удалось подготовить приватное восстановление связи; обновление не запущено");
+                return;
+            }
+        }
         File wipeReq = new File(WIPE_FLAG);
         new File("/cache/recovery").mkdirs();
         if (wipe) write(wipeReq.getPath(), "1"); else wipeReq.delete();

@@ -268,6 +268,7 @@ sudo sed -i 's/^persist\.sys\.zram_enabled=.*/persist.sys.zram_enabled=0/' "$MNT
 grep -q '^persist\.sys\.zram_enabled=0$' "$MNT/build.prop" || echo 'persist.sys.zram_enabled=0' | sudo tee -a "$MNT/build.prop" >/dev/null
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-bootlog.sh $MNT/bin/tvbox-bootlog.sh
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-wipecheck.sh $MNT/bin/tvbox-wipecheck.sh
+sudo install -m 0755 $R/overlay/vendor/bin/tvbox-ota-connectivity.sh $MNT/bin/tvbox-ota-connectivity.sh
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-sdboot.sh $MNT/bin/tvbox-sdboot.sh
 # IR remote keylayout from stock A9 (OK=ENTER); key 388 keeps the A12 label (TV_KEYMOUSE_MODE_SWITCH unknown in A12)
 sudo install -m 0644 $R/overlay/vendor/usr/keylayout/ff1b0030_pwm.kl $MNT/usr/keylayout/ff1b0030_pwm.kl

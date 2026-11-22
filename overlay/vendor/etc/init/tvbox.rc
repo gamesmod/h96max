@@ -15,7 +15,8 @@ on init
 on post-fs
     exec u:r:su:s0 root root -- /system/bin/sh /vendor/bin/tvbox-emmc-ro.sh post-fs
 
-# Сетевой ADB не включаем автоматически; отладка остаётся на USB с проверкой ключа.
+# По умолчанию сетевой ADB выключен. Приватная политика после OTA может вернуть
+# доступ только прежнему компьютеру, с проверкой ключа и фильтрацией IPv4/IPv6.
 
 on property:sys.boot_completed=1
     start tvbox_firstboot
@@ -57,6 +58,7 @@ service tvbox_firstboot /system/bin/sh /vendor/bin/tvbox-firstboot.sh
 
 # TorrServer MatriX (web UI + streaming) on :8090, starts at boot
 on post-fs-data
+    exec u:r:su:s0 root root -- /system/bin/sh /vendor/bin/tvbox-ota-connectivity.sh data
     mkdir /data/vendor/torrserver 0770 root root
     exec u:r:su:s0 root root -- /system/bin/sh /vendor/bin/tvbox-restore-wifi.sh
 
@@ -79,6 +81,7 @@ service tvboxd /system/bin/app_process /system/bin org.tvbox.daemon.Main
     disabled
 
 on property:sys.boot_completed=1
+    exec u:r:su:s0 root root -- /system/bin/sh /vendor/bin/tvbox-ota-connectivity.sh network
     start tvboxd
 
 # OTA "с очисткой": clear userdata before it is mounted (marker in misc, see tvbox-wipecheck.sh);
