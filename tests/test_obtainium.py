@@ -34,3 +34,20 @@ class ObtainiumTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Missing Obtainium sources'):
                 module.prepare(source, Path(d) / 'out')
             self.assertFalse((Path(d) / 'out').exists())
+
+    def test_own_apps_rejected_and_stale_seed_removed(self):
+        with tempfile.TemporaryDirectory() as d:
+            dest = Path(d) / 'seed'
+            dest.mkdir()
+            stale = dest / 'org.tvbox.iptv.json'
+            stale.write_text('{}')
+            module.prepare(ROOT / 'obtainium-apps.json', dest)
+            self.assertFalse(stale.exists())
+            self.assertFalse(any(p.name.startswith('org.tvbox.') for p in dest.glob('*.json')))
+            apps = json.loads((ROOT / 'obtainium-apps.json').read_text())
+            apps.append(dict(id='org.tvbox.iptv', url='https://github.com/gamesmod/h96max',
+                             author='gamesmod', name='IPTV'))
+            source = Path(d) / 'apps.json'
+            source.write_text(json.dumps(apps))
+            with self.assertRaisesRegex(ValueError, 'Panadonik apps'):
+                module.prepare(source, dest)

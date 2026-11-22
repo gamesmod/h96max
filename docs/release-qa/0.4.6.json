@@ -392,5 +392,24 @@
         "bash_json_diff_checks": "pass"
       }
     }
+  },
+  "obtainium_third_party_only": {
+    "date": "2026-11-14",
+    "source_commit": "f7fc40aec70504e53b6903ec628827b133366e61",
+    "scope": "Only third-party APKs in Obtainium; supersedes previous 17-record inventory",
+    "configured_third_party_records": 9,
+    "own_app_records": 0,
+    "device_release": "0.4.5",
+    "device_action": "Removed seven Panadonik tracking records after private backup; applications preserved; refreshed manual import JSON",
+    "device_verified": "0 org.tvbox.* records; 9 total records",
+    "checks": "3 Obtainium tests pass; firstboot bash syntax and diff check pass",
+    "ui_update_install": "pending",
+    "image_rebuilt": false,
+    "files_sha256": {
+      "obtainium-apps.json": "f97861098d6809ac87c9fa13c81d554221644bed1a92028ba3867e001e6dd4d5",
+      "tools/prepare-obtainium.py": "2a76cd4473b6f5d3a834651bfe3b93c257259eaccdd331e4b11e31135bf99adc",
+      "tests/test_obtainium.py": "eab8004fe102d257b23f0b047cf3e607e94fbd62d60ad7f5cfbaa558142fdc76",
+      "overlay/vendor/bin/tvbox-firstboot.sh": "d1956b40cf10a60ae2d17a54f5def0c777e046531e7d8e0d6efd9b7614b20502"
+    }
   }
 }

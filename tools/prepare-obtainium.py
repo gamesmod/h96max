@@ -13,6 +13,8 @@ def prepare(source, output):
         package = app['id']
         if not re.fullmatch(r'[A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)+', package):
             raise ValueError('Invalid package ID')
+        if package.startswith('org.tvbox.'):
+            raise ValueError('Panadonik apps must not be tracked by Obtainium: ' + package)
         if package in records:
             raise ValueError('Duplicate package ID: ' + package)
         settings = json.loads(app.get('additionalSettings', '{}'))
@@ -30,6 +32,9 @@ def prepare(source, output):
         raise ValueError('Missing Obtainium sources: ' + ', '.join(sorted(missing)))
     dest = Path(output)
     dest.mkdir(parents=True, exist_ok=True)
+    # Убрать записи прежних сборок из повторно используемого staging-каталога.
+    for stale in dest.glob('org.tvbox.*.json'):
+        stale.unlink()
     for package, record in records.items():
         (dest / (package + '.json')).write_text(json.dumps(record, ensure_ascii=False) + '\n')
 

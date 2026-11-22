@@ -35,55 +35,6 @@
     "additionalSettings": "{}"
   },
   {
-    "id": "org.tvbox.antivirus",
-    "url": "https://github.com/gamesmod/h96max",
-    "author": "gamesmod",
-    "name": "Panadonik — Антивирус",
-    "additionalSettings": "{\"apkFilterRegEx\":\"^Panadonik-antivirus\\\\.apk$\",\"autoApkFilterByArch\":false}"
-  },
-  {
-    "id": "org.tvbox.bootlog",
-    "url": "https://github.com/gamesmod/h96max",
-    "author": "gamesmod",
-    "name": "Panadonik — Журнал загрузки",
-    "additionalSettings": "{\"apkFilterRegEx\":\"^Panadonik-bootlog\\\\.apk$\",\"autoApkFilterByArch\":false}"
-  },
-  {
-    "id": "org.tvbox.clean",
-    "url": "https://github.com/gamesmod/h96max",
-    "author": "gamesmod",
-    "name": "Panadonik — Производительность",
-    "additionalSettings": "{\"apkFilterRegEx\":\"^Panadonik-performance\\\\.apk$\",\"autoApkFilterByArch\":false}"
-  },
-  {
-    "id": "org.tvbox.installer",
-    "url": "https://github.com/gamesmod/h96max",
-    "author": "gamesmod",
-    "name": "Panadonik — Установка",
-    "additionalSettings": "{\"apkFilterRegEx\":\"^Panadonik-installer\\\\.apk$\",\"autoApkFilterByArch\":false}"
-  },
-  {
-    "id": "org.tvbox.iptv",
-    "url": "https://github.com/gamesmod/h96max",
-    "author": "gamesmod",
-    "name": "Panadonik — ТВ-каналы",
-    "additionalSettings": "{\"apkFilterRegEx\":\"^Panadonik-iptv\\\\.apk$\",\"autoApkFilterByArch\":false}"
-  },
-  {
-    "id": "org.tvbox.links",
-    "url": "https://github.com/gamesmod/h96max",
-    "author": "gamesmod",
-    "name": "Panadonik — Ссылки",
-    "additionalSettings": "{\"apkFilterRegEx\":\"^Panadonik-links\\\\.apk$\",\"autoApkFilterByArch\":false}"
-  },
-  {
-    "id": "org.tvbox.power",
-    "url": "https://github.com/gamesmod/h96max",
-    "author": "gamesmod",
-    "name": "Panadonik — Питание",
-    "additionalSettings": "{\"apkFilterRegEx\":\"^Panadonik-power\\\\.apk$\",\"autoApkFilterByArch\":false}"
-  },
-  {
     "id": "com.ghisler.android.TotalCommander",
     "url": "https://raw.githubusercontent.com/chrisgch/tca/master/fdroid/repo?appId=com.ghisler.android.TotalCommander",
     "author": "C. Ghisler",

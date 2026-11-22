@@ -65,8 +65,16 @@ if [ -f /product/tvbox/obtainium-apps.json ]; then
     cp /product/tvbox/obtainium-apps.json /sdcard/tvbox/obtainium-apps.json
 fi
 if pm path dev.imranr.obtainium >/dev/null 2>&1; then
+    # Удалить только прежние записи собственных APK, сохранив сами приложения.
+    for p in antivirus bootlog clean installer iptv links power; do
+        if [ -f "$O/org.tvbox.$p.json" ]; then
+            am force-stop dev.imranr.obtainium
+            rm -f "$O/org.tvbox.$p.json"
+        fi
+    done
     for seed in /product/tvbox/obtainium-seed/*.json; do
         [ -f "$seed" ] || continue
+        case "${seed##*/}" in org.tvbox.*.json) continue;; esac
         [ -e "$O/${seed##*/}" ] && continue
         # Остановить только Obtainium перед первой записью, не трогать плееры.
         if [ "${OBTAINIUM_STOPPED:-0}" != 1 ]; then
