@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="panadonik-architecture" version="26.0.0" type="device" pages="3">
+<diagram id="72cf96f9-6392-4715-a85f-4021f8b4adff" name="1. Архитектура решения">
+<mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+<root>
+<mxCell id="0"/>
+<mxCell id="1" parent="0"/>
+<mxCell id="2" value="Panadonik — архитектура решения (H96 Max / RK3318·RK3328)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;convertToSvg=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="16" width="1200" height="32" as="geometry"/>
+</mxCell>
+<mxCell id="3" value="Аппаратная платформа" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="60" width="1520" height="160" as="geometry"/>
+</mxCell>
+<mxCell id="4" value="H96 Max&#xa;синяя ревизия&#xa;SoC Rockchip&#xa;A53 ×4 + Mali-450" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="3">
+  <mxGeometry x="20" y="40" width="200" height="100" as="geometry"/>
+</mxCell>
+<mxCell id="5" value="eMMC ~32 ГБ&#xa;ОЗУ ~4 ГиБ" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="3">
+  <mxGeometry x="240" y="40" width="150" height="100" as="geometry"/>
+</mxCell>
+<mxCell id="6" value="HDMI 1080p&#xa;VFD-дисплей" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="3">
+  <mxGeometry x="410" y="40" width="140" height="100" as="geometry"/>
+</mxCell>
+<mxCell id="7" value="USB-пульт&#xa;радиоадаптер&#xa;микрофон" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="3">
+  <mxGeometry x="570" y="40" width="160" height="100" as="geometry"/>
+</mxCell>
+<mxCell id="8" value="Wi‑Fi / BT&#xa;BCM4334 (SDIO+UART)&#xa;firmware из стоковой A9" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="3">
+  <mxGeometry x="750" y="40" width="220" height="100" as="geometry"/>
+</mxCell>
+<mxCell id="9" value="Сценарии подключения&#xa;• ТВ: HDMI + Wi‑Fi&#xa;• ПК: USB питание+ADB" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="3">
+  <mxGeometry x="990" y="40" width="230" height="100" as="geometry"/>
+</mxCell>
+<mxCell id="10" value="Маркетингово RK3318; живой A12 BSP: rk3328_box.&#xa;База: Android 12 userdebug, Linux 4.19.232." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontColor=#666666;convertToSvg=1;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="3">
+  <mxGeometry x="1240" y="45" width="260" height="80" as="geometry"/>
+</mxCell>
+<mxCell id="11" value="Разделы образа Android 12 (super / GPT)" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="240" width="760" height="260" as="geometry"/>
+</mxCell>
+<mxCell id="12" value="boot / recovery&#xa;uboot / trust / dtbo" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="11">
+  <mxGeometry x="20" y="40" width="220" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="13" value="system&#xa;framework, priv-app&#xa;tvboxd.jar, TorrServer" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="11">
+  <mxGeometry x="260" y="40" width="230" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="14" value="vendor&#xa;tvbox.rc + скрипты&#xa;overlay Wi‑Fi RRO" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="11">
+  <mxGeometry x="510" y="40" width="230" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="15" value="product&#xa;tvbox/apk (сторонние)&#xa;WebView LineageOS" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="11">
+  <mxGeometry x="20" y="130" width="250" height="90" as="geometry"/>
+</mxCell>
+<mxCell id="16" value="Сборка: удаление GMS/телеметрии&#xa;OEM OTA / datadis / DRM-UDP&#xa;+ подпись tvbox / ota-ключами" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="11">
+  <mxGeometry x="290" y="130" width="280" height="90" as="geometry"/>
+</mxCell>
+<mxCell id="17" value="Ключи secrets/&#xa;(не в публичном Git)&#xa;APK + OTA" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="11">
+  <mxGeometry x="590" y="130" width="150" height="90" as="geometry"/>
+</mxCell>
+<mxCell id="18" value="Службы и рантайм на приставке" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="820" y="240" width="740" height="260" as="geometry"/>
+</mxCell>
+<mxCell id="19" value="tvbox-firstboot.sh&#xa;плитки лаунчера, APK" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="18">
+  <mxGeometry x="20" y="40" width="210" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="20" value="tvboxd&#xa;root helper&#xa;OTA / eMMC / FS" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="18">
+  <mxGeometry x="250" y="40" width="180" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="21" value="TorrServer :8090&#xa;/system/bin/torrserver" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="18">
+  <mxGeometry x="450" y="40" width="210" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="22" value="bootscreen / bootlog&#xa;сводка загрузки" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="18">
+  <mxGeometry x="20" y="130" width="210" height="90" as="geometry"/>
+</mxCell>
+<mxCell id="23" value="Обновление&#xa;org.tvbox.installer&#xa;→ GitHub Releases" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="18">
+  <mxGeometry x="250" y="130" width="210" height="90" as="geometry"/>
+</mxCell>
+<mxCell id="24" value="Obtainium&#xa;обновления&#xa;сторонних APK" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="18">
+  <mxGeometry x="480" y="130" width="180" height="90" as="geometry"/>
+</mxCell>
+<mxCell id="25" value="Домашний экран (TV Launcher) и приложения" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="520" width="1000" height="230" as="geometry"/>
+</mxCell>
+<mxCell id="26" value="ТВ-каналы&#xa;org.tvbox.iptv" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="25">
+  <mxGeometry x="20" y="45" width="130" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="27" value="TorrServe" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="25">
+  <mxGeometry x="165" y="45" width="110" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="28" value="Файлы&#xa;FileExploresky" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="25">
+  <mxGeometry x="290" y="45" width="130" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="29" value="Ссылки&#xa;QR → TorrServer" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="25">
+  <mxGeometry x="435" y="45" width="140" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="30" value="Обновление" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="25">
+  <mxGeometry x="590" y="45" width="110" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="31" value="Настройки" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="25">
+  <mxGeometry x="715" y="45" width="110" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="32" value="Производительность" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="25">
+  <mxGeometry x="840" y="45" width="140" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="33" value="Антивирус + Hypatia" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="25">
+  <mxGeometry x="20" y="135" width="170" height="60" as="geometry"/>
+</mxCell>
+<mxCell id="34" value="Питание" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="25">
+  <mxGeometry x="210" y="135" width="110" height="60" as="geometry"/>
+</mxCell>
+<mxCell id="35" value="VLC (зависимость IPTV/торрент, без плитки)" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="25">
+  <mxGeometry x="340" y="135" width="300" height="60" as="geometry"/>
+</mxCell>
+<mxCell id="36" value="Порядок плиток задаёт firstboot; пользователь может менять." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontColor=#666666;convertToSvg=1;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="25">
+  <mxGeometry x="660" y="145" width="310" height="45" as="geometry"/>
+</mxCell>
+<mxCell id="37" value="Внешние источники и потребители" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="1060" y="520" width="500" height="230" as="geometry"/>
+</mxCell>
+<mxCell id="38" value="GitHub Releases&#xa;OTA + clean-install + APK" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="37">
+  <mxGeometry x="20" y="40" width="220" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="39" value="IPTV-источники&#xa;≥1080p, русские категории" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="37">
+  <mxGeometry x="260" y="40" width="210" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="40" value="Телефон&#xa;QR «Ссылки»&#xa;→ TorrServer → VLC на ТВ" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="37">
+  <mxGeometry x="20" y="130" width="220" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="41" value="F-Droid / GitHub&#xa;сторонние APK" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="37">
+  <mxGeometry x="260" y="130" width="210" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="42" value="Документация: README.md · COMPONENTS.md · docs/install-from-stock.md · AGENTS.md" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontColor=#666666;convertToSvg=1;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="40" y="770" width="1000" height="28" as="geometry"/>
+</mxCell>
+</root>
+</mxGraphModel>
+</diagram>
+<diagram id="be85d0c4-2979-471b-8f12-91746accfc08" name="2. Подготовка образа">
+<mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+<root>
+<mxCell id="0"/>
+<mxCell id="1" parent="0"/>
+<mxCell id="2" value="Подготовка образа eMMC и артефактов релиза" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;convertToSvg=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="16" width="1100" height="32" as="geometry"/>
+</mxCell>
+<mxCell id="3" value="Единая команда: tools/build-release.sh  ·  версия = ro.tvbox.release в build-sd.sh" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontColor=#666666;convertToSvg=1;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="40" y="52" width="1000" height="24" as="geometry"/>
+</mxCell>
+<mxCell id="4" value="Входы (секреты и сырой сток не публикуются)" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="90" width="1520" height="130" as="geometry"/>
+</mxCell>
+<mxCell id="5" value="База A12&#xa;dl/a12 (Git LFS)&#xa;или update.img" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="4">
+  <mxGeometry x="20" y="40" width="200" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="6" value="A9 Wi‑Fi/BT&#xa;firmware BCM4334" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="4">
+  <mxGeometry x="240" y="40" width="170" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="7" value="secrets/&#xa;tvbox + ota&#xa;key/cert" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="4">
+  <mxGeometry x="430" y="40" width="150" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="8" value="apps/*/&#xa;исходники Panadonik" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="4">
+  <mxGeometry x="600" y="40" width="180" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="9" value="Сторонние APK&#xa;third-party-apps.json" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="4">
+  <mxGeometry x="800" y="40" width="200" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="10" value="release/notes/ВЕР.txt&#xa;changelog" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="4">
+  <mxGeometry x="1020" y="40" width="190" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="11" value="IPTV sources&#xa;iptv-merge + verify" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="4">
+  <mxGeometry x="1230" y="40" width="180" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="12" value="1. prepare-build-inputs&#xa;extract / LFS check" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="40" y="250" width="200" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="13" value="2. setup-sdk&#xa;JDK21 + android-23" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="270" y="250" width="180" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="14" value="3. apps/*/build.sh&#xa;APK + tvboxd.jar&#xa;подпись tvbox-key" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="480" y="250" width="210" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="15" value="4. ota/tvbox-flash&#xa;static aarch64" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="720" y="250" width="170" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="16" value="5. MEDIA=emmc&#xa;./build-sd.sh&#xa;super + regions" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="920" y="250" width="200" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="17" value="6. release-ota&#xa;+ clean-install.zip&#xa;подпись ota-key" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="1150" y="250" width="230" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="12" target="13">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="13" target="14">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="14" target="15">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="15" target="16">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="16" target="17">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="23" value="Что делает build-sd.sh (eMMC)" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="350" width="900" height="210" as="geometry"/>
+</mxCell>
+<mxCell id="24" value="Правки boot/recovery&#xa;cmdline, fstab, dtbo" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="23">
+  <mxGeometry x="20" y="40" width="200" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="25" value="Удаление OEM-мусора&#xa;GMS, datadis, stress…" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="23">
+  <mxGeometry x="240" y="40" width="200" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="26" value="Установка своих APK&#xa;overlay vendor/system" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="23">
+  <mxGeometry x="460" y="40" width="200" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="27" value="Wi‑Fi без credentials&#xa;RRO WPA2, pmf=0" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="23">
+  <mxGeometry x="680" y="40" width="190" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="28" value="Сборка super / GPT&#xa;manifest + MD5 регионов" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="23">
+  <mxGeometry x="20" y="130" width="250" height="55" as="geometry"/>
+</mxCell>
+<mxCell id="29" value="bootanimation + IPTV m3u" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="23">
+  <mxGeometry x="290" y="130" width="220" height="55" as="geometry"/>
+</mxCell>
+<mxCell id="30" value="SSID/ключи Wi‑Fi в публичный образ не вшиваются." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontColor=#666666;convertToSvg=1;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="23">
+  <mxGeometry x="530" y="140" width="340" height="40" as="geometry"/>
+</mxCell>
+<mxCell id="31" value="Выходы и проверки кандидата" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="960" y="350" width="600" height="210" as="geometry"/>
+</mxCell>
+<mxCell id="32" value="release/ВЕР/emmc/&#xa;regions + SHA256SUMS" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="31">
+  <mxGeometry x="20" y="40" width="220" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="33" value="tvbox-update-ВЕР-emmc.zip&#xa;подписанный OTA" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="31">
+  <mxGeometry x="260" y="40" width="220" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="34" value="Panadonik-ВЕР-&#xa;emmc-clean-install.zip" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="31">
+  <mxGeometry x="20" y="125" width="240" height="55" as="geometry"/>
+</mxCell>
+<mxCell id="35" value="Obtainium APK ×7" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="31">
+  <mxGeometry x="280" y="125" width="160" height="55" as="geometry"/>
+</mxCell>
+<mxCell id="36" value="CI и продвижение (GitHub Actions)" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="590" width="1520" height="200" as="geometry"/>
+</mxCell>
+<mxCell id="37" value="candidate/* / schedule&#xa;артефакт 3 дня&#xa;не Release" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="36">
+  <mxGeometry x="20" y="45" width="200" height="90" as="geometry"/>
+</mxCell>
+<mxCell id="38" value="Автотесты + IPTV&#xa;+ wifi-secrets scan&#xa;+ подпись OTA" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="36">
+  <mxGeometry x="240" y="45" width="210" height="90" as="geometry"/>
+</mxCell>
+<mxCell id="39" value="Аппаратная приёмка&#xa;docs/release-qa/ВЕР&#xa;на живой приставке" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="36">
+  <mxGeometry x="470" y="45" width="220" height="90" as="geometry"/>
+</mxCell>
+<mxCell id="40" value="Подтверждение&#xa;пользователя?" style="rhombus;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="36">
+  <mxGeometry x="720" y="40" width="150" height="100" as="geometry"/>
+</mxCell>
+<mxCell id="41" value="Тег dev-vВЕР&#xa;→ prerelease" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="36">
+  <mxGeometry x="900" y="50" width="180" height="80" as="geometry"/>
+</mxCell>
+<mxCell id="42" value="Тег vВЕР&#xa;→ stable Release&#xa;security_review=pass" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="36">
+  <mxGeometry x="1110" y="50" width="240" height="80" as="geometry"/>
+</mxCell>
+<mxCell id="43" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="37" target="38">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="44" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="38" target="39">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="45" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="39" target="40">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="46" value="dev" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="40" target="41">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="47" value="stable" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="40" target="42">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="48" value="Публикационный тег не отправлять до явного подтверждения. Ночной кандидат ≠ выпуск." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontColor=#666666;convertToSvg=1;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="40" y="820" width="1000" height="28" as="geometry"/>
+</mxCell>
+</root>
+</mxGraphModel>
+</diagram>
+<diagram id="8718e668-2a4d-44fe-89f0-cf240c7858d5" name="3. Загрузка и обновление">
+<mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+<root>
+<mxCell id="0"/>
+<mxCell id="1" parent="0"/>
+<mxCell id="2" value="Загрузка приставки: чистая установка и OTA" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;convertToSvg=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="16" width="1100" height="32" as="geometry"/>
+</mxCell>
+<mxCell id="3" value="Путь A — чистая установка со стока / с нуля" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="40" y="60" width="720" height="40" as="geometry"/>
+</mxCell>
+<mxCell id="4" value="Путь B — обновление уже установленной Panadonik" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="800" y="60" width="720" height="40" as="geometry"/>
+</mxCell>
+<mxCell id="5" value="Скачать clean-install.zip&#xa;+ .sha256 + .sig + ota-cert" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="120" width="260" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="6" value="Проверить SHA-256&#xa;и openssl dgst -verify" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="330" y="120" width="220" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="7" value="Выключить приставку&#xa;USB-A↔A → OTG&#xa;режим Rockchip Loader" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="580" y="120" width="240" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="8" value="sudo python3 -I tools/rkusb.py&#xa;flash release/ВЕР/emmc" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="850" y="120" width="270" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="9" value="Перезапуск →&#xa;первая загрузка A12" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="1150" y="120" width="180" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="5" target="6">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="6" target="7">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="7" target="8">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="8" target="9">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="14" value="Loader USB 2207:320c. Обратная побайтная сверка выше 32 МиБ в Loader ненадёжна — сохранять лог записи." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontColor=#666666;convertToSvg=1;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="40" y="205" width="1000" height="28" as="geometry"/>
+</mxCell>
+<mxCell id="15" value="GitHub Release&#xa;tvbox-update-ВЕР-emmc.zip" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="1">
+  <mxGeometry x="800" y="250" width="240" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="16" value="Плитка «Обновление»&#xa;org.tvbox.installer&#xa;или recovery SD/USB" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="1080" y="250" width="240" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="17" value="Проверка подписи&#xa;прежним ota-ключом&#xa;(otacerts.zip)" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="800" y="350" width="240" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="18" value="По умолчанию: очистка userdata&#xa;два шага подтверждения в UI" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="1080" y="350" width="240" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="15" target="16">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="16" target="17">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeColor=#666666;" edge="1" parent="1" source="17" target="18">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+<mxCell id="22" value="После записи / OTA: первая загрузка" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="250" width="720" height="230" as="geometry"/>
+</mxCell>
+<mxCell id="23" value="Холодный старт&#xa;до рабочего стола" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="22">
+  <mxGeometry x="20" y="40" width="180" height="60" as="geometry"/>
+</mxCell>
+<mxCell id="24" value="tvbox-firstboot&#xa;APK + плитки лаунчера" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="22">
+  <mxGeometry x="220" y="40" width="210" height="60" as="geometry"/>
+</mxCell>
+<mxCell id="25" value="torrserver :8090&#xa;tvboxd" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="22">
+  <mxGeometry x="450" y="40" width="160" height="60" as="geometry"/>
+</mxCell>
+<mxCell id="26" value="Управление с USB-пульта&#xa;= критерий готовности" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="22">
+  <mxGeometry x="20" y="120" width="240" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="27" value="Wi‑Fi: страна эксплуатации&#xa;без вшитых SSID/ключей" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="22">
+  <mxGeometry x="280" y="120" width="240" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="28" value="Obtainium уже настроен&#xa;на сторонние APK" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Helvetica;fontSize=12;dashed=1;" vertex="1" parent="22">
+  <mxGeometry x="540" y="120" width="160" height="70" as="geometry"/>
+</mxCell>
+<mxCell id="29" value="Два обязательных сценария приёмки" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="510" width="1520" height="200" as="geometry"/>
+</mxCell>
+<mxCell id="30" value="У телевизора&#xa;• HDMI + только Wi‑Fi&#xa;• автоподключение после OTA&#xa;• пульт + Bluetooth отдельно" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="29">
+  <mxGeometry x="20" y="40" width="360" height="130" as="geometry"/>
+</mxCell>
+<mxCell id="31" value="У компьютера (без экрана)&#xa;• один USB: питание + данные&#xa;• ADB без диалога на экране&#xa;• сохранить adbkey хоста" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="29">
+  <mxGeometry x="410" y="40" width="380" height="130" as="geometry"/>
+</mxCell>
+<mxCell id="32" value="Sanity после установки&#xa;IPTV ≥1080 · торрент QR&#xa;PAGE ± канал · без swap/zRAM&#xa;сетевой аудит (очищенный)" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="29">
+  <mxGeometry x="820" y="40" width="320" height="130" as="geometry"/>
+</mxCell>
+<mxCell id="33" value="Блокеры выпуска&#xa;секреты в образе&#xa;нет согласия на wipe&#xa;нет аппаратного gate" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="29">
+  <mxGeometry x="1170" y="40" width="300" height="130" as="geometry"/>
+</mxCell>
+<mxCell id="34" value="Инструкция: docs/install-from-stock.md · OTA: apps/installer + recovery · Gate: docs/release-quality-gate.md" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontColor=#666666;convertToSvg=1;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+  <mxGeometry x="40" y="730" width="1200" height="28" as="geometry"/>
+</mxCell>
+</root>
+</mxGraphModel>
+</diagram>
+</mxfile>
