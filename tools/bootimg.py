@@ -58,6 +58,39 @@ def calc_id(d):
     return h.digest().ljust(32, b"\0")
 
 
+def blank_boot_logos(resource):
+    """Black out Rockchip boot logos, preserving DTB, layout and BMP headers."""
+    if resource[:12] != b"RSCE\0\0\0\0\1\1\1\0":
+        raise ValueError("unsupported Rockchip resource header")
+    data = bytearray(resource)
+    count = struct.unpack_from("<I", data, 12)[0]
+    found = False
+    for i in range(count):
+        entry = 512 + i * 512
+        if data[entry:entry + 4] != b"ENTR":
+            raise ValueError("invalid Rockchip resource entry")
+        name = data[entry + 4:entry + 260].split(b"\0")[0]
+        if name not in (b"logo.bmp", b"logo_kernel.bmp"):
+            continue
+        block, size = struct.unpack_from("<II", data, entry + 260)
+        start = block * 512
+        bmp = data[start:start + size]
+        if len(bmp) != size or size < 54 or bmp[:2] != b"BM":
+            raise ValueError("invalid boot logo BMP")
+        pixels = struct.unpack_from("<I", bmp, 10)[0]
+        header, width, height, planes, bits, compression = struct.unpack_from("<IiiHHI", bmp, 14)
+        stride = ((width * bits + 31) // 32) * 4
+        end = pixels + stride * abs(height)
+        if (header != 40 or planes != 1 or bits != 24 or compression != 0
+                or width <= 0 or height == 0 or pixels < 54 or end > size):
+            raise ValueError("unsupported boot logo BMP format")
+        data[start + pixels:start + end] = b"\0" * (end - pixels)
+        found = True
+    if not found:
+        raise ValueError("Rockchip boot logo missing")
+    return bytes(data)
+
+
 def save(d, path):
     ks, ka, rs, ra, ss, sa, ta, ps, hv, osv = d["f"]
     ks, rs, ss = len(d["kernel"]), len(d["ramdisk"]), len(d["second"])
@@ -150,6 +183,10 @@ def main():
             cmd = cmd.replace(old, new)
         elif opt == "--cmd-append":
             cmd = cmd + " " + val
+        elif opt == "--boot-logo":
+            if val != "black":
+                raise ValueError("only black boot logo is supported")
+            d["second"] = blank_boot_logos(d["second"])
         elif opt == "--rd-put":
             p, f = val.split("=", 1); puts[p] = f
         elif opt == "--rd-add":
