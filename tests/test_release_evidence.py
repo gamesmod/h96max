@@ -229,6 +229,8 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.assertIn("branches: [master]", workflow)
         self.assertIn("python3 -m unittest discover -s tests -v", workflow)
         self.assertIn("--fail-on-errors", workflow)
+        # prebuilt/stock-filemanager/FileExploresky.apk хранится в Git LFS
+        self.assertRegex(workflow, r"actions/checkout@v4[\s\S]*?\blfs:\s*true\b")
 
 
 if __name__ == "__main__":
