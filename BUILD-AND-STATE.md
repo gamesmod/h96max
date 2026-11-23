@@ -32,3 +32,7 @@
 - Wi‑Fi: страна US (cmdline), WPA3‑апгрейд выключен (RRO), pmf=0/oce=0, сеть пользователя не вшивается в образ.
 - SELinux: Permissive (вендорский userdebug).
 - Живые отличия от build-sd.sh: ro.product.model на живой ещё H96_Max_V12 (в сборке panadonik); bootlog/allsettings стоят как user-приложения (в сборке /system/app).
+
+## Секреты GitHub Actions
+
+`tools/setup-release-secrets.sh` настраивает git/gh и шесть секретов `release.yml` из прежних ключей `secrets/` и приватного архива входов; формат секретов, требования к адресу архива и примеры — в README, раздел «Публикация релиза через GitHub Actions».

@@ -40,6 +40,29 @@ Workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) зап
 
 В Settings → Secrets and variables → Actions задаются секреты `RELEASE_INPUTS_ARCHIVE_URL`, `RELEASE_INPUTS_SHA256`, `TVBOX_SIGNING_KEY`, `TVBOX_SIGNING_CERT`, `OTA_SIGNING_KEY`, `OTA_SIGNING_CERT`. Приватный `.tar.zst` содержит A12 base и необходимые бинарные зависимости; точный состав перечислен в `tools/package-ci-inputs.sh`, архив готовится этой командой, а URL и SHA-256 задаются в Secrets. Используются прежние ключи проекта. Wi-Fi credentials не нужны: `build-sd.sh` удаляет `vendor/etc/tvbox/wifi.env` из базового образа. После сборки CI читает ext4-разделы system/vendor и блокирует выпуск при найденном Wi-Fi-профиле или сохранённых SSID/ключе в конфигурации.
 
+Секреты и git/gh настраивает `bash tools/setup-release-secrets.sh` (Linux, macOS; в Windows — WSL или Git Bash с установленными `gh` и `openssl`). Скрипт запускается в клоне репозитория на компьютере, где лежат прежние ключи `secrets/` и приватный архив входов. Он проверяет `git`, `gh`, `openssl`, `curl`, `sha256sum`/`shasum`; при необходимости записывает `user.name`/`user.email`, настраивает `origin`, выполняет `gh auth login` (права `repo`, `workflow`) и `gh auth setup-git`, проверяет права администратора репозитория. Новые ключи не создаются: сертификаты сверяются с отпечатками из `COMPONENTS.md`, ключ — с сертификатом, ключ с паролем отклоняется. Значения передаются в `gh secret set` только через stdin и не печатаются.
+
+| Секрет | Формат |
+|---|---|
+| `TVBOX_SIGNING_KEY`, `OTA_SIGNING_KEY` | полный текст `secrets/tvbox-key.pem` и `secrets/ota-key.pem` (PEM закрытого ключа без пароля) |
+| `TVBOX_SIGNING_CERT`, `OTA_SIGNING_CERT` | полный текст `secrets/tvbox-cert.pem` и `secrets/ota-cert.pem` (PEM X.509) |
+| `RELEASE_INPUTS_ARCHIVE_URL` | HTTPS-адрес архива `.tar.zst` из `tools/package-ci-inputs.sh`; CI скачивает его `curl -L` без авторизации |
+| `RELEASE_INPUTS_SHA256` | SHA-256 архива, 64 hex-символа |
+
+Архив не публикуется: нужен приватный адрес прямого скачивания (подписанная ссылка S3/R2/B2/Object Storage или собственный HTTPS-сервер с неугадываемым путём). Release-ассеты публичного репозитория и черновики GitHub Release не подходят: первые публичны, вторые без токена не скачиваются. У подписанной ссылки ограничен срок; после истечения запустите скрипт снова с новым адресом.
+
+```sh
+# проверка без изменений
+bash tools/setup-release-secrets.sh --dry-run --archive /ПРИВАТНЫЙ_ПУТЬ/inputs.tar.zst
+# настройка git/gh и всех шести секретов; адрес вводится скрыто по запросу или из переменной окружения
+bash tools/setup-release-secrets.sh --git-name "Имя" --git-email you@example.com \
+    --archive /ПРИВАТНЫЙ_ПУТЬ/inputs.tar.zst --verify-url
+# создать архив, задать секреты и перезапустить неуспешную сборку candidate/<версия>
+bash tools/setup-release-secrets.sh --package-archive /ПРИВАТНЫЙ_ПУТЬ/inputs.tar.zst --verify-url --rerun
+```
+
+`--keys-only` задаёт только четыре секрета ключей, `--dispatch REF` запускает `release.yml` вручную на ветке. Теги скрипт не создаёт.
+
 Стандартный runner `ubuntu-24.04` может не иметь достаточного свободного диска для Android base и промежуточных образов. Workflow останавливается при запасе меньше 18 GB. Если это происходит, подключите GitHub-hosted larger runner с достаточным диском и задайте в Actions → Variables переменную `RELEASE_RUNNER` равной его метке. Параметры larger runner и стоимость задаются в GitHub организации/аккаунте; сам workflow не создаёт платные ресурсы.
 
 В Release прикладываются подписанный `tvbox-update-<версия>-emmc.zip`, `latest-emmc.txt`, `SHA256SUMS`, семь APK Panadonik, полный архив чистой установки `Panadonik-<версия>-emmc-clean-install.zip` с отдельным `.sha256`, а также отчёты автоматических тестов, анализа журналов и аппаратной приёмки. Установка со стока описана в [`docs/install-from-stock.md`](docs/install-from-stock.md). Версия APK берётся из `ro.tvbox.release`; Android `versionCode` растёт вместе с версией, чтобы Obtainium распознавал обновления. Новая версия tvboxd получает метаданные и OTA по HTTPS из GitHub Releases. Workflow запускает регрессионные и security-проверки и блокирует публикацию при критических ошибках. Отдельно требуется протокол проверки самой приставки: холодная загрузка до управляемого рабочего стола, журналы, QR, сеть, IPTV/торрент и графическая нагрузка. Эти проверки GitHub runner выполнить не может; выпуск допускается только после заполнения и прохождения аппаратного gate. Полный перечень находится в [`docs/release-quality-gate.md`](docs/release-quality-gate.md).
