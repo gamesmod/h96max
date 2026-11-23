@@ -57,5 +57,31 @@
   "security_analysis": {
     "reviewed": true,
     "summary": "0.4.10: ro.adb.secure=1, ADB TCP включён, ro.debuggable=1, SELinux Permissive. Wi‑Fi credentials не в образе; handoff после wipe сработал. Плейлист проходит публичный IPTV-gate. Полный разбор трафика и ряд аппаратных сценариев не закрыты; для stable security_review=fail."
+  },
+  "master_sync_2026_11_23": {
+    "checked_at_utc": "2026-11-23T15:50:33.419791+00:00",
+    "source_head_before_sync": "0afeb5fc49223e7f9b85de387f97b00443ac1a60",
+    "upstream_at_fetch": "c141a99ebe1463da1f1b5e7222b31609308b0de5",
+    "preserved_local_history_tip": "19ab6afa510f4c355dd3e385524d555e56ccb6f0",
+    "task_branch": "task/master-sync-20261123",
+    "integration": "merge with current AGENTS.md retained; no source-code changes versus source_head_before_sync",
+    "automated_tests": {
+      "status": "pass",
+      "count": 157,
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -v",
+      "scope": "current source tree; not new firmware acceptance"
+    },
+    "checks": {
+      "bash_syntax": "pass",
+      "obtainium_json": "pass",
+      "git_diff_check": "pass"
+    },
+    "device_readonly_probe": {
+      "adb_online_count": 0,
+      "scope": "read-only state, no installation or reboot"
+    },
+    "new_firmware_built": false,
+    "new_firmware_installed": false,
+    "tag_or_release_created_by_task": false
   }
 }
