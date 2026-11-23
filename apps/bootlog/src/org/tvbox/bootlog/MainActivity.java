@@ -1,16 +1,19 @@
 package org.tvbox.bootlog;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -42,15 +45,27 @@ public class MainActivity extends Activity {
         "Process crashed", "died; restarting", "tombstone"
     };
 
+    static final String[][] STAGES = {
+        {"x:kernel", "🐧 Ядро Linux"},
+        {"p:ro.boottime.init", "⚙️ init: разделы, SELinux"},
+        {"p:ro.boottime.vold", "💾 Хранилище (vold)"},
+        {"p:ro.boottime.surfaceflinger", "🖼  Графика (SurfaceFlinger)"},
+        {"p:ro.boottime.zygote", "☕ Zygote: среда Java"},
+        {"e:boot_progress_preload_end", "📚 Классы предзагружены"},
+        {"e:boot_progress_system_run", "🧠 Системный сервер"},
+        {"e:boot_progress_pms_ready", "📦 Приложения проверены"},
+        {"e:boot_progress_ams_ready", "🚀 Службы готовы"},
+        {"e:boot_progress_enable_screen", "🖥  Включение экрана"},
+        {"x:wifi", "📶 Wi‑Fi подключён"},
+        {"x:done", "✅ Загрузка завершена"},
+    };
+
     static boolean benign(String s) {
         for (String b : BENIGN) if (s.contains(b)) return true;
         return s.trim().isEmpty();
     }
 
-    /** level: 0-3 error, 4 warn, else info. dmesg -r lines start with <N>; logcat-errors are all errors. */
     static int level(String line, boolean logcat) {
-        // logcat-errors.txt holds every E line; most are vendor HAL chatter on a working box. An error here is a
-        // real failure (crash, ANR, dead service, unlinkable binary); other E lines count as "notice" (5).
         if (logcat) {
             if (line.contains(" F ")) return 2;
             for (String c : CRITICAL) if (line.contains(c)) return 3;
@@ -69,6 +84,13 @@ public class MainActivity extends Activity {
             out.add("<3>не удалось прочитать " + path + ": " + e.getMessage());
         }
         return out;
+    }
+
+    static String prop(String k) {
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            return (String) c.getMethod("get", String.class).invoke(null, k);
+        } catch (Throwable t) { return ""; }
     }
 
     SpannableStringBuilder sb = new SpannableStringBuilder();
@@ -113,6 +135,61 @@ public class MainActivity extends Activity {
         add("", Color.WHITE, false);
     }
 
+    String memorySummary() {
+        try (BufferedReader r = new BufferedReader(new FileReader("/proc/meminfo"))) {
+            long total = 0, free = 0, avail = 0;
+            String l;
+            while ((l = r.readLine()) != null) {
+                if (l.startsWith("MemTotal:")) total = Long.parseLong(l.replaceAll("[^0-9]", ""));
+                else if (l.startsWith("MemFree:")) free = Long.parseLong(l.replaceAll("[^0-9]", ""));
+                else if (l.startsWith("MemAvailable:")) avail = Long.parseLong(l.replaceAll("[^0-9]", ""));
+            }
+            long used = total - (avail > 0 ? avail : free);
+            return String.format("ОЗУ: %d / %d МБ занято", used / 1024, total / 1024);
+        } catch (Exception e) { return "ОЗУ: нет данных"; }
+    }
+
+    String temperature() {
+        String[] paths = {"/sys/class/thermal/thermal_zone0/temp", "/sys/class/thermal/thermal_zone1/temp"};
+        for (String p : paths) {
+            try (BufferedReader r = new BufferedReader(new FileReader(p))) {
+                String v = r.readLine();
+                if (v == null) continue;
+                long t = Long.parseLong(v.trim());
+                if (t > 1000) t /= 1000;
+                return String.format("Температура: %d,0 °C", t);
+            } catch (Exception e) { }
+        }
+        return "Температура: нет данных";
+    }
+
+    void buildDevicePanel(TextView panel) {
+        StringBuilder p = new StringBuilder();
+        String rel = prop("ro.tvbox.release");
+        if (rel.isEmpty()) rel = "?";
+        String media = prop("ro.boot.boot_devices").contains("ff500000") ? "с карты SD" : "с внутренней памяти";
+        p.append("panadonik · Android 12 · выпуск ").append(rel).append(" · ").append(media).append("\n\n");
+        p.append("УСТРОЙСТВО И РЕСУРСЫ\n");
+        p.append("CPU: Rockchip RK3318 · 4 × Cortex-A53\n");
+        p.append("GPU: Mali-450 MP\n");
+        p.append("Вывод: 1920 × 1080\n");
+        p.append(memorySummary()).append('\n');
+        p.append(temperature()).append("\n\n");
+        p.append("Этапы загрузки\n");
+        List<String> summary = read(DIR + "startup-summary.txt");
+        boolean hasStages = false;
+        for (String line : summary) {
+            if (line.contains("ЭТАПЫ") || line.matches(".*[0-9]+\\.[0-9]+.*с.*")) {
+                hasStages = true;
+                p.append(line).append('\n');
+            }
+        }
+        if (!hasStages) {
+            for (String[] s : STAGES) p.append("▫️ ").append(s[1]).append('\n');
+        }
+        panel.setText(p.toString());
+    }
+
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -120,38 +197,50 @@ public class MainActivity extends Activity {
             showStartupSummary();
             return;
         }
+
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.HORIZONTAL);
+        root.setBackgroundColor(0xFF0D1117);
+        root.setPadding(24, 16, 24, 16);
+
+        // Left: recent logs
+        ScrollView logScroll = new ScrollView(this);
+        TextView logView = new TextView(this);
+        logView.setTypeface(Typeface.MONOSPACE);
+        logView.setTextSize(13);
+        logView.setTextColor(0xFFB0BEC5);
+        logView.setPadding(12, 8, 12, 8);
+
         List<String> dmesg = read(DIR + "dmesg.txt");
         List<String> logcat = read(DIR + "logcat-errors.txt");
-        List<String> upd = read(DIR + "updated.txt");
-        add("Журнал загрузки — panadonik", Color.WHITE, true);
-        add("Снят: " + (upd.isEmpty() ? "?" : upd.get(0)) + "   (▲▼ — прокрутка, Назад — выход)", 0xFF90A4AE, false);
-        add("", Color.WHITE, false);
-        List<String> summary = read(DIR + "startup-summary.txt");
-        add("━━ Сводка устройства и ресурсов ━━", 0xFF4FC3F7, true);
-        for (String line : summary) {
-            int color = line.contains("ПРОЦЕССОР") || line.contains("ГРАФИКА") || line.contains("ПАМЯТЬ")
-                    ? 0xFF81C784 : 0xFFCFD8DC;
-            add(line, color, line.startsWith("Снимок:") || line.contains("ЭТАПЫ ЗАПУСКА"));
+        int from = Math.max(0, dmesg.size() - 80);
+        StringBuilder logs = new StringBuilder();
+        for (int i = from; i < dmesg.size(); i++) {
+            String l = dmesg.get(i);
+            if (l.length() > 140) l = l.substring(0, 137) + "…";
+            logs.append(l).append('\n');
         }
-        add("", Color.WHITE, false);
-        section("Ядро и init (dmesg)", dmesg, false);
-        section("Android (logcat, уровень E)", logcat, true);
-        int from = Math.max(0, dmesg.size() - 400);
-        add("━━ Журнал ядра: последние " + (dmesg.size() - from) + " строк из " + dmesg.size() + " ━━", 0xFF4FC3F7, true);
-        for (int i = from; i < dmesg.size(); i++) { String l = dmesg.get(i); add(l, colorFor(level(l, false)), false); }
+        logView.setText(logs.toString());
+        logScroll.addView(logView);
+        LinearLayout.LayoutParams lpLog = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 2.2f);
+        root.addView(logScroll, lpLog);
 
-        TextView tv = new TextView(this);
-        tv.setText(sb);
-        tv.setTextSize(15);
-        tv.setTypeface(Typeface.MONOSPACE);
-        tv.setPadding(48, 32, 48, 32);
-        tv.setTextColor(Color.WHITE);
-        final ScrollView sv = new ScrollView(this);
-        sv.setBackgroundColor(0xFF0D1117);
-        sv.setFocusable(true);
-        sv.addView(tv);
-        setContentView(sv);
-        sv.requestFocus();
+        // Right: device + stages
+        ScrollView panelScroll = new ScrollView(this);
+        TextView panel = new TextView(this);
+        panel.setTypeface(Typeface.MONOSPACE);
+        panel.setTextSize(14);
+        panel.setTextColor(0xFFE0E0E0);
+        panel.setPadding(20, 12, 12, 12);
+        panel.setBackgroundColor(0xFF1A2332);
+        buildDevicePanel(panel);
+        panelScroll.addView(panel);
+        LinearLayout.LayoutParams lpPanel = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+        lpPanel.leftMargin = 16;
+        root.addView(panelScroll, lpPanel);
+
+        setContentView(root);
+        logScroll.requestFocus();
     }
 
     /** Short, non-animated startup report; the full diagnostic journal remains available from its tile. */
@@ -202,7 +291,6 @@ public class MainActivity extends Activity {
             openHome();
             return true;
         }
-        ScrollView sv = (ScrollView) findViewById(android.R.id.content).getRootView().findViewById(android.R.id.content);
         return super.onKeyDown(code, e);
     }
 }
