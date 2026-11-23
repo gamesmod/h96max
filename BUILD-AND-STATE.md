@@ -33,4 +33,4 @@
 
 ## Секреты GitHub Actions
 
-`tools/setup-release-secrets.sh` настраивает git/gh и четыре секрета подписи `release.yml` (`TVBOX_*`, `OTA_*`) из прежних ключей `secrets/`. Стоковые входы — Git LFS приватного репозитория; приватный архив и секреты `RELEASE_INPUTS_*` больше не используются. Формат секретов и примеры — в README, раздел «Публикация релиза через GitHub Actions».
+`tools/setup-release-secrets.sh` настраивает git/gh и четыре секрета подписи `release.yml` (`TVBOX_*`, `OTA_*`) из прежних ключей `secrets/`. Стоковые входы — в публичном Git LFS; приватный архив и секреты `RELEASE_INPUTS_*` больше не используются. Формат секретов и примеры — в README, раздел «Публикация релиза через GitHub Actions».
