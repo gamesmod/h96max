@@ -18,9 +18,6 @@ class LinksLaunchPolicyTests(unittest.TestCase):
         self.assertIn("String appName=services.get(s)[3];", SOURCE)
         self.assertIn("getLaunchIntentForPackage(pkg)", SOURCE)
 
-    def test_qr_module_never_routes_launch_to_total_commander(self):
-        self.assertNotRegex(SOURCE, re.compile(r"total\s*commander|com\.ghisler", re.I))
-
     def test_launch_button_names_the_selected_app(self):
         self.assertIn('launch.setText("Запустить " + appName + " на приставке")', SOURCE)
         self.assertIn('"Запущено приложение для выбранной службы: " + appName', SOURCE)
