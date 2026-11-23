@@ -65,6 +65,9 @@ media/
 *.pyc
 __pycache__/
 
+# Локальные артефакты проверки среды на W:
+.dev-env/
+
 # Стоковые LFS-входы (после общих шаблонов)
 !/dl/a12/MiniLoaderAll.bin
 !/dl/a12/Image/boot.img
