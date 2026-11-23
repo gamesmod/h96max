@@ -331,6 +331,53 @@ class PublicReleaseSecurityTests(unittest.TestCase):
             self.assertEqual(MERGE.parse(output.read_text(encoding="utf-8"))[0]["url"],
                              "https://example.invalid/safe")
 
+    def test_iptv_org_meta_fills_only_missing_logo_and_group(self):
+        meta = ({("Perviy.ru", "HD"): "https://example.invalid/hd.png", ("Perviy.ru", ""): "https://example.invalid/sd.png",
+                 ("Sport.ru", ""): "https://example.invalid/sport.png"},
+                {"Perviy.ru": "general", "Sport.ru": "sports"})
+        text = ('#EXTM3U\n'
+                '#EXTINF:-1 tvg-id="Perviy.ru@HD",Первый (1080p)\nhttps://example.invalid/1\n'
+                '#EXTINF:-1 tvg-id="Perviy.ru@SD",Первый (576p)\nhttps://example.invalid/2\n'
+                '#EXTINF:-1 tvg-id="Sport.ru" tvg-logo="https://example.invalid/own.png" group-title="Music",Спорт\n'
+                'https://example.invalid/3\n'
+                '#EXTINF:-1,Без идентификатора\nhttps://example.invalid/4\n')
+        hd, sd, own, bare = MERGE.parse(text, meta=meta)
+        self.assertEqual(hd["attrs"]["tvg-logo"], "https://example.invalid/hd.png")
+        self.assertEqual(sd["attrs"]["tvg-logo"], "https://example.invalid/sd.png")
+        self.assertEqual(hd["attrs"]["group-title"], "Общие")
+        self.assertEqual(own["attrs"]["tvg-logo"], "https://example.invalid/own.png")
+        self.assertEqual(own["attrs"]["group-title"], "Музыка")
+        self.assertNotIn("tvg-logo", bare["attrs"])
+        self.assertNotIn("tvg-logo", MERGE.parse(text)[0]["attrs"])
+
+    def test_iptv_org_meta_prefers_raster_logos_in_use(self):
+        logos = [
+            {"channel": "One.ru", "feed": None, "in_use": True, "format": "SVG", "width": 1000, "url": "https://example.invalid/a.svg"},
+            {"channel": "One.ru", "feed": None, "in_use": False, "format": "PNG", "width": 900, "url": "https://example.invalid/b.png"},
+            {"channel": "One.ru", "feed": None, "in_use": True, "format": "PNG", "width": 300, "url": "https://example.invalid/c.png"},
+            {"channel": "Two.ru", "feed": None, "in_use": True, "format": "PNG", "width": 300, "url": "http://example.invalid/insecure.png"},
+        ]
+        channels = [{"id": "One.ru", "categories": ["news"], "is_nsfw": False},
+                    {"id": "Night.ru", "categories": ["xxx"], "is_nsfw": True}]
+        replies = {MERGE.IPTV_ORG_API + "logos.json": json.dumps(logos).encode(),
+                   MERGE.IPTV_ORG_API + "channels.json": json.dumps(channels).encode()}
+        with mock.patch.object(MERGE, "_iptv_org_meta", None), \
+             mock.patch.object(MERGE, "fetch", side_effect=lambda url, **kw: (200, "", replies[url], url)):
+            logos_map, cats = MERGE.iptv_org_meta()
+        self.assertEqual(logos_map, {("One.ru", ""): "https://example.invalid/c.png"})
+        self.assertEqual(cats, {"One.ru": "news"})
+
+    def test_sources_use_iptv_org_meta_for_raw_stream_lists(self):
+        lines = [line.split() for line in (ROOT / "tools/iptv-sources.txt").read_text(encoding="utf-8").splitlines()
+                 if line.strip() and not line.startswith("#")]
+        raw = [fields for fields in lines if "iptv-org/iptv/master/streams/" in fields[0]]
+        self.assertTrue(raw)
+        for fields in raw:
+            self.assertIn("meta=iptv-org", fields[1:])
+        urls = [fields[0] for fields in lines]
+        self.assertEqual(len(urls), len(set(urls)), "источник указан дважды")
+        self.assertTrue(all(url.startswith("https://") for url in urls))
+
     def test_public_playlist_accepts_russian_unique_full_hd_channels(self):
         entries = [
             {"name": "Adult One (1080p)", "url": "https://example.invalid/a", "attrs": {"group-title": "Для взрослых"}, "opts": []},

@@ -31,7 +31,7 @@ https://raw.githubusercontent.com/streamline-iptv/iptv-playlists/dist/categories
 https://raw.githubusercontent.com/streamline-iptv/iptv-playlists/dist/categories/entertainment.m3u
 # Публичные каталоги, где издатели описывают происхождение потоков.
 https://biskyt.github.io/legalFreeIPTVplaylist/live.m3u
-https://shahrukhalid.github.io/nexonic-iptv/playlists/quality/1080p.m3u
+# nexonic-iptv: HTTP 404 (2026-11-23), was https://shahrukhalid.github.io/nexonic-iptv/playlists/quality/1080p.m3u
 https://www.tdtchannels.com/lists/tv.m3u8
 
 # Расширение 2026-11-23: дополнительные тематические списки iptv-org и музыка ngrch.
@@ -49,3 +49,29 @@ https://iptv-org.github.io/iptv/categories/culture.m3u
 https://iptv-org.github.io/iptv/categories/cooking.m3u
 https://iptv-org.github.io/iptv/categories/science.m3u
 https://iptv-org.github.io/iptv/regions/cis.m3u
+
+# Расширение 0.4.9 (2026-11-23): исходные списки потоков iptv-org по России и соседним странам с русскоязычным
+# вещанием. В них нет логотипов и категорий: meta=iptv-org берёт их по tvg-id из публичного API iptv-org.
+# Дают запасные адреса для каналов из списков выше; итог по-прежнему проходит проверку логотипа и 1080p.
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/ru.m3u meta=iptv-org
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/by.m3u meta=iptv-org
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/kz.m3u meta=iptv-org
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/ua.m3u meta=iptv-org
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/uz.m3u meta=iptv-org
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/md.m3u meta=iptv-org
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/am.m3u meta=iptv-org
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/ge.m3u meta=iptv-org
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/lv.m3u meta=iptv-org
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/ee.m3u meta=iptv-org
+# Бесплатное официальное вещание Беларуси из Free-TV (общий список выше фильтруется только по России).
+https://raw.githubusercontent.com/Free-TV/IPTV/master/playlists/playlist_belarus.m3u8
+# Дополнительные тематические категории iptv-org.
+https://iptv-org.github.io/iptv/categories/series.m3u
+https://iptv-org.github.io/iptv/categories/lifestyle.m3u
+https://iptv-org.github.io/iptv/categories/outdoor.m3u
+https://iptv-org.github.io/iptv/categories/education.m3u
+https://iptv-org.github.io/iptv/categories/travel.m3u
+https://iptv-org.github.io/iptv/categories/comedy.m3u
+https://iptv-org.github.io/iptv/categories/classic.m3u
+https://iptv-org.github.io/iptv/categories/weather.m3u
+https://iptv-org.github.io/iptv/categories/relax.m3u
