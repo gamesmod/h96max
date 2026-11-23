@@ -14,7 +14,7 @@ Rules (user, 2026-10-27): no duplicates, every channel has a working logo, every
   --exclude-adult removes them. Детские категории и явно помеченные детские каналы всегда исключаются.
 Downloads are only parsed, never executed. Network: VLC user agent, short timeouts, 48 parallel checks.
 """
-import argparse, concurrent.futures as cf, json, re, shlex, shutil, subprocess, sys, urllib.parse, urllib.request
+import argparse, concurrent.futures as cf, json, os, re, shlex, shutil, subprocess, sys, urllib.parse, urllib.request
 
 UA = "VLC/3.0.20 LibVLC/3.0.20"
 ADULT = re.compile(r"18\+|xxx|adult|эрот|взросл|для взрослых|playboy|brazzers|hustler|private|redlight|blue hustler|секс|sex", re.I)
@@ -512,9 +512,15 @@ def main():
     write(out, a.out)
     print(f"written {len(out)} channels -> {a.out}", file=sys.stderr)
 
-def write(out, path):
+def write(out, path, epg_url=None):
+    """Записать M3U. epg_url (или $EPG_URL) добавляется как url-tvg в заголовок."""
+    if epg_url is None:
+        epg_url = os.environ.get("EPG_URL", "https://iptv-org.github.io/epg/guides/ru.xml")
+    header = "#EXTM3U"
+    if epg_url:
+        header += f' url-tvg="{epg_url}"'
     with open(path, "w", encoding="utf-8") as f:
-        f.write("#EXTM3U\n")
+        f.write(header + "\n")
         for e in out:
             at = e["attrs"]
             keep = " ".join(f'{k}="{at[k]}"' for k in ("tvg-id", "tvg-name", "tvg-logo", "group-title") if at.get(k))
