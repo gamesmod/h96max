@@ -63,9 +63,9 @@ public class MainActivity extends Activity {
         root.addView(button("⟳  Перезагрузка в recovery", new View.OnClickListener() {
             public void onClick(View v) { rebootRecovery(); }
         }));
-        if (bootedFromSd()) root.addView(button("⟳  Перезагрузить с внутренней памяти", new View.OnClickListener() {
-            public void onClick(View v) { rebootEmmc(); }
-        }));
+        final LinearLayout sdSlot = new LinearLayout(this);
+        sdSlot.setOrientation(LinearLayout.VERTICAL);
+        root.addView(sdSlot);
         root.addView(button("☾  Спящий режим", new View.OnClickListener() {
             public void onClick(View v) { sleep(); }
         }));
@@ -79,6 +79,21 @@ public class MainActivity extends Activity {
                 ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT));
         setContentView(scroll);
         off.requestFocus();
+        // /proc/cmdline вне main — кнопка eMMC появляется после проверки.
+        new Thread(new Runnable() {
+            public void run() {
+                final boolean fromSd = bootedFromSd();
+                if (!fromSd) return;
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (isFinishing()) return;
+                        sdSlot.addView(button("⟳  Перезагрузить с внутренней памяти", new View.OnClickListener() {
+                            public void onClick(View v) { rebootEmmc(); }
+                        }));
+                    }
+                });
+            }
+        }, "power-boot-media").start();
     }
 
     private Button button(String text, View.OnClickListener l) {

@@ -83,8 +83,22 @@ public class MainActivity extends Activity {
                 if (indexDialog != null && indexDialog.isShowing()) indexDialog.dismiss();
                 int count = p.getInt("channels", 0);
                 if (groups.isEmpty()) {
-                    if (!loadCachedIndex(bundled) && bundled.length() > 0) parse(read(bundled));
-                    showGroups();
+                    // Чтение индекса/M3U и разбор — вне UI-потока (slowMain при открытии IPTV).
+                    final File playlist = bundled;
+                    new Thread(new Runnable() {
+                        public void run() {
+                            if (!loadCachedIndex(playlist) && playlist.length() > 0) {
+                                String text = read(playlist);
+                                if (text.length() > 0) parse(text);
+                            }
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    if (isFinishing()) return;
+                                    showGroups();
+                                }
+                            });
+                        }
+                    }, "iptv-index-ready").start();
                 }
                 if (count > 0 && !p.getBoolean("shown", false)) {
                     Toast.makeText(MainActivity.this, "Индексация завершена: " + count + " каналов, " +
@@ -135,32 +149,53 @@ public class MainActivity extends Activity {
                 }
             }
         });
-        File bundled = playlistFile(this);
-        if (loadCachedIndex(bundled)) {
-            showGroups();
-            showBootIndexStatus();
-            return;
-        }
-        ensureIndexService();
-        showBootIndexStatus();
-        android.content.SharedPreferences indexState = getSharedPreferences("iptv_index", MODE_PRIVATE);
-        if (!indexCurrent(bundled, indexState) && indexState.getString("error", "").isEmpty()) {
-            setTitle("Подготовка списка ТВ-каналов…");
-            return;
-        }
-        if (bundled.length() > 0) {
-            parse(read(bundled));
-            showGroups();
-            return;
-        }
-        File cache = new File(getFilesDir(), "playlist.m3u");
-        if (cache.length() > 0) {
-            parse(read(cache));
-            showGroups();
-        } else {
-            setTitle("Загрузка…");
-        }
-        refresh(cache);
+        setTitle("Подготовка списка ТВ-каналов…");
+        final File bundled = playlistFile(this);
+        // Диск и разбор плейлиста не на main: иначе activityLaunch/slowMain при старте плитки.
+        new Thread(new Runnable() {
+            public void run() {
+                if (loadCachedIndex(bundled)) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            if (isFinishing()) return;
+                            showGroups();
+                            showBootIndexStatus();
+                        }
+                    });
+                    return;
+                }
+                ensureIndexService();
+                android.content.SharedPreferences indexState = getSharedPreferences("iptv_index", MODE_PRIVATE);
+                final boolean waiting = !indexCurrent(bundled, indexState)
+                        && indexState.getString("error", "").isEmpty();
+                if (waiting) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            if (isFinishing()) return;
+                            showBootIndexStatus();
+                            setTitle("Подготовка списка ТВ-каналов…");
+                        }
+                    });
+                    return;
+                }
+                final File cache = new File(getFilesDir(), "playlist.m3u");
+                String text = "";
+                if (bundled.length() > 0) text = read(bundled);
+                else if (cache.length() > 0) text = read(cache);
+                if (text.length() > 0) parse(text);
+                final boolean hasGroups = !groups.isEmpty();
+                final boolean needNetRefresh = bundled.length() == 0;
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (isFinishing()) return;
+                        showBootIndexStatus();
+                        if (hasGroups) showGroups();
+                        else setTitle("Загрузка…");
+                        if (needNetRefresh) refresh(cache);
+                    }
+                });
+            }
+        }, "iptv-load-playlist").start();
     }
 
     @SuppressWarnings("unchecked")
@@ -327,10 +362,11 @@ public class MainActivity extends Activity {
                     FileOutputStream o = new FileOutputStream(cache);
                     o.write(text.getBytes("UTF-8"));
                     o.close();
+                    final boolean first = groups.isEmpty();
+                    parse(text);
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            boolean first = groups.isEmpty();
-                            parse(text);
+                            if (isFinishing()) return;
                             if (first || cur == null) showGroups();
                         }
                     });
@@ -505,48 +541,72 @@ public class MainActivity extends Activity {
     void playGroup(List<String[]> chans, int pos) {
         if (chans == null || chans.isEmpty() || pos < 0 || pos >= chans.size()) return;
         String[] ch = chans.get(pos);
-        if (!nativePlayerTestEnabled() && playVlcPlaylist(chans, pos, ch[1])) return;
+        if (!nativePlayerTestEnabled()) {
+            playVlcPlaylistAsync(chans, pos, ch[1], ch[0], ch[3]);
+            return;
+        }
         play(ch[0], ch[1], ch[3]);
     }
 
-    /** Открывает в VLC временный плейлист только текущей категории, начиная с выбранного канала. */
-    boolean playVlcPlaylist(List<String[]> chans, int pos, String title) {
-        File playlist = new File(getCacheDir(), "iptv-" + UUID.randomUUID().toString().replace("-", "") + ".m3u");
-        int written = 0;
-        try {
-            OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(playlist), StandardCharsets.UTF_8);
-            try {
-                out.write("#EXTM3U\n");
-                for (int offset = 0; offset < chans.size(); offset++) {
-                    String[] channel = chans.get((pos + offset) % chans.size());
-                    String url = channel[0] == null ? "" : channel[0].trim();
-                    if (!isPlayableUrl(url)) continue;
-                    out.write("#EXTINF:-1");
-                    writeM3uAttribute(out, "tvg-id", valueAt(channel, 3));
-                    writeM3uAttribute(out, "tvg-name", valueAt(channel, 4));
-                    writeM3uAttribute(out, "tvg-logo", valueAt(channel, 2));
-                    writeM3uAttribute(out, "group-title", valueAt(channel, 5));
-                    out.write("," + m3uText(valueAt(channel, 1)) + "\n" + url + "\n");
-                    written++;
+    /** Пишет временный M3U вне UI, затем открывает его во VLC; при ошибке — одиночный URL. */
+    void playVlcPlaylistAsync(final List<String[]> chans, final int pos, final String title,
+                              final String fallbackUrl, final String fallbackEpg) {
+        new Thread(new Runnable() {
+            public void run() {
+                File playlist = new File(getCacheDir(), "iptv-" + UUID.randomUUID().toString().replace("-", "") + ".m3u");
+                int written = 0;
+                try {
+                    OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(playlist), StandardCharsets.UTF_8);
+                    try {
+                        out.write("#EXTM3U\n");
+                        for (int offset = 0; offset < chans.size(); offset++) {
+                            String[] channel = chans.get((pos + offset) % chans.size());
+                            String url = channel[0] == null ? "" : channel[0].trim();
+                            if (!isPlayableUrl(url)) continue;
+                            out.write("#EXTINF:-1");
+                            writeM3uAttribute(out, "tvg-id", valueAt(channel, 3));
+                            writeM3uAttribute(out, "tvg-name", valueAt(channel, 4));
+                            writeM3uAttribute(out, "tvg-logo", valueAt(channel, 2));
+                            writeM3uAttribute(out, "group-title", valueAt(channel, 5));
+                            out.write("," + m3uText(valueAt(channel, 1)) + "\n" + url + "\n");
+                            written++;
+                        }
+                    } finally {
+                        out.close();
+                    }
+                    if (written == 0) throw new IOException("в категории нет доступных URL");
+                    final Uri uri = Uri.parse("content://org.tvbox.iptv.playlists/" + playlist.getName());
+                    final int channelCount = written;
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            if (isFinishing()) return;
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setDataAndType(uri, "application/x-mpegURL");
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.putExtra("title", title);
+                            intent.setPackage(VLC);
+                            try {
+                                startActivity(intent);
+                                iptvLog("playback_handoff", "target=vlc category_playlist channels=" + channelCount);
+                            } catch (Exception e) {
+                                playlist.delete();
+                                iptvLog("playback_playlist_failed", "error=" + e.getClass().getSimpleName());
+                                play(fallbackUrl, title, fallbackEpg);
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    playlist.delete();
+                    iptvLog("playback_playlist_failed", "error=" + e.getClass().getSimpleName());
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            if (isFinishing()) return;
+                            play(fallbackUrl, title, fallbackEpg);
+                        }
+                    });
                 }
-            } finally {
-                out.close();
             }
-            if (written == 0) throw new IOException("в категории нет доступных URL");
-            Uri uri = Uri.parse("content://org.tvbox.iptv.playlists/" + playlist.getName());
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(uri, "application/x-mpegURL");
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.putExtra("title", title);
-            intent.setPackage(VLC);
-            startActivity(intent);
-            iptvLog("playback_handoff", "target=vlc category_playlist channels=" + written);
-            return true;
-        } catch (Exception e) {
-            playlist.delete();
-            iptvLog("playback_playlist_failed", "error=" + e.getClass().getSimpleName());
-            return false;
-        }
+        }, "iptv-vlc-playlist").start();
     }
 
     boolean isPlayableUrl(String url) {

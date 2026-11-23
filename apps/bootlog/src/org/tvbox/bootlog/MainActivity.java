@@ -10,7 +10,6 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -18,7 +17,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +161,7 @@ public class MainActivity extends Activity {
         return "Температура: нет данных";
     }
 
-    void buildDevicePanel(TextView panel) {
+    String buildDevicePanelText() {
         StringBuilder p = new StringBuilder();
         String rel = prop("ro.tvbox.release");
         if (rel.isEmpty()) rel = "?";
@@ -187,7 +185,7 @@ public class MainActivity extends Activity {
         if (!hasStages) {
             for (String[] s : STAGES) p.append("▫️ ").append(s[1]).append('\n');
         }
-        panel.setText(p.toString());
+        return p.toString();
     }
 
     @Override
@@ -203,37 +201,25 @@ public class MainActivity extends Activity {
         root.setBackgroundColor(0xFF0D1117);
         root.setPadding(24, 16, 24, 16);
 
-        // Left: recent logs
         ScrollView logScroll = new ScrollView(this);
-        TextView logView = new TextView(this);
+        final TextView logView = new TextView(this);
         logView.setTypeface(Typeface.MONOSPACE);
         logView.setTextSize(13);
         logView.setTextColor(0xFFB0BEC5);
         logView.setPadding(12, 8, 12, 8);
-
-        List<String> dmesg = read(DIR + "dmesg.txt");
-        List<String> logcat = read(DIR + "logcat-errors.txt");
-        int from = Math.max(0, dmesg.size() - 80);
-        StringBuilder logs = new StringBuilder();
-        for (int i = from; i < dmesg.size(); i++) {
-            String l = dmesg.get(i);
-            if (l.length() > 140) l = l.substring(0, 137) + "…";
-            logs.append(l).append('\n');
-        }
-        logView.setText(logs.toString());
+        logView.setText("Загрузка журнала…");
         logScroll.addView(logView);
         LinearLayout.LayoutParams lpLog = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 2.2f);
         root.addView(logScroll, lpLog);
 
-        // Right: device + stages
         ScrollView panelScroll = new ScrollView(this);
-        TextView panel = new TextView(this);
+        final TextView panel = new TextView(this);
         panel.setTypeface(Typeface.MONOSPACE);
         panel.setTextSize(14);
         panel.setTextColor(0xFFE0E0E0);
         panel.setPadding(20, 12, 12, 12);
         panel.setBackgroundColor(0xFF1A2332);
-        buildDevicePanel(panel);
+        panel.setText("Загрузка…");
         panelScroll.addView(panel);
         LinearLayout.LayoutParams lpPanel = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
         lpPanel.leftMargin = 16;
@@ -241,25 +227,34 @@ public class MainActivity extends Activity {
 
         setContentView(root);
         logScroll.requestFocus();
+
+        // dmesg/logcat/meminfo/thermal — диск и /proc вне main (slowMain при открытии журнала).
+        new Thread(new Runnable() {
+            public void run() {
+                List<String> dmesg = read(DIR + "dmesg.txt");
+                int from = Math.max(0, dmesg.size() - 80);
+                final StringBuilder logs = new StringBuilder();
+                for (int i = from; i < dmesg.size(); i++) {
+                    String l = dmesg.get(i);
+                    if (l.length() > 140) l = l.substring(0, 137) + "…";
+                    logs.append(l).append('\n');
+                }
+                final String panelText = buildDevicePanelText();
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (isFinishing()) return;
+                        logView.setText(logs.toString());
+                        panel.setText(panelText);
+                    }
+                });
+            }
+        }, "bootlog-load").start();
     }
 
     /** Short, non-animated startup report; the full diagnostic journal remains available from its tile. */
     void showStartupSummary() {
-        add("PANADONIK  ·  RK3318", 0xFFE6EDF3, true);
-        add("СВОДКА ЗАГРУЗКИ УСТРОЙСТВА", 0xFF4FC3F7, true);
-        add("", Color.WHITE, false);
-        List<String> rows = read(DIR + "startup-summary.txt");
-        for (String line : rows) {
-            int color = line.contains("ОШИБКА") ? 0xFFFF6B6B
-                    : line.contains("ПРОЦЕССОР") || line.contains("ГРАФИКА") || line.contains("ПАМЯТЬ")
-                    ? 0xFF81C784 : line.contains("ЭТАПЫ") ? 0xFF4FC3F7 : 0xFFCFD8DC;
-            add(line, color, line.contains("ЭТАПЫ") || line.startsWith("Снимок:"));
-        }
-        add("", Color.WHITE, false);
-        add("Через 10 секунд откроется главный экран.\nНажмите OK или Назад, чтобы продолжить сейчас.", 0xFF90A4AE, false);
-
-        TextView tv = new TextView(this);
-        tv.setText(sb);
+        final TextView tv = new TextView(this);
+        tv.setText("Загрузка сводки…");
         tv.setTextSize(22);
         tv.setTypeface(Typeface.MONOSPACE);
         tv.setPadding(64, 48, 64, 48);
@@ -271,9 +266,42 @@ public class MainActivity extends Activity {
         sv.addView(tv);
         setContentView(sv);
         sv.requestFocus();
+
+        new Thread(new Runnable() {
+            public void run() {
+                final SpannableStringBuilder built = new SpannableStringBuilder();
+                append(built, "PANADONIK  ·  RK3318", 0xFFE6EDF3, true);
+                append(built, "СВОДКА ЗАГРУЗКИ УСТРОЙСТВА", 0xFF4FC3F7, true);
+                append(built, "", Color.WHITE, false);
+                List<String> rows = read(DIR + "startup-summary.txt");
+                for (String line : rows) {
+                    int color = line.contains("ОШИБКА") ? 0xFFFF6B6B
+                            : line.contains("ПРОЦЕССОР") || line.contains("ГРАФИКА") || line.contains("ПАМЯТЬ")
+                            ? 0xFF81C784 : line.contains("ЭТАПЫ") ? 0xFF4FC3F7 : 0xFFCFD8DC;
+                    append(built, line, color, line.contains("ЭТАПЫ") || line.startsWith("Снимок:"));
+                }
+                append(built, "", Color.WHITE, false);
+                append(built, "Через 10 секунд откроется главный экран.\nНажмите OK или Назад, чтобы продолжить сейчас.", 0xFF90A4AE, false);
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (isFinishing()) return;
+                        sb = built;
+                        tv.setText(sb);
+                    }
+                });
+            }
+        }, "bootlog-startup").start();
+
         new Handler().postDelayed(new Runnable() {
             public void run() { openHome(); }
         }, 10_000);
+    }
+
+    static void append(SpannableStringBuilder target, String text, int color, boolean bold) {
+        int s = target.length();
+        target.append(text).append('\n');
+        target.setSpan(new ForegroundColorSpan(color), s, target.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (bold) target.setSpan(new StyleSpan(Typeface.BOLD), s, target.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     void openHome() {

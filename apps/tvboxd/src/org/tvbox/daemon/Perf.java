@@ -23,10 +23,18 @@ class Perf {
     static long lastTopAt;
     static List<String> lastTop;
 
-    /** CPU load in % since the previous call (or over 300 ms on the first / a stale one): total first, then per core. */
+    /**
+     * CPU load in % since the previous PERF_NOW (клиент опрашивает раз в ~2 с).
+     * Без Thread.sleep на пути ответа: иначе binderSlow у плитки «Производительность».
+     * Первый/устаревший снимок возвращает нули и запоминает базу для следующего опроса.
+     */
     static synchronized int[] cpuLoad() {
-        if (lastStat == null || System.currentTimeMillis() - lastAt > 10000) { lastStat = readStat(); Main.sleep(300); }
         long[][] st = readStat();
+        if (lastStat == null || System.currentTimeMillis() - lastAt > 10000) {
+            lastStat = st;
+            lastAt = System.currentTimeMillis();
+            return new int[st.length];
+        }
         int[] pct = new int[st.length];
         for (int i = 0; i < st.length && i < lastStat.length; i++) {
             long busy = st[i][0] - lastStat[i][0], all = st[i][1] - lastStat[i][1];
