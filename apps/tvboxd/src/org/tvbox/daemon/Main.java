@@ -739,7 +739,7 @@ public class Main {
             try {
                 java.util.Map<String, String> m = latest(base);
                 String ver = m.get("version");
-                op.send("UPD url:" + base + "\t" + ver + "\t" + packageUrl(base, m.get("file")) + "\t" + (Long.parseLong(m.get("size")) >> 20) + " МБ\t" + (newer(ver, cur) ? "new" : "old"));
+                op.send("UPD url:" + base + "\t" + ver + "\t" + packageUrl(m.get("resolved_base"), m.get("file")) + "\t" + (Long.parseLong(m.get("size")) >> 20) + " МБ\t" + (newer(ver, cur) ? "new" : "old"));
                 if (m.containsKey("notes")) {
                     // Протокол сокета построчный: кодируем заметки, чтобы переводы строк не обрезали описание выпуска.
                     String encoded = android.util.Base64.encodeToString(m.get("notes").getBytes("UTF-8"), android.util.Base64.NO_WRAP);
@@ -879,6 +879,7 @@ public class Main {
     static String media() { return bootedFromSd() ? "sd" : "emmc"; }
 
     static java.util.Map<String, String> latest(String base) throws Exception {
+        base = GitHubDevSource.resolve(base);
         java.util.Map<String, String> m = new java.util.HashMap<>();
         HttpURLConnection c = (HttpURLConnection) new URL(latestUrl(base)).openConnection();
         c.setConnectTimeout(8_000); c.setReadTimeout(15_000);
@@ -896,6 +897,7 @@ public class Main {
         }
         for (String k : new String[]{"version", "file", "sha256", "size"})
             if (!m.containsKey(k)) throw new Exception("latest.txt без " + k);
+        m.put("resolved_base", base);
         return m;
     }
 
@@ -933,7 +935,7 @@ public class Main {
             java.util.Map<String, String> m = latest(base);
             wantSha = m.get("sha256");
             if (new File("/data").getUsableSpace() < Long.parseLong(m.get("size")) + (512L << 20)) { op.done(false, "мало места для загрузки"); return; }
-            String pkgUrl = packageUrl(base, m.get("file"));
+            String pkgUrl = packageUrl(m.get("resolved_base"), m.get("file"));
             op.log("загрузка " + pkgUrl);
             HttpURLConnection c = (HttpURLConnection) new URL(pkgUrl).openConnection();
             c.setConnectTimeout(15_000); c.setReadTimeout(60_000);
