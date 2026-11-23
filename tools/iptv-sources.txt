@@ -33,3 +33,19 @@ https://raw.githubusercontent.com/streamline-iptv/iptv-playlists/dist/categories
 https://biskyt.github.io/legalFreeIPTVplaylist/live.m3u
 https://shahrukhalid.github.io/nexonic-iptv/playlists/quality/1080p.m3u
 https://www.tdtchannels.com/lists/tv.m3u8
+
+# Расширение 2026-11-23: дополнительные тематические списки iptv-org и музыка ngrch.
+# Детские каналы по-прежнему отсекаются iptv-merge.py; взрослые остаются в отдельной категории.
+https://ngrch.github.io/iptv/music.m3u set-group="Музыка"
+https://iptv-org.github.io/iptv/categories/news.m3u
+https://iptv-org.github.io/iptv/categories/sports.m3u
+https://iptv-org.github.io/iptv/categories/movies.m3u
+https://iptv-org.github.io/iptv/categories/music.m3u
+https://iptv-org.github.io/iptv/categories/documentary.m3u
+https://iptv-org.github.io/iptv/categories/entertainment.m3u
+https://iptv-org.github.io/iptv/categories/business.m3u
+https://iptv-org.github.io/iptv/categories/auto.m3u
+https://iptv-org.github.io/iptv/categories/culture.m3u
+https://iptv-org.github.io/iptv/categories/cooking.m3u
+https://iptv-org.github.io/iptv/categories/science.m3u
+https://iptv-org.github.io/iptv/regions/cis.m3u

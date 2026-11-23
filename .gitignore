@@ -46,3 +46,5 @@ wpa_supplicant*.conf
 # Локальная IPTV-сборка может содержать авторизационные ссылки
 overlay/system/etc/tvbox/iptv.m3u
 overlay-wifi/
+!release/notes/0.4.6.txt
+!release/notes/0.4.7.txt
