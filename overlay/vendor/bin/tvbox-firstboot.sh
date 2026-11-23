@@ -52,8 +52,8 @@ done
 for p in com.agateau.tinywheels.android org.supertux.supertux2 app.flicky org.smarttube.stable org.smarttube.beta com.liskovsoft.smarttubetv; do
     if pm path "$p" >/dev/null 2>&1; then pm uninstall --user 0 "$p"; fi
 done
-# Total Commander и его плагины исключены из выпуска: файловый менеджер по умолчанию — встроенные «Файлы»
-# (org.tvbox.files). Удалить их с уже обновлённых приставок вместе с источниками в Obtainium.
+# Total Commander и его плагины исключены из выпуска: файловый менеджер по умолчанию — штатный «Файловый менеджер»
+# Rockchip (RkExplorer, com.android.rk). Удалить их с уже обновлённых приставок вместе с источниками в Obtainium.
 for p in com.ghisler.android.TotalCommander com.ghisler.tcplugins.LAN com.ghisler.tcplugins.FTP \
          com.ghisler.tcplugins.SFTP com.ghisler.tcplugins.wifitransfer; do
     if pm path "$p" >/dev/null 2>&1; then echo "remove $p: $(pm uninstall --user 0 "$p" 2>&1)"; fi
@@ -104,7 +104,20 @@ appops set org.maintainteam.hypatia MANAGE_EXTERNAL_STORAGE allow
 pm grant org.tvbox.bootlog android.permission.READ_EXTERNAL_STORAGE 2>/dev/null
 # «ТВ-каналы» записывает плейлист для VLC в /sdcard/tvbox/iptv-now.m3u, чтобы переключать CH+/CH−.
 appops set org.tvbox.iptv MANAGE_EXTERNAL_STORAGE allow
-# «Файлы» получают доступ ко всем общим файлам и без root; системные папки они открывают через tvboxd (FS_*).
+# Файловый менеджер по умолчанию — штатный RkExplorer (com.android.rk). Он системный (sharedUserId android.uid.system,
+# uid 1000): Android не запускает приложения от uid 0, а su закрыт для приложений. Поэтому он получает максимум
+# прав, доступных системному приложению: включён, полный доступ к общей памяти и носителям выдан без запросов.
+if pm path com.android.rk >/dev/null 2>&1; then
+    pm enable com.android.rk >/dev/null 2>&1
+    appops set com.android.rk MANAGE_EXTERNAL_STORAGE allow 2>/dev/null
+    appops set com.android.rk LEGACY_STORAGE allow 2>/dev/null
+    for perm in READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE WRITE_MEDIA_STORAGE; do
+        pm grant com.android.rk android.permission.$perm 2>/dev/null
+    done
+else
+    echo "filemanager: com.android.rk not installed"
+fi
+# Запасной «Файлы (root)» (org.tvbox.files) без плитки: системные папки открывает через tvboxd (FS_*).
 appops set org.tvbox.files MANAGE_EXTERNAL_STORAGE allow
 pm grant org.tvbox.files android.permission.READ_EXTERNAL_STORAGE 2>/dev/null
 pm grant org.tvbox.files android.permission.WRITE_EXTERNAL_STORAGE 2>/dev/null
@@ -168,7 +181,7 @@ L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
 if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initialized" ]; then
     # Атомарно записать настройки до остановки HOME; особенности запуска описаны в HANDOFF.md.
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
-    ALLOWED="org.tvbox.iptv ru.yourok.torrserve org.tvbox.files org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
+    ALLOWED="org.tvbox.iptv ru.yourok.torrserve com.android.rk org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
     T=""; EXTRA=""; N=0
     # Сохранить установленные функции и их порядок; удалить дубли, игры и устаревшие плитки.
     for p in $(printf '%s' "$OLD" | sed 's/\&\#30;/ /g'); do
@@ -296,22 +309,24 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-flicky-removed"
     fi
     touch "$D/launcher-flicky-removed"
 fi
-# Плитка «Файлы» заменяет Total Commander на его месте; если его плитки не было, она встаёт после TorrServe.
-# Выполняется один раз, дальнейший порядок пользователя сохраняется.
-if pm path com.tvlauncher >/dev/null 2>&1 && pm path org.tvbox.files >/dev/null 2>&1 \
-        && [ ! -e "$D/launcher-files-tile" ] && [ -f "$L" ]; then
+# Плитка штатного файлового менеджера (com.android.rk) заменяет на своём месте плитку Total Commander или
+# «Файлов» (org.tvbox.files); если их не было, она встаёт после TorrServe. Один раз, порядок пользователя сохраняется.
+FM=com.android.rk
+if pm path com.tvlauncher >/dev/null 2>&1 && pm path $FM >/dev/null 2>&1 \
+        && [ ! -e "$D/launcher-filemanager-tile" ] && [ -f "$L" ]; then
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
     T=""; N=" "; C=0
-    case " $(printf '%s' "$OLD" | sed 's/\&#30;/ /g') " in *" org.tvbox.files "*) PLACED=1;; *) PLACED=0;; esac
+    case " $(printf '%s' "$OLD" | sed 's/\&#30;/ /g') " in *" $FM "*) PLACED=1;; *) PLACED=0;; esac
     for p in $(printf '%s' "$OLD" | sed 's/\&#30;/ /g'); do
-        case "$p" in com.ghisler.*) [ "$PLACED" = 1 ] && continue; p=org.tvbox.files; PLACED=1;; esac
+        case "$p" in com.ghisler.*|org.tvbox.files) [ "$PLACED" = 1 ] && continue; p=$FM; PLACED=1;; esac
         case "$N" in *" $p "*) continue;; esac
         T="${T:+$T&#30;}$p"; N="$N$p "; C=$((C+1))
-        if [ "$p" = ru.yourok.torrserve ] && [ "$PLACED" = 0 ] && ! printf '%s' "$OLD" | grep -q 'com\.ghisler\.'; then
-            T="$T&#30;org.tvbox.files"; N="${N}org.tvbox.files "; C=$((C+1)); PLACED=1
+        if [ "$p" = ru.yourok.torrserve ] && [ "$PLACED" = 0 ] \
+                && ! printf '%s' "$OLD" | grep -q -e 'com\.ghisler\.' -e 'org\.tvbox\.files'; then
+            T="$T&#30;$FM"; N="$N$FM "; C=$((C+1)); PLACED=1
         fi
     done
-    if [ "$PLACED" = 0 ] && [ "$C" -lt 14 ]; then T="${T:+$T&#30;}org.tvbox.files"; fi
+    if [ "$PLACED" = 0 ] && [ "$C" -lt 14 ]; then T="${T:+$T&#30;}$FM"; fi
     if [ "$T" != "$OLD" ]; then
         REPL=$(printf '%s' "$T" | sed 's/\&/\\\&/g')
         sed "s|<string name=\"apps_order\">[^<]*</string>|<string name=\"apps_order\">$REPL</string>|" "$L" > "$L.new"
@@ -319,9 +334,9 @@ if pm path com.tvlauncher >/dev/null 2>&1 && pm path org.tvbox.files >/dev/null 
         chown "$u:$u" "$L.new"; chmod 660 "$L.new"; mv "$L.new" "$L"; restorecon "$L"
         am force-stop com.tvlauncher
         am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
-        echo "tvlauncher: Files tile replaces Total Commander"
+        echo "tvlauncher: stock file manager tile"
     fi
-    touch "$D/launcher-files-tile"
+    touch "$D/launcher-filemanager-tile"
 fi
 pm disable com.mbx.settingsmbox/.OobeActivity >/dev/null 2>&1
 # Показать поверх экрана запуска краткую сводку ресурсов с временными метками; TV Launcher остаётся HOME-приложением.
