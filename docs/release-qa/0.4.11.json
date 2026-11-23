@@ -1,0 +1,53 @@
+{
+  "version": "0.4.11",
+  "device": "Panadonik H96 Max / RK3328, Android 12",
+  "reviewed_at": "2026-11-23",
+  "source_commit": null,
+  "source_state": "заготовка кандидата после dev-v0.4.10; сборка и приёмка ещё не закрыты",
+  "candidate": {
+    "ota_sha256": null,
+    "playlist_sha256": null,
+    "clean_install_sha256": null,
+    "installed": false,
+    "install_method": null,
+    "actions_run_id": null,
+    "publication": null
+  },
+  "automated_tests": {
+    "status": "pending",
+    "count": null,
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -v",
+    "scope": "локальное дерево перед/после сборки кандидата 0.4.11"
+  },
+  "checks": {
+    "cold_boot_ready": "pending",
+    "boot_log_review": "pending",
+    "qr_vlc": "pending",
+    "wired_network": "pending",
+    "wifi_network": "pending",
+    "iptv_playback": "pending",
+    "torrent_playback": "pending",
+    "graphics_video": "pending",
+    "graphics_stress": "pending",
+    "swap_disabled": "pending",
+    "network_capture_review": "pending",
+    "usb_remote_iptv_channels": "pending",
+    "security_review": "pending"
+  },
+  "hot_test": {
+    "tested_installed_version": null,
+    "candidate_installed": false,
+    "notes": {
+      "security_review": "не переносить pass/fail с 0.4.10; заполнить после анализа этого артефакта"
+    }
+  },
+  "log_analysis": {
+    "reviewed": false,
+    "untriaged_errors": null,
+    "summary": "ожидает журнал сборки/установки 0.4.11"
+  },
+  "security_analysis": {
+    "reviewed": false,
+    "summary": "ожидает сканер Wi‑Fi credentials и анализ после сборки кандидата 0.4.11"
+  }
+}
