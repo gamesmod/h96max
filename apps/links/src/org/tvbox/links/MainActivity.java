@@ -127,20 +127,22 @@ public class MainActivity extends Activity {
         }
         final String link=(pkg.equals("org.videolan.vlc") ? "https://" : "http://")+host+":"+port+"/";
         url.setText(link);
-        int size=Math.min(image.getWidth(),image.getHeight())-dp(16);
-        if(size>0) {
-            Bitmap bitmap=qr(link,size);
-            // DENSITY_NONE отключает повторное масштабирование при плотности экрана, отличной от mdpi.
-            bitmap.setDensity(Bitmap.DENSITY_NONE);
-            android.graphics.drawable.BitmapDrawable d=new android.graphics.drawable.BitmapDrawable(getResources(),bitmap);
-            d.setFilterBitmap(false); d.setAntiAlias(false);
-            image.setImageDrawable(d);
-        }
+        final int size=Math.min(image.getWidth(),image.getHeight())-dp(16);
         final int id=++scanId;
+        // QR-растр и TCP-probe вне main: иначе slowMain при смене сети/службы.
         new Thread(new Runnable() { public void run() {
+            final Bitmap bitmap = size > 0 ? qr(link, size) : null;
+            if (bitmap != null) bitmap.setDensity(Bitmap.DENSITY_NONE);
             final boolean up=listening(host,Integer.parseInt(port));
             runOnUiThread(new Runnable() { public void run() {
                 if(isFinishing() || scanId!=id) return;
+                if (bitmap != null) {
+                    android.graphics.drawable.BitmapDrawable d=new android.graphics.drawable.BitmapDrawable(getResources(),bitmap);
+                    d.setFilterBitmap(false); d.setAntiAlias(false);
+                    image.setImageDrawable(d);
+                } else {
+                    image.setImageDrawable(null);
+                }
                 hint.setText(up ? "Служба доступна по выбранному адресу. Наведите камеру на QR-код."
                         : "Служба по этому адресу не отвечает. Проверьте её запуск или выберите другой интерфейс.");
             } });
