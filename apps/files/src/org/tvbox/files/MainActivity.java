@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * "Файлы": the built-in file manager of Panadonik and the default one on the home screen.
- * Browses and changes files as root through tvboxd (Root.java), opens files in other apps through Provider, and serves
- * VIEW of folders and GET_CONTENT (file picking) for other apps. Remote: OK opens, MENU (or long OK) shows actions,
- * BACK goes up a folder.
+ * "Файлы (root)": a fallback file manager of Panadonik without a home-screen tile. The default file manager and tile
+ * is the stock Rockchip "Файловый менеджер" (com.android.rk), which runs as the system uid and cannot reach root.
+ * This app browses and changes files as root through tvboxd (Root.java) and opens files in other apps through
+ * Provider. Remote: OK opens, MENU (or long OK) shows actions, BACK goes up a folder.
  */
 public class MainActivity extends Activity {
     static final String HOME = Environment.getExternalStorageDirectory().getAbsolutePath();
