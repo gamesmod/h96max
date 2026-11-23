@@ -21,7 +21,7 @@
 | `com.tvlauncher` (TV Launcher) | 1.6.2 | [F-Droid APK](https://f-droid.org/repo/com.tvlauncher_10602.apk); [исходники](https://github.com/wiiguy/lightweight_androidtv_launcher) | `7afde83f96ccf30d1bc69ca06692d385800d2d9a14dd5f7d85fb4ad4f3c5c210` | `9e9f185a5b3cfb6ff65ac2907d3180c150483705ba129787c60667088647a767` |
 | `org.maintainteam.hypatia` (Hypatia, антивирус-движок) | 3.18 | https://apt.izzysoft.de/fdroid/repo/org.maintainteam.hypatia_318.apk (IzzyOnDroid) | `d0e31c8dbb338e61220373be61ee524c8476f39aa2d59517984fe45c5e7576c3` | `1b008d64bb95ab4774d68b87f22b8be9a272f4924df52029d7e6183835d918cc` |
 
-Совпадение VLC, TorrServe, TV Launcher, Pixel Wheels с F-Droid проверено по sha256 против **подписанного**
+Совпадение VLC, TorrServe и TV Launcher с F-Droid проверено по sha256 против **подписанного**
 индекса https://f-droid.org/repo/index-v1.jar (подпись JAR проверена, ключ репозитория `43238d51…9c9ccab`).
 
 ### Параметры лаунчера и плиток
@@ -56,13 +56,13 @@
 | Антивирус | `org.tvbox.antivirus` | `apps/antivirus` | проверка по требованию через Hypatia, базы, защита в реальном времени |
 | Питание | `org.tvbox.power` | `apps/power` | выключение, сон, перезагрузка и переход в recovery; значок выключения рисуется приложением, не зависит от шрифта |
 | Журнал загрузки | `org.tvbox.bootlog` | `apps/bootlog` | журнал ядра и ошибок; краткая сводка запуска также показана при старте и хранится для просмотра |
-| Производительность | `org.tvbox.clean` | `apps/clean` | закрытие фоновых приложений, метрики, настройка zRAM |
-| Ссылки | `org.tvbox.links` | `apps/links` (+ qrcodegen Nayuki, MIT) | QR-коды TorrServer и VLC с выбором сетевого адреса |
+| Производительность | `org.tvbox.clean` | `apps/clean` | закрытие фоновых приложений и метрики; UI zRAM удалён |
+| Ссылки | `org.tvbox.links` | `apps/links` (+ qrcodegen Nayuki, MIT) | QR служб; целевой сценарий — добавление торрента в TorrServer и «Смотреть на ТВ» |
 | Файлы (root) | `org.tvbox.files` | `apps/files` | запасной файловый менеджер без плитки и без роли по умолчанию: просмотр и операции с файлами с правами root через `tvboxd` (`FS_*`), открытие файлов в VLC и других приложениях |
-| tvboxd (root-служба) | `/system/framework/tvboxd.jar` | `apps/tvboxd` | файловые операции «Файлов (root)» (только их uid); установка/сверка eMMC, OTA (uncrypt), misc, антивирус и zRAM |
+| tvboxd (root-служба) | `/system/framework/tvboxd.jar` | `apps/tvboxd` | файловые операции «Файлов (root)» (только их uid); установка/сверка eMMC, OTA (uncrypt), misc, антивирус; `PERF_ZRAM_SET` отклоняется |
 | Заставка и сводка загрузки | `media/bootanimation.zip`, `org.tvbox.bootlog` | `tools/mkbootanim.py`, `apps/bootlog`, `overlay/vendor/bin/tvbox-startup-summary.sh` | статичная карточка PANADONIK/RK3318/1080p без 4K; после запуска Android краткий снимок CPU, GPU, RAM, температуры, хранилища и этапов с временными метками; Matrix и кадровая анимация удалены |
 
-Игровые приложения SuperTux и Pixel Wheels не входят в выпуск 0.3.9; firstboot удаляет оставшиеся пользовательские копии и убирает их плитки.
+Игровые приложения SuperTux и Pixel Wheels не входят в выпуск; firstboot удаляет оставшиеся пользовательские копии и убирает их плитки. Ярлык `org.tvbox.allsettings` и `tools/bench` (zRAM) из исходников удалены.
 
 ## 5. Генерируемые данные (инструкция по сборке)
 | Что | Как получить |
