@@ -1,0 +1,65 @@
+{
+  "version": "0.4.9",
+  "device": "Panadonik H96 Max / RK3328, Android 12",
+  "reviewed_at": "2026-11-23",
+  "source_commit": "4de9b09a73042573792605d6c7b357fdfae55f27",
+  "source_state": "установлен локальный OTA-кандидат 0.4.9 с очисткой данных; подробности в 0.4.9.md",
+  "candidate": {
+    "ota_sha256": "c323855f3b253626fb73828d60c9e4ffaeea3f3cf90c9299a12f725d4164937c",
+    "playlist_sha256": "1fa3959446426a6f073b61ccd83566437ce38b219cb25d14341ba15ac2fd9a30",
+    "installed": true,
+    "install_method": "UPDATE_INSTALL wipe через локальный HTTP; Wi‑Fi/ADB восстановлены handoff-ом"
+  },
+  "automated_tests": {
+    "status": "pass",
+    "count": 137,
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -v",
+    "scope": "локальное дерево HEAD 4de9b09 после установки OTA 0.4.9, 2026-11-23"
+  },
+  "checks": {
+    "cold_boot_ready": "pass",
+    "boot_log_review": "pass",
+    "qr_vlc": "pending",
+    "wired_network": "pending",
+    "wifi_network": "pass",
+    "iptv_playback": "pass",
+    "torrent_playback": "pending",
+    "graphics_video": "pass",
+    "graphics_stress": "pending",
+    "swap_disabled": "pass",
+    "network_capture_review": "pending",
+    "usb_remote_iptv_channels": "pending",
+    "security_review": "fail"
+  },
+  "hot_test": {
+    "tested_installed_version": "0.4.9",
+    "candidate_installed": true,
+    "ota_sha256": "c323855f3b253626fb73828d60c9e4ffaeea3f3cf90c9299a12f725d4164937c",
+    "playlist_sha256": "1fa3959446426a6f073b61ccd83566437ce38b219cb25d14341ba15ac2fd9a30",
+    "playlist_public_check": "fail: нет «Для взрослых», 18+=0",
+    "notes": {
+      "cold_boot_ready": "после OTA/recovery до лаунчера; пробуждение дисплея; полный цикл от розетки не повторялся",
+      "iptv_playback": "1HD Music Television 1080p во VLC PlaybackState=3, кадр не чёрный",
+      "qr_vlc": "QR TorrServer на экране «Ссылки», :8090 HTTP 200; телефон и «Смотреть на ТВ» не проверены",
+      "security_review": "SELinux Permissive, ro.debuggable=1, сетевой ADB при ro.adb.secure=1"
+    },
+    "network_capture": {
+      "captured_at": "2026-11-23",
+      "duration_seconds": 15,
+      "packets": 56,
+      "interface": "device wlan0",
+      "raw_capture_retained": false,
+      "auth_cookie_or_token_patterns": 0,
+      "notes": "краткий захват; host enp4s0 device-monitor не удался; не полный security gate"
+    }
+  },
+  "log_analysis": {
+    "reviewed": true,
+    "untriaged_errors": 0,
+    "summary": "Выборка logcat *:E после OTA: FATAL/tombstone нет. Автоанализ build-log на logcat даёт ложный высокий счёт E-строк; по тегам служебный шум без подтверждённых падений приложений в сессии."
+  },
+  "security_analysis": {
+    "reviewed": true,
+    "summary": "0.4.9: ro.adb.secure=1, ADB TCP включён, ro.debuggable=1, SELinux Permissive. Wi‑Fi не в образе; handoff после wipe сработал. Плейлист не проходит публичный IPTV-gate (0×18+). Полный разбор трафика не закрыт."
+  }
+}
