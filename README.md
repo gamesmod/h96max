@@ -64,7 +64,7 @@ tools/build-release.sh
 
 1. ТВ-каналы
 2. TorrServe
-3. Файлы (встроенный файловый менеджер, права root через tvboxd)
+3. Файловый менеджер (штатный RkExplorer `com.android.rk`, системные права)
 4. Ссылки
 5. Обновление (внутри — Obtainium)
 6. Настройки Android
@@ -145,7 +145,7 @@ USB-приёмник микрофонного пульта определяет�
 | Питание | `apps/power` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/power) | Выключение, сон, перезагрузка и переход в recovery |
 | Журнал загрузки | `apps/bootlog` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/bootlog) | Просмотр журналов загрузки |
 | Ссылки | `apps/links` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/links) | QR для TorrServer. Планируется прямой переход к добавлению торрента с телефона и действие «Смотреть на ТВ» после добавления |
-| Файлы | `apps/files` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/files) | Встроенный файловый менеджер по умолчанию; операции с правами root через tvboxd |
+| Файлы | `apps/files` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/files) | Запасной файловый менеджер «Файлы (root)» без плитки; операции с правами root через tvboxd. По умолчанию используется штатный «Файловый менеджер» (`com.android.rk`) |
 | tvboxd | `apps/tvboxd` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/tvboxd) | Привилегированный помощник OTA и eMMC |
 
 ### Сторонние приложения
@@ -170,16 +170,16 @@ USB-приёмник микрофонного пульта определяет�
 |---|---|---|
 | `ngrch/iptv` | Русскоязычная подборка; при последнем чтении 978 записей | [ru.m3u](https://ngrch.github.io/iptv/ru.m3u) |
 | `Sanuyyq/iptv-ot-sanaeye` | Набор из восьми M3U/M3U8-списков, разные зеркала и подборки | [Репозиторий](https://github.com/Sanuyyq/iptv-ot-sanaeye) |
-| `iptv-org/iptv` | Общинный каталог по странам и языкам; в проекте подключены Россия и русский язык | [Каталог плейлистов](https://github.com/iptv-org/iptv/blob/master/PLAYLISTS.md), [страны](https://iptv-org.github.io/iptv/countries/ru.m3u), [русский язык](https://iptv-org.github.io/iptv/languages/rus.m3u) |
-| `Free-TV/IPTV` | Дополнительный открытый плейлист; при последнем чтении 59 записей | [Плейлист](https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8) |
+| `iptv-org/iptv` | Общинный каталог по странам и языкам; в проекте подключены Россия, русский язык, СНГ, тематические категории и исходные списки потоков России и соседних стран (с 0.4.9; логотипы и категории — из API iptv-org) | [Каталог плейлистов](https://github.com/iptv-org/iptv/blob/master/PLAYLISTS.md), [страны](https://iptv-org.github.io/iptv/countries/ru.m3u), [русский язык](https://iptv-org.github.io/iptv/languages/rus.m3u) |
+| `Free-TV/IPTV` | Бесплатное официальное вещание: общий плейлист (фильтр «Russia», 59 записей) и с 0.4.9 — плейлист Беларуси (18 записей) | [Плейлист](https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8) |
 | `zwrt/IPTV` | Тематический источник 18+; при последнем чтении 40 записей | [Adult.m3u](https://github.com/zwrt/IPTV/blob/Files/Adult.m3u) |
 | `FreeCastHub` | Новости, спорт, погода, образование | [Репозиторий](https://github.com/freecasthub/public-iptv) |
 | `streamline-iptv` | Русский язык, Россия, тематические списки | [Репозиторий](https://github.com/streamline-iptv/iptv-playlists) |
 | `biskyt/legalFreeIPTVplaylist` | Каталог бесплатных эфиров | [Репозиторий](https://github.com/biskyt/legalFreeIPTVplaylist) |
-| `Nexonic IPTV` | Плейлист открытых потоков, качество требует повторного измерения | [Репозиторий](https://github.com/Shahrukhalid/nexonic-iptv) |
+| `Nexonic IPTV` | Отключён 2026-11-23: плейлист отвечает HTTP 404 | [Репозиторий](https://github.com/Shahrukhalid/nexonic-iptv) |
 | `TDTChannels` | Преимущественно испанские каналы | [Репозиторий](https://github.com/LaQuay/TDTChannels) |
 
-Адреса 28 списков десяти групп издателей заданы в [`tools/iptv-sources.txt`](tools/iptv-sources.txt). Часть издателей использует общие базы и пересекается; результаты после удаления дублей и проверки качества нельзя суммировать по источникам. Доступность самих списков проверена, но новые каналы ещё не прошли полную проверку с приставки и анализ истории. Текущий кандидат 0.4.5 не подтвердил требование о 20 каналах для взрослых. Подробности — в [исследовании источников](docs/iptv-source-research-2026-11-10.md). Перед выпуском требуются измерение 1080p+, проверка воспроизведения и не менее 20 доступных каналов 18+.
+Адреса 60 списков заданы в [`tools/iptv-sources.txt`](tools/iptv-sources.txt). Часть издателей использует общие базы и пересекается; результаты после удаления дублей и проверки качества нельзя суммировать по источникам. Доступность самих списков проверена, но новые каналы ещё не прошли полную проверку с приставки и анализ истории. Текущий кандидат 0.4.5 не подтвердил требование о 20 каналах для взрослых. Подробности — в [исследовании источников](docs/iptv-source-research-2026-11-10.md). Перед выпуском требуются измерение 1080p+, проверка воспроизведения и не менее 20 доступных каналов 18+.
 
 Все категории, включая 18+, находятся в одном плейлисте и доступны через группировку на плитке ТВ-каналов; список категорий начинается с «Для взрослых». Страны и распознанные области/штаты отмечаются флагом. Сборщик убирает дубли без учёта отметки качества. Доступность сторонних потоков меняется; перед конкретной сборкой их проверяют тем же верификатором.
 
@@ -211,7 +211,7 @@ python3 tools/device-monitor.py --capture-interface wlan0 --controlled-network -
 
 ## Стороннее ПО
 
-Целевой комплект сторонних приложений: TV Launcher 1.6.2, TorrServer MatriX.143.FOSS, VLC 3.7.2, Obtainium 1.7.4 и Hypatia 3.18. Файловый менеджер встроен в образ — плитка «Файлы» (`apps/files`). Ссылки на страницы проектов приведены в таблице выше. Obtainium проверяет обновления напрямую в источниках приложений; Flicky удалён. WebView — LineageOS 155.0.8059.39. TorrServer работает на порту 8090.
+Целевой комплект сторонних приложений: TV Launcher 1.6.2, TorrServer MatriX.143.FOSS, VLC 3.7.2, Obtainium 1.7.4 и Hypatia 3.18. Файловый менеджер — штатный «Файловый менеджер» Rockchip из vendor-образа (плитка), запасной root-менеджер — «Файлы (root)» (`apps/files`). Ссылки на страницы проектов приведены в таблице выше. Obtainium проверяет обновления напрямую в источниках приложений; Flicky удалён. WebView — LineageOS 155.0.8059.39. TorrServer работает на порту 8090.
 
 Для регистрации приложений откройте Obtainium → **Import/Export** → **Obtainium import** и выберите `/sdcard/tvbox/obtainium-apps.json`. Файл содержит источники VLC, TorrServe, TV Launcher, Obtainium, Hypatia и всех семи собираемых APK Panadonik. Алиса и RuStore в этом списке отсутствуют. CI прикладывает APK Panadonik к каждому GitHub Release; Obtainium выбирает нужный файл по package ID и фильтру имени. Приложение `tvboxd` и загрузочный экран остаются в подписанном OTA, поскольку это системные JAR, а не APK. Android может запросить подтверждение установки APK-обновления.
 
