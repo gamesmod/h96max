@@ -20,6 +20,7 @@ class GitHubReleasePathTests(unittest.TestCase):
 import java.io.*;
 import java.net.*;
 import com.sun.net.httpserver.HttpServer;
+class GitHubDevSource { static String resolve(String base) { return base; } }
 class Check {
     static String latestUrl(String base) { return base; }
 METHOD
@@ -45,6 +46,30 @@ METHOD
             (path / "Check.java").write_text(harness, encoding="utf-8")
             subprocess.run([JAVAC, "Check.java"], cwd=path, check=True, capture_output=True)
             subprocess.run([JAVA, "-cp", str(path), "Check"], cwd=path, check=True, capture_output=True, timeout=20)
+
+    def test_dev_source_and_release_filter(self):
+        source = (ROOT / "apps/tvboxd/src/org/tvbox/daemon/GitHubDevSource.java").read_text()
+        methods = source[source.index("    static String repository("):source.index("    static String resolve(")]
+        checks = r'''public static void main(String[] args) throws Exception {
+            if (!"owner/repo".equals(repository("https://github.com/owner/repo/releases/dev/"))) throw new AssertionError();
+            for (String u : new String[]{"https://example.com/owner/repo/releases/dev/",
+                    "http://github.com/owner/repo/releases/dev/", "https://github.com/owner/repo/releases/dev/?x=1",
+                    "https://github.com/owner/repo/releases/download/dev-v1/"}) {
+                if (repository(u) != null) throw new AssertionError(u);
+            }
+            String date = "2026-11-23T12:00:00Z";
+            if (!eligible("dev-v0.4.7", false, true, date)) throw new AssertionError();
+            if (eligible("v0.4.7", false, false, date)
+                || eligible("dev-v0.4.7", true, true, date)
+                || eligible("dev-v0.4.7", false, false, date)
+                || eligible("dev-v0.4.7", false, true, "null")
+                || eligible("dev-v../bad", false, true, date)) throw new AssertionError();
+        }'''
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory)
+            (path / "Check.java").write_text("import java.net.URL; class Check {" + methods + checks + "}")
+            subprocess.run([JAVAC, "Check.java"], cwd=path, check=True, capture_output=True)
+            subprocess.run([JAVA, "-cp", str(path), "Check"], check=True, capture_output=True)
 
     def test_release_bases(self):
         source = (ROOT / "apps/tvboxd/src/org/tvbox/daemon/Main.java").read_text()

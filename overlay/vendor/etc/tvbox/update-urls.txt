@@ -1,4 +1,4 @@
 # update sources: each folder has emmc/latest.txt and sd/latest.txt (tools/release-ota.sh)
 https://github.com/gamesmod/h96max/releases/latest/download/
-# Dev prerelease (pinned tag)
-https://github.com/gamesmod/h96max/releases/download/dev-v0.4.6/
+# Latest published dev prerelease (resolved by tvboxd via GitHub API)
+https://github.com/gamesmod/h96max/releases/dev/
