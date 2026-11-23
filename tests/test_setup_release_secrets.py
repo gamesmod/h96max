@@ -12,8 +12,7 @@ SCRIPT = ROOT / "tools/setup-release-secrets.sh"
 TEXT = SCRIPT.read_text()
 WORKFLOW = (ROOT / ".github/workflows/release.yml").read_text()
 COMPONENTS = (ROOT / "COMPONENTS.md").read_text()
-SECRETS = ("RELEASE_INPUTS_ARCHIVE_URL", "RELEASE_INPUTS_SHA256", "TVBOX_SIGNING_KEY",
-           "TVBOX_SIGNING_CERT", "OTA_SIGNING_KEY", "OTA_SIGNING_CERT")
+SECRETS = ("TVBOX_SIGNING_KEY", "TVBOX_SIGNING_CERT", "OTA_SIGNING_KEY", "OTA_SIGNING_CERT")
 
 GH_STUB = """#!/bin/bash
 case "$1 $2" in
@@ -37,6 +36,8 @@ class SetupReleaseSecretsTests(unittest.TestCase):
         self.assertEqual(used, set(SECRETS))
         for name in SECRETS:
             self.assertIn(name, TEXT)
+        self.assertNotIn("RELEASE_INPUTS_ARCHIVE_URL", WORKFLOW)
+        self.assertNotIn("RELEASE_INPUTS_SHA256", WORKFLOW)
 
     def test_expected_fingerprints_match_components(self):
         for var in ("TVBOX_CERT_SHA256", "OTA_CERT_SHA256"):
@@ -76,17 +77,14 @@ class SetupReleaseSecretsTests(unittest.TestCase):
         (bin_dir / "gh").chmod(0o755)
         log = tmp / "gh"
         log.mkdir()
-        archive = tmp / "inputs.tar.zst"
-        archive.write_bytes(b"not a real archive")
         env = dict(os.environ, PATH=f"{bin_dir}:{os.environ['PATH']}", GH_LOG=str(log))
         env.pop("RELEASE_INPUTS_ARCHIVE_URL", None)
-        return path, sec, archive, log, env
+        return path, sec, log, env
 
     def test_refuses_keys_that_are_not_the_project_keys(self):
         with tempfile.TemporaryDirectory() as t:
-            path, sec, archive, log, env = self._fixture(pathlib.Path(t), patch_fingerprints=False)
-            r = subprocess.run(["bash", str(path), "--skip-git", "--archive", str(archive), "--archive-url",
-                                "https://example.invalid/x"], env=env, capture_output=True, text=True,
+            path, sec, log, env = self._fixture(pathlib.Path(t), patch_fingerprints=False)
+            r = subprocess.run(["bash", str(path), "--skip-git"], env=env, capture_output=True, text=True,
                                stdin=subprocess.DEVNULL)
             self.assertNotEqual(r.returncode, 0)
             self.assertIn("COMPONENTS.md", r.stderr)
@@ -95,33 +93,21 @@ class SetupReleaseSecretsTests(unittest.TestCase):
 
     def test_sets_secrets_via_stdin_without_printing_keys(self):
         with tempfile.TemporaryDirectory() as t:
-            path, sec, archive, log, env = self._fixture(pathlib.Path(t), patch_fingerprints=True)
-            url = "https://example.invalid/private/inputs.tar.zst"
-            r = subprocess.run(["bash", str(path), "--skip-git", "--archive", str(archive)],
-                               env=dict(env, RELEASE_INPUTS_ARCHIVE_URL=url), capture_output=True, text=True,
+            path, sec, log, env = self._fixture(pathlib.Path(t), patch_fingerprints=True)
+            r = subprocess.run(["bash", str(path), "--skip-git"], env=env, capture_output=True, text=True,
                                stdin=subprocess.DEVNULL)
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertNotIn("PRIVATE KEY", r.stdout + r.stderr)
-            self.assertNotIn(url, r.stdout + r.stderr)
             self.assertEqual(sorted(p.name for p in log.iterdir()), sorted(SECRETS))
             self.assertEqual((log / "TVBOX_SIGNING_KEY").read_bytes(), (sec / "tvbox-key.pem").read_bytes())
             self.assertEqual((log / "OTA_SIGNING_CERT").read_bytes(), (sec / "ota-cert.pem").read_bytes())
-            self.assertEqual((log / "RELEASE_INPUTS_ARCHIVE_URL").read_text(), url)
-            import hashlib
-            self.assertEqual((log / "RELEASE_INPUTS_SHA256").read_text(),
-                             hashlib.sha256(archive.read_bytes()).hexdigest())
 
-    def test_dry_run_sets_nothing_and_rejects_public_repo_url(self):
+    def test_dry_run_sets_nothing(self):
         with tempfile.TemporaryDirectory() as t:
-            path, sec, archive, log, env = self._fixture(pathlib.Path(t), patch_fingerprints=True)
-            r = subprocess.run(["bash", str(path), "--skip-git", "--dry-run", "--archive", str(archive)],
+            path, sec, log, env = self._fixture(pathlib.Path(t), patch_fingerprints=True)
+            r = subprocess.run(["bash", str(path), "--skip-git", "--dry-run"],
                                env=env, capture_output=True, text=True, stdin=subprocess.DEVNULL)
             self.assertEqual(r.returncode, 0, r.stderr)
-            self.assertEqual(list(log.iterdir()), [])
-            r = subprocess.run(["bash", str(path), "--skip-git", "--archive", str(archive), "--archive-url",
-                                "https://github.com/gamesmod/h96max/releases/download/x/inputs.tar.zst"],
-                               env=env, capture_output=True, text=True, stdin=subprocess.DEVNULL)
-            self.assertNotEqual(r.returncode, 0)
             self.assertEqual(list(log.iterdir()), [])
 
 

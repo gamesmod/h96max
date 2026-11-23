@@ -1,0 +1,59 @@
+{
+  "comment": "Pinned third-party build inputs. Not stored in git; fetched by tools/fetch-third-party.sh. SHA-256 measured from local verified copies 2026-11-23.",
+  "items": [
+    {
+      "id": "com.tvlauncher",
+      "version": "1.6.2",
+      "url": "https://f-droid.org/repo/com.tvlauncher_10602.apk",
+      "sha256": "7afde83f96ccf30d1bc69ca06692d385800d2d9a14dd5f7d85fb4ad4f3c5c210",
+      "dest": "dl/apk/com.tvlauncher.apk"
+    },
+    {
+      "id": "dev.imranr.obtainium",
+      "version": "1.7.4",
+      "url": "https://github.com/ImranR98/Obtainium/releases/download/v1.7.4/app-arm64-v8a-release.apk",
+      "sha256": "f9216f721a7713b75929e0806bc18586f8fcf7328fbbff99b6aef1debb9eef80",
+      "dest": "dl/apk/dev.imranr.obtainium.apk"
+    },
+    {
+      "id": "org.maintainteam.hypatia",
+      "version": "3.18",
+      "url": "https://apt.izzysoft.de/fdroid/repo/org.maintainteam.hypatia_318.apk",
+      "sha256": "d0e31c8dbb338e61220373be61ee524c8476f39aa2d59517984fe45c5e7576c3",
+      "dest": "dl/apk/org.maintainteam.hypatia.apk"
+    },
+    {
+      "id": "org.videolan.vlc",
+      "version": "3.7.2",
+      "url": "https://f-droid.org/repo/org.videolan.vlc_13070206.apk",
+      "sha256": "e748c3e0bb9ec447f3e49f71d5c73e0b48c2c0309faa7fb79806d3afb5601b66",
+      "dest": "dl/apk/org.videolan.vlc.apk"
+    },
+    {
+      "id": "ru.yourok.torrserve",
+      "version": "MatriX.143.FOSS",
+      "url": "https://f-droid.org/repo/ru.yourok.torrserve_177.apk",
+      "sha256": "c1021faf83e99bd9cdb7359581ec9c7dabf306ca37edaf286685b30d73e772a6",
+      "dest": "dl/apk/ru.yourok.torrserve.apk"
+    },
+    {
+      "id": "com.android.webview",
+      "version": "155.0.8059.39",
+      "url": "https://github.com/LineageOS/android_external_chromium-webview_prebuilt_arm64",
+      "git": {
+        "repo": "https://github.com/LineageOS/android_external_chromium-webview_prebuilt_arm64.git",
+        "commit": "604ad4cbc41d3b894065ee6e83189c76e1ec06a1",
+        "path": "webview.apk"
+      },
+      "sha256": "e91bced008fa9a2976997072cd9168c653905b538217530994f20d73276e72d9",
+      "dest": "dl/webview/webview-arm64.apk"
+    },
+    {
+      "id": "TorrServer-android-arm64",
+      "version": "MatriX.147.1",
+      "url": "https://github.com/YouROK/TorrServer/releases/download/MatriX.147.1/TorrServer-android-arm64",
+      "sha256": "93250bb1850e69663c6758398be515c2c429595cb4692c6eccb367f2236868d5",
+      "dest": "dl/torrserver/TorrServer-android-arm64"
+    }
+  ]
+}

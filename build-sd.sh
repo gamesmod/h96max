@@ -308,12 +308,19 @@ sudo rm -f $MNT/bin/xbmc_copy_folder.sh
 lbl u:object_r:vendor_configs_file:s0 $MNT/etc/init/hw/init.hcy.rc
 lbl u:object_r:preinstall_exec:s0 $MNT/bin/preinstall.sh
 # no cameras on this box (user 2026-10-27): drop both camera provider HALs (rc, binaries, VINTF manifest entry),
-# so neither starts at boot nor makes cameraserver wait for a declared instance; cameraserver stays (reports 0 cameras)
+# so neither starts at boot nor makes cameraserver wait for a declared instance; cameraserver stays (reports 0 cameras).
+# Идемпотентно: очищенные LFS-входы уже могут не содержать HAL.
 sudo rm -f $MNT/etc/init/android.hardware.camera.provider@2.4-service.rc $MNT/etc/init/android.hardware.camera.provider@2.4-external-service.rc \
     $MNT/bin/hw/android.hardware.camera.provider@2.4-service $MNT/bin/hw/android.hardware.camera.provider@2.4-external-service
+sudo rm -f $MNT/etc/permissions/android.hardware.camera.xml \
+    $MNT/etc/permissions/android.hardware.camera.front.xml \
+    $MNT/etc/permissions/android.hardware.camera.external.xml \
+    $MNT/etc/external_camera_config.xml
 sudo python3 -I - $MNT/etc/vintf/manifest.xml <<'PY'
 import re, sys
 p = sys.argv[1]; s = open(p).read()
+if 'camera.provider' not in s:
+    raise SystemExit(0)
 n = re.subn(r'\n[ \t]*<hal format="hidl">\s*<name>android\.hardware\.camera\.provider</name>.*?</hal>', '', s, flags=re.S)
 assert n[1] == 1, "camera.provider not found in vendor manifest"
 open(p, 'w').write(n[0])

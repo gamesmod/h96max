@@ -6,9 +6,8 @@
 #   TVBOX_SIGNING_CERT  содержимое secrets/tvbox-cert.pem (PEM X.509, как есть)
 #   OTA_SIGNING_KEY     содержимое secrets/ota-key.pem    (PEM закрытого ключа без пароля, как есть)
 #   OTA_SIGNING_CERT    содержимое secrets/ota-cert.pem   (PEM X.509, как есть)
-#   RELEASE_INPUTS_ARCHIVE_URL  HTTPS-адрес приватного архива входов (.tar.zst из tools/package-ci-inputs.sh),
-#                               который скачивается обычным `curl -L` без авторизации
-#   RELEASE_INPUTS_SHA256       64 hex-символа SHA-256 этого архива
+# Стоковые входы — Git LFS; сторонние APK — tools/fetch-third-party.sh.
+# RELEASE_INPUTS_ARCHIVE_URL / RELEASE_INPUTS_SHA256 больше не используются.
 # CI пишет ключи обратно в secrets/*.pem через printf, поэтому base64/pk8 не нужны.
 #
 # Ключи никогда не генерируются, не печатаются и не попадают в аргументы команд: в `gh secret set` они
@@ -23,7 +22,7 @@ ARCHIVE=""
 PACKAGE_ARCHIVE=""
 ARCHIVE_URL="${RELEASE_INPUTS_ARCHIVE_URL:-}"
 VERIFY_URL=0
-KEYS_ONLY=0
+KEYS_ONLY=1
 SKIP_GIT=0
 SET_REMOTE=0
 GIT_NAME=""
@@ -46,15 +45,10 @@ Git и gh:
   --set-remote             перенастроить origin на https://github.com/OWNER/NAME.git
   --skip-git               не трогать git/gh-настройки (только проверить вход gh)
 
-Ключи и архив входов:
+Ключи подписи:
   --secrets-dir DIR        каталог с tvbox-key.pem, tvbox-cert.pem, ota-key.pem, ota-cert.pem (по умолчанию ./secrets)
-  --archive FILE           готовый приватный архив входов (.tar.zst); SHA-256 считается локально
-  --package-archive FILE   сначала создать архив через tools/package-ci-inputs.sh FILE (файл не должен существовать)
-  --archive-url URL        HTTPS-адрес, по которому CI скачает этот архив без авторизации.
-                           Лучше передать через переменную окружения RELEASE_INPUTS_ARCHIVE_URL или ввести по запросу,
-                           чтобы адрес не попал в историю shell.
-  --verify-url             скачать архив по URL и сверить SHA-256 до записи секретов
-  --keys-only              задать только четыре секрета ключей/сертификатов
+  --keys-only              устаревший флаг (поведение по умолчанию)
+  --archive/--archive-url  устарели: сток в Git LFS, сторонние APK качает fetch-third-party.sh
 
 Запуск сборки (только по явному флагу):
   --rerun                  перезапустить последний неуспешный запуск release.yml на candidate/<версия>
@@ -77,10 +71,10 @@ while [ $# -gt 0 ]; do
         --set-remote) SET_REMOTE=1; shift;;
         --skip-git) SKIP_GIT=1; shift;;
         --secrets-dir) SECRETS_DIR=${2:?}; shift 2;;
-        --archive) ARCHIVE=${2:?}; shift 2;;
-        --package-archive) PACKAGE_ARCHIVE=${2:?}; shift 2;;
-        --archive-url) ARCHIVE_URL=${2:?}; shift 2;;
-        --verify-url) VERIFY_URL=1; shift;;
+        --archive|--package-archive|--archive-url)
+            echo "  внимание: приватный архив входов больше не нужен (Git LFS + fetch-third-party); флаг $1 игнорируется" >&2
+            shift; case "$1" in -*) ;; *) shift;; esac;;
+        --verify-url) echo "  внимание: --verify-url устарел" >&2; shift;;
         --keys-only) KEYS_ONLY=1; shift;;
         --rerun) RERUN=1; shift;;
         --dispatch) DISPATCH_REF=${2:?}; shift 2;;

@@ -1,0 +1,11 @@
+nv_by_chip=2 17200 4 nvram_AP6330.txt 43342 1 nvram_43342.txt
+ccode=XZ
+regrev=11
+kso_enable=0
+pm2_sleep_ret=2000
+force_wme_ac=1
+wme_ac_sta_be=aifsn 3 ecwmin 4 ecwmax 4 t
+dhd_master_mode=0
+pkt_filter_add=120 0 0 12 0xFFFF000000000000000000000089, 121 0 0 0 0xFFFF 0x3333
+
+

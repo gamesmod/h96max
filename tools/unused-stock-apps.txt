@@ -1,5 +1,8 @@
-# partition absolute-path-inside-filesystem; only apps excluded from Panadonik
+# partition absolute-path-inside-filesystem; apps and hardware-unavailable bits excluded from Panadonik
 # Не удалять FileExploresky (com.droidlogic.FileBrower) — штатный файловый менеджер платы.
+# Не удалять Bluetooth, VfdService, ChangeLed, BoxLatinIME, Settings/SystemUI/TvSettings, PackageInstaller.
+# Кандидаты (не трогать без проверки на устройстве): FusedLocation, ContactsProvider, CalendarProvider,
+# CompanionDeviceManager, BasicDreams, HTMLViewer, WallpaperBackup, telephony/ims jars, NFC stubs.
 product /app/GoogleCalendarSyncAdapter
 product /app/GoogleContactsSyncAdapter
 product /app/GoogleLocationHistory
@@ -27,6 +30,8 @@ system_ext /priv-app/GoogleServicesFramework
 system /system/app/katniss
 system /system/app/chrome_hcy
 system /system/app/GooglePrintRecommendationService
+system /system/app/PrintSpooler
+system /system/app/SecureElement
 system /system/app/RKHcyUpdate
 system /system/app/ProductTest
 system /system/app/RKHcyDeviceTest
@@ -43,3 +48,22 @@ system /system/app/SkySetupWizard
 system /system/priv-app/ShowDebug
 system /system/priv-app/DynamicSystemInstallationService
 system /system/preinstall
+system /system/usr/Aging_Test_Video.mp4
+system /system/bin/datadis
+system /system/bin/user_drmservice
+system /system/bin/mytest
+system /system/bin/userfun.sh
+system /system/bin/stress_ddr_test
+system /system/bin/stress_wifi_test.sh
+vendor /etc/init/android.hardware.camera.provider@2.4-service.rc
+vendor /etc/init/android.hardware.camera.provider@2.4-external-service.rc
+vendor /bin/hw/android.hardware.camera.provider@2.4-service
+vendor /bin/hw/android.hardware.camera.provider@2.4-external-service
+vendor /etc/permissions/android.hardware.camera.xml
+vendor /etc/permissions/android.hardware.camera.front.xml
+vendor /etc/permissions/android.hardware.camera.external.xml
+vendor /etc/external_camera_config.xml
+vendor /bin/xbmc_copy_folder.sh
+vendor /recovery-from-boot.p
+vendor /etc/init/vendor_flash_recovery.rc
+vendor /bin/install-recovery.sh

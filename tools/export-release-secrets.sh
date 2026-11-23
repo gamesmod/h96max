@@ -9,7 +9,7 @@
 #   secrets/tvbox-key.pem, secrets/tvbox-cert.pem, secrets/ota-key.pem, secrets/ota-cert.pem
 #       — имена, под которыми release.yml восстанавливает ключи; содержимое = значения секретов
 #       TVBOX_SIGNING_KEY, TVBOX_SIGNING_CERT, OTA_SIGNING_KEY, OTA_SIGNING_CERT
-#   RELEASE_INPUTS_SHA256, RELEASE_INPUTS_ARCHIVE_URL (если задан) — значения одноимённых секретов
+#   (устаревшие RELEASE_INPUTS_* больше не требуются: сток в Git LFS)
 #   MANIFEST.txt — дата, коммит, версия, отпечатки сертификатов, инструкция импорта
 #
 # Шифрование: openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt, пароль из скрытого ввода (дважды) или
@@ -153,29 +153,22 @@ if [ "$MODE" = export ]; then
     check_pair "APK (tvbox)" "$TK" "$TC" "$TVBOX_CERT_SHA256"
     check_pair "OTA" "$OK" "$OC" "$OTA_CERT_SHA256"
 
-    if [ -z "$INPUTS_SHA" ]; then
-        if [ -z "$INPUTS_ARCHIVE" ]; then
-            INPUTS_ARCHIVE=$(ls -t "$R"/*inputs*.tar.zst /tmp/*inputs*.tar.zst /tmp/*/*inputs*.tar.zst \
-                "$HOME"/*inputs*.tar.zst 2>/dev/null | head -n 1 || true)
-        fi
-        if [ -n "$INPUTS_ARCHIVE" ]; then
-            [ -f "$INPUTS_ARCHIVE" ] && [ -s "$INPUTS_ARCHIVE" ] || die "архив входов $INPUTS_ARCHIVE не найден"
-            note "архив входов: $INPUTS_ARCHIVE; считаю SHA-256"
-            INPUTS_SHA=$(sha256_stdin < "$INPUTS_ARCHIVE")
-        fi
+    # Приватный архив входов CI устарел (сток в Git LFS). Явные --archive/--sha256/--ask-url
+    # сохраняются только для совместимости старых бандлов и в новый архив не обязательны.
+    if [ -n "$INPUTS_ARCHIVE" ] && [ -z "$INPUTS_SHA" ]; then
+        [ -f "$INPUTS_ARCHIVE" ] && [ -s "$INPUTS_ARCHIVE" ] || die "архив входов $INPUTS_ARCHIVE не найден"
+        echo "  внимание: --archive устарел; SHA-256 посчитан, но release.yml его больше не использует" >&2
+        INPUTS_SHA=$(sha256_stdin < "$INPUTS_ARCHIVE")
     fi
     if [ -n "$INPUTS_SHA" ]; then
         [[ "$INPUTS_SHA" =~ ^[0-9a-f]{64}$ ]] || die "SHA-256 должен состоять из 64 hex-символов в нижнем регистре"
-        note "RELEASE_INPUTS_SHA256: $INPUTS_SHA"
-    else
-        echo "  внимание: архив входов не найден — RELEASE_INPUTS_SHA256 в архив секретов не попадёт (--archive/--sha256)" >&2
     fi
     if [ -z "$ARCHIVE_URL" ] && [ "$ASK_URL" = 1 ]; then
-        [ -t 0 ] || die "нет терминала для ввода адреса; задайте RELEASE_INPUTS_ARCHIVE_URL"
-        printf 'HTTPS-адрес архива входов (ввод скрыт, Enter — пропустить): ' >&2; IFS= read -r -s ARCHIVE_URL; echo >&2
+        echo "  внимание: --ask-url устарел (Git LFS); пропускаю" >&2
     fi
     if [ -n "$ARCHIVE_URL" ]; then
-        [ -n "$INPUTS_SHA" ] || die "адрес архива без его SHA-256 бесполезен для CI"
+        echo "  внимание: RELEASE_INPUTS_ARCHIVE_URL устарел и не нужен CI" >&2
+        [ -n "$INPUTS_SHA" ] || die "адрес архива без его SHA-256 бесполезен"
         check_url "$ARCHIVE_URL" "$INPUTS_SHA"
     fi
 
@@ -210,15 +203,11 @@ Panadonik / $REPO_SLUG — секреты GitHub Actions для release.yml
   secrets/tvbox-cert.pem     → TVBOX_SIGNING_CERT
   secrets/ota-key.pem        → OTA_SIGNING_KEY
   secrets/ota-cert.pem       → OTA_SIGNING_CERT
-  RELEASE_INPUTS_SHA256      → RELEASE_INPUTS_SHA256$([ -n "$INPUTS_SHA" ] || echo ' (нет в этом архиве)')
-  RELEASE_INPUTS_ARCHIVE_URL → RELEASE_INPUTS_ARCHIVE_URL$([ -n "$ARCHIVE_URL" ] || echo ' (нет в этом архиве)')
-
 Импорт из клона репозитория:
   bash tools/export-release-secrets.sh --apply ЭТОТ_АРХИВ [--rerun]
 Импорт вручную из распакованного каталога (значения идут через stdin):
   for s in TVBOX_SIGNING_KEY:secrets/tvbox-key.pem TVBOX_SIGNING_CERT:secrets/tvbox-cert.pem \\
-           OTA_SIGNING_KEY:secrets/ota-key.pem OTA_SIGNING_CERT:secrets/ota-cert.pem \\
-           RELEASE_INPUTS_SHA256:RELEASE_INPUTS_SHA256 RELEASE_INPUTS_ARCHIVE_URL:RELEASE_INPUTS_ARCHIVE_URL; do
+           OTA_SIGNING_KEY:secrets/ota-key.pem OTA_SIGNING_CERT:secrets/ota-cert.pem; do
       [ -f "\${s#*:}" ] && gh secret set "\${s%%:*}" -R $REPO_SLUG < "\${s#*:}"
   done
 Расшифровка: openssl enc -d -aes-256-cbc -pbkdf2 -iter $ITER -in АРХИВ | tar -xzf -
@@ -254,12 +243,6 @@ tar -C "$WORK" -xzf "$WORK/bundle.tar.gz" "$BUNDLE" || die "в архиве не
 B="$WORK/$BUNDLE"
 check_pair "APK (tvbox)" "$B/secrets/tvbox-key.pem" "$B/secrets/tvbox-cert.pem" "$TVBOX_CERT_SHA256"
 check_pair "OTA" "$B/secrets/ota-key.pem" "$B/secrets/ota-cert.pem" "$OTA_CERT_SHA256"
-if [ -f "$B/RELEASE_INPUTS_SHA256" ]; then
-    grep -Eqx '[0-9a-f]{64}' "$B/RELEASE_INPUTS_SHA256" || die "RELEASE_INPUTS_SHA256 в архиве повреждён"
-    [ ! -f "$B/RELEASE_INPUTS_ARCHIVE_URL" ] \
-        || check_url "$(cat "$B/RELEASE_INPUTS_ARCHIVE_URL")" "$(cat "$B/RELEASE_INPUTS_SHA256")"
-fi
-
 if git -C "$R" rev-parse --is-inside-work-tree >/dev/null 2>&1 && [ "$DRY_RUN" = 0 ]; then
     [ -z "$GIT_NAME" ] || git -C "$R" config --local user.name "$GIT_NAME"
     [ -z "$GIT_EMAIL" ] || git -C "$R" config --local user.email "$GIT_EMAIL"
@@ -273,8 +256,7 @@ fi
     || die "у текущего входа gh нет прав администратора $REPO_SLUG"
 
 for pair in TVBOX_SIGNING_KEY:secrets/tvbox-key.pem TVBOX_SIGNING_CERT:secrets/tvbox-cert.pem \
-            OTA_SIGNING_KEY:secrets/ota-key.pem OTA_SIGNING_CERT:secrets/ota-cert.pem \
-            RELEASE_INPUTS_SHA256:RELEASE_INPUTS_SHA256 RELEASE_INPUTS_ARCHIVE_URL:RELEASE_INPUTS_ARCHIVE_URL; do
+            OTA_SIGNING_KEY:secrets/ota-key.pem OTA_SIGNING_CERT:secrets/ota-cert.pem; do
     name=${pair%%:*}; file="$B/${pair#*:}"
     if [ ! -f "$file" ]; then echo "  внимание: $name нет в архиве — секрет не изменён" >&2; continue; fi
     if [ "$DRY_RUN" = 1 ]; then echo "  [dry-run] gh secret set $name -R $REPO_SLUG (через stdin)"; continue; fi
