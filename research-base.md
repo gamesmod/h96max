@@ -42,6 +42,4 @@
 - A11 V11 20211029: ядро 4.19.193, патч 2021-06-05, те же fddis/LED/BT, bcm4334 есть. Отличий от A12 в нашу пользу нет.
 - apex в A12 — модули `com.google.android.*` (ART, media, permission, statsd…). Это код AOSP с подписью Google,
   телеметрии GMS в них нет, без замены не вырезаются. Их оставляем и объясняем в критерии `pm list | grep google`.
-- F-Droid: FLauncher в основном репозитории нет (заброшен). Живые TV-лаунчеры: TV Launcher (com.tvlauncher, 2026-10),
-  Couchy, Luncher. Клиенты: F-Droid 2.0.2, Droid-ify 0.7.8, Neo Store 1.3.2. TorrServe MatriX FOSS (ru.yourok.torrserve)
-  есть в F-Droid; есть Kodi 21.3, RetroArch 1.22.2, LibreTorrent.
+- F-Droid / прямые релизы: домашний экран — TV Launcher (`com.tvlauncher`); остальные сторонние APK образа — см. [`apps-sources.md`](apps-sources.md) и Obtainium.

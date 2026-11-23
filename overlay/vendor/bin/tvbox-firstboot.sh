@@ -42,18 +42,17 @@ fi
 for apk in /product/tvbox/apk/*.apk; do
     [ -f "$apk" ] || continue
     pkg=$(basename "$apk" .apk)
-    # Flicky и игры удалены из выпуска: не ставить старый APK с /product перед его удалением ниже.
+    # Не ставить с /product пакеты, которых нет в текущем комплекте образа.
     case "$pkg" in org.smarttube.stable|org.smarttube.beta|com.liskovsoft.smarttubetv|app.flicky|com.agateau.tinywheels.android|org.supertux.supertux2) continue;; esac
     if ! pm path "$pkg" >/dev/null 2>&1; then
         echo "install $pkg: $(pm install -r "$apk" 2>&1)"
     fi
 done
-# Удалить исключённые приложения вместе с данными прежних установок.
+# Миграция: снять с пользователя пакеты вне текущего комплекта образа.
 for p in com.agateau.tinywheels.android org.supertux.supertux2 app.flicky org.smarttube.stable org.smarttube.beta com.liskovsoft.smarttubetv; do
     if pm path "$p" >/dev/null 2>&1; then pm uninstall --user 0 "$p"; fi
 done
-# Total Commander и его плагины исключены из выпуска: файловый менеджер по умолчанию — штатный «Файловый менеджер»
-# штатный FileExploresky (com.droidlogic.FileBrower). Удалить их с уже обновлённых приставок вместе с источниками в Obtainium.
+# Миграция: прежний сторонний файловый менеджер → штатный FileExploresky; снять пакеты и записи Obtainium.
 for p in com.ghisler.android.TotalCommander com.ghisler.tcplugins.LAN com.ghisler.tcplugins.FTP \
          com.ghisler.tcplugins.SFTP com.ghisler.tcplugins.wifitransfer; do
     if pm path "$p" >/dev/null 2>&1; then echo "remove $p: $(pm uninstall --user 0 "$p" 2>&1)"; fi
@@ -67,7 +66,7 @@ appops set dev.imranr.obtainium REQUEST_INSTALL_PACKAGES allow
 # Obtainium v1.7.4: getAppStorageDir()/app_data, один JSON на пакет.
 # Добавлять только отсутствующие записи; не менять выбранные пользователем источники.
 O=/sdcard/Android/data/dev.imranr.obtainium/files/app_data
-# Удалить источники исключённого видеоклиента, включая старую копию ручного импорта.
+# Миграция: убрать устаревшие записи Obtainium вне текущего комплекта.
 for p in org.smarttube.stable org.smarttube.beta com.liskovsoft.smarttubetv; do
     rm -f "$O/$p.json"
 done
@@ -171,7 +170,7 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initializ
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
     ALLOWED="org.tvbox.iptv ru.yourok.torrserve com.droidlogic.FileBrower org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
     T=""; EXTRA=""; N=0
-    # Сохранить установленные функции и их порядок; удалить дубли, игры и устаревшие плитки.
+    # Сохранить установленные функции и их порядок; удалить дубли и устаревшие плитки.
     for p in $(printf '%s' "$OLD" | sed 's/\&\#30;/ /g'); do
         case "$p" in com.agateau.tinywheels.android|org.supertux.supertux2|dev.imranr.obtainium) continue;; esac
         pm path "$p" >/dev/null 2>&1 || continue
@@ -274,7 +273,7 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-obtainium-integ
     fi
     touch "$D/launcher-obtainium-integrated"
 fi
-# При переходе с Flicky на Obtainium заменить только старый пакет плитки и сохранить её позицию.
+# Миграция: прежняя плитка клиента обновлений → Obtainium, позиция сохраняется.
 L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
 if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-flicky-removed" ] && [ -f "$L" ]; then
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
@@ -293,12 +292,12 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-flicky-removed"
         mv "$L.new" "$L"; restorecon -R "${L%/*}"
         am force-stop com.tvlauncher
         am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
-        echo "tvlauncher: replaced Flicky tile with Obtainium"
+        echo "tvlauncher: replaced legacy update-client tile with Obtainium"
     fi
     touch "$D/launcher-flicky-removed"
 fi
-# Плитка штатного файлового менеджера (com.droidlogic.FileBrower) заменяет на своём месте плитку Total Commander или
-# «Файлов» (org.tvbox.files); если их не было, она встаёт после TorrServe. Один раз, порядок пользователя сохраняется.
+# Плитка FileExploresky заменяет на своём месте прежний сторонний ФМ или «Файлы (root)»;
+# если их не было — после TorrServe. Один раз, порядок пользователя сохраняется.
 FM=com.droidlogic.FileBrower
 if pm path com.tvlauncher >/dev/null 2>&1 && pm path $FM >/dev/null 2>&1 \
         && [ ! -e "$D/launcher-filemanager-tile" ] && [ -f "$L" ]; then

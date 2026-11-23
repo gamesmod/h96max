@@ -10,7 +10,7 @@
 |---|---|---|---|
 | Образ Rockchip `update.img` | RK3318_userdebug_H96_Max_V12_12_20221117.1447 (Android 12, ядро 4.19.232) | sha256 `e93ccc90e5a41fbc430c1f9b3f4621989945ff5a6e9685de6d228f5e7cc5ad58` (`dl/fw/a12.sha256`) | mega.nz из описания видео на Rutube; **точная ссылка — уточнить**, кандидаты в журнале: `mega.nz/file/nxRzxZ6b`, `mega.nz/file/OhZVVIxb`, `mega.nz/file/LkYQmARJ` (последняя рядом с `a11-v11-20211029.7z`). Распаковка: `tools/rkunpack.py`, `tools/lpunpack.py` → `dl/a12/Image` |
 
-Из прошивки удаляются GMS, телеметрия (datadis, user_drmservice), стресс-тесты, Kodi, MediaCenter, камера (HAL), см. build-sd.sh.
+Из прошивки удаляются GMS, телеметрия (datadis, user_drmservice), стресс-тесты, OEM MediaCenter, камера (HAL) и прочий вендорский мусор по спискам `build-sd.sh`.
 
 ## 2. Сторонние приложения (ставятся при первой загрузке из /product/tvbox/apk; Obtainium проверяет обновления из источников приложений)
 | Пакет | Версия | Источник (скачано отсюда) | SHA-256 файла | SHA-256 сертификата |
@@ -21,14 +21,14 @@
 | `com.tvlauncher` (TV Launcher) | 1.6.2 | [F-Droid APK](https://f-droid.org/repo/com.tvlauncher_10602.apk); [исходники](https://github.com/wiiguy/lightweight_androidtv_launcher) | `7afde83f96ccf30d1bc69ca06692d385800d2d9a14dd5f7d85fb4ad4f3c5c210` | `9e9f185a5b3cfb6ff65ac2907d3180c150483705ba129787c60667088647a767` |
 | `org.maintainteam.hypatia` (Hypatia, антивирус-движок) | 3.18 | https://apt.izzysoft.de/fdroid/repo/org.maintainteam.hypatia_318.apk (IzzyOnDroid) | `d0e31c8dbb338e61220373be61ee524c8476f39aa2d59517984fe45c5e7576c3` | `1b008d64bb95ab4774d68b87f22b8be9a272f4924df52029d7e6183835d918cc` |
 
-Совпадение VLC, TorrServe, TV Launcher, Pixel Wheels с F-Droid проверено по sha256 против **подписанного**
+Совпадение VLC, TorrServe и TV Launcher с F-Droid проверено по sha256 против **подписанного**
 индекса https://f-droid.org/repo/index-v1.jar (подпись JAR проверена, ключ репозитория `43238d51…9c9ccab`).
 
 ### Параметры лаунчера и плиток
 
 - Домашнее приложение: `com.tvlauncher/.MainActivity` (TV Launcher 1.6.2 из F-Droid).
 - Порядок: `/data/data/com.tvlauncher/shared_prefs/selected_apps.xml`, ключ `apps_order`; разделитель пакетов — U+001E, сериализуется как `&#30;`; лимит приложения — 14 плиток.
-- После чистой установки `overlay/vendor/bin/tvbox-firstboot.sh` один раз останавливает HOME, убирает игры/устаревшие записи и добавляет штатные плитки в исходном порядке. Маркер `/data/vendor/tvbox/launcher-tiles.initialized` блокирует повторную правку: пользователь может менять порядок и набор, обычная перезагрузка их не сбрасывает. Очистка данных возвращает исходную раскладку.
+- После чистой установки `overlay/vendor/bin/tvbox-firstboot.sh` один раз останавливает HOME, убирает устаревшие записи и добавляет штатные плитки в исходном порядке. Маркер `/data/vendor/tvbox/launcher-tiles.initialized` блокирует повторную правку: пользователь может менять порядок и набор, обычная перезагрузка их не сбрасывает. Очистка данных возвращает исходную раскладку.
 - Порядок по умолчанию: IPTV, TorrServe, Файловый менеджер (штатный FileExploresky `com.droidlogic.FileBrower`), Ссылки, Установка, Журнал загрузки, Настройки Android, Производительность, Питание. Obtainium открывается из пункта «Обновления приложений» внутри плитки «Установка». VLC остаётся зависимостью ТВ-каналов и TorrServer, но отдельной плиткой не выводится. Антивирус также исключён из домашнего ряда, приложение остаётся в списке приложений.
 
 ## 3. Системные компоненты из сторонних источников
@@ -56,13 +56,11 @@
 | Антивирус | `org.tvbox.antivirus` | `apps/antivirus` | проверка по требованию через Hypatia, базы, защита в реальном времени |
 | Питание | `org.tvbox.power` | `apps/power` | выключение, сон, перезагрузка и переход в recovery; значок выключения рисуется приложением, не зависит от шрифта |
 | Журнал загрузки | `org.tvbox.bootlog` | `apps/bootlog` | журнал ядра и ошибок; краткая сводка запуска также показана при старте и хранится для просмотра |
-| Производительность | `org.tvbox.clean` | `apps/clean` | закрытие фоновых приложений, метрики, настройка zRAM |
-| Ссылки | `org.tvbox.links` | `apps/links` (+ qrcodegen Nayuki, MIT) | QR-коды TorrServer и VLC с выбором сетевого адреса |
+| Производительность | `org.tvbox.clean` | `apps/clean` | закрытие фоновых приложений и метрики; UI zRAM удалён |
+| Ссылки | `org.tvbox.links` | `apps/links` (+ qrcodegen Nayuki, MIT) | QR служб; целевой сценарий — добавление торрента в TorrServer и «Смотреть на ТВ» |
 | Файлы (root) | `org.tvbox.files` | `apps/files` | запасной файловый менеджер без плитки и без роли по умолчанию: просмотр и операции с файлами с правами root через `tvboxd` (`FS_*`), открытие файлов в VLC и других приложениях |
-| tvboxd (root-служба) | `/system/framework/tvboxd.jar` | `apps/tvboxd` | файловые операции «Файлов (root)» (только их uid); установка/сверка eMMC, OTA (uncrypt), misc, антивирус и zRAM |
+| tvboxd (root-служба) | `/system/framework/tvboxd.jar` | `apps/tvboxd` | файловые операции «Файлов (root)» (только их uid); установка/сверка eMMC, OTA (uncrypt), misc, антивирус; `PERF_ZRAM_SET` отклоняется |
 | Заставка и сводка загрузки | `media/bootanimation.zip`, `org.tvbox.bootlog` | `tools/mkbootanim.py`, `apps/bootlog`, `overlay/vendor/bin/tvbox-startup-summary.sh` | статичная карточка PANADONIK/RK3318/1080p без 4K; после запуска Android краткий снимок CPU, GPU, RAM, температуры, хранилища и этапов с временными метками; Matrix и кадровая анимация удалены |
-
-Игровые приложения SuperTux и Pixel Wheels не входят в выпуск 0.3.9; firstboot удаляет оставшиеся пользовательские копии и убирает их плитки.
 
 ## 5. Генерируемые данные (инструкция по сборке)
 | Что | Как получить |

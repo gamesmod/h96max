@@ -22,15 +22,3 @@ GitHub APK сверены с SHA-256 релиза и проверены `apksign
 
 Проверка подписи: `tools/apkcert.sh` (apksigner 35.0.2 + apksig из sdk/x, схемы v1/v2/v3). Файлы лежат в `dl/apk/<пакет>.apk`,
 ставятся при первой загрузке как пользовательские (`tvbox-firstboot.sh`, из /product/tvbox/apk) — для проверки новых версий установлен Obtainium.
-
-## Pixel Wheels — f-droid.org
-Индекс https://f-droid.org/repo/index-v1.jar: подпись JAR проверена вручную (CMS + дайджесты SF→MANIFEST→index-v1.json, SHA1withRSA),
-сертификат индекса 43238d512c1e5eb2d6569f4a3afbf5523418b82e0a3ed1552770abb9a9c9ccab = опубликованный отпечаток репозитория F-Droid.
-APK сверен с этим индексом: sha256 файла и подписант (`signer`) совпали.
-
-| `com.agateau.tinywheels.android` | 1.0.1 | com.agateau.tinywheels.android_33.apk | файл `61a50936e728518ce90e7191f8454a98ff24a80b866fa58292a0b474d2dabcd1` | сертификат `d24912992e85d99daa175dbdc14561d2287b253dd656fbbb14bd8fd4a86138cc` (= signer в индексе F-Droid) |
-
-## SuperTux — релиз GitHub SuperTux/supertux v0.7.0 (в F-Droid нет; там только SuperTuxKart, ему нужен GLES3)
-Файл SuperTux-v0.7.0-arm64-v8a.apk, sha256 сверен с `digest` релиза; GLES 2.0, arm64.
-
-| `org.supertux.supertux2` | 0.7.0 | SuperTux-v0.7.0-arm64-v8a.apk | файл `7dd41db4c38862a22625ca0cb66f382d2c30653254a7a2807887cedde4b8f0f9` | сертификат `bc1ac64e45435b9d69beaf4a77cb02c3e9e36bb6dc0d85ceb33665b9f85e1b94` |

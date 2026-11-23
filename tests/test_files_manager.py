@@ -1,4 +1,4 @@
-"""Файловый менеджер по умолчанию — штатный FileExploresky (com.droidlogic.FileBrower) вместо Total Commander; запасные «Файлы (root)»."""
+"""Файловый менеджер по умолчанию — штатный FileExploresky (com.droidlogic.FileBrower); запасные «Файлы (root)»."""
 import hashlib
 import pathlib
 import re

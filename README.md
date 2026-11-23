@@ -124,7 +124,7 @@ tools/build-release.sh
 
 ## Плитки главного экрана
 
-Домашний экран — **TV Launcher** `com.tvlauncher`, версия 1.6.2. APK берётся из [F-Droid](https://f-droid.org/repo/com.tvlauncher_10602.apk), исходники: [wiiguy/lightweight_androidtv_launcher](https://github.com/wiiguy/lightweight_androidtv_launcher). Launcher activity — `com.tvlauncher/.MainActivity`; порядок хранится в `selected_apps.xml`, ключ `apps_order`, разделитель — U+001E (`&#30;`), предел — 14 плиток. После новой установки система один раз сверяет раскладку и добавляет штатные плитки. Игры исключаются при сборке; очистка старых копий в `/data` служит миграцией прежних установок. Затем пользователь свободно меняет порядок и состав плиток; обычная перезагрузка его не меняет. OTA с очисткой данных создаёт новую исходную раскладку.
+Домашний экран — **TV Launcher** `com.tvlauncher`, версия 1.6.2. APK берётся из [F-Droid](https://f-droid.org/repo/com.tvlauncher_10602.apk), исходники: [wiiguy/lightweight_androidtv_launcher](https://github.com/wiiguy/lightweight_androidtv_launcher). Launcher activity — `com.tvlauncher/.MainActivity`; порядок хранится в `selected_apps.xml`, ключ `apps_order`, разделитель — U+001E (`&#30;`), предел — 14 плиток. После новой установки система один раз сверяет раскладку и добавляет штатные плитки. Затем пользователь свободно меняет порядок и состав плиток; обычная перезагрузка его не меняет. OTA с очисткой данных создаёт новую исходную раскладку.
 
 Порядок по умолчанию задаёт [`overlay/vendor/bin/tvbox-firstboot.sh`](overlay/vendor/bin/tvbox-firstboot.sh):
 
@@ -140,7 +140,7 @@ tools/build-release.sh
 | 8 | Антивирус | `org.tvbox.antivirus` (+ Hypatia) | [`apps/antivirus`](https://github.com/gamesmod/h96max/tree/master/apps/antivirus) · [Hypatia](https://github.com/MaintainTeam/Hypatia) |
 | 9 | Питание | `org.tvbox.power` | [`apps/power`](https://github.com/gamesmod/h96max/tree/master/apps/power) |
 
-Самостоятельные функции не дублируются плитками зависимостей: отдельной плитки VLC нет. При миграции сохраняется порядок существующих плиток, недостающие добавляются; пользователь затем свободно меняет раскладку. Игры в выпуск не входят.
+Самостоятельные функции не дублируются плитками зависимостей: отдельной плитки VLC нет. При миграции сохраняется порядок существующих плиток, недостающие добавляются; пользователь затем свободно меняет раскладку.
 
 UI-анимации окон и переходов отключены. Предусмотрен живой журнал загрузки на чёрном фоне (автоматический показ при старте требует отдельной аппаратной проверки): текущая запись выделяется и обновляется в списке, сведения о CPU/GPU, разрешении, занятой ОЗУ и температуре размещены справа. Логотип и маркировка 4K убраны. Разрешение HDMI ограничено режимом 1920×1080; аппаратное GPU-ускорение SurfaceFlinger/HWUI сохраняется. Игровые и тестовые видеоматериалы не входят в образ.
 
@@ -283,7 +283,7 @@ python3 tools/device-monitor.py --capture-interface wlan0 --controlled-network -
 | TorrServer | Порт 8090 на приставке | [TorrServe](https://github.com/YouROK/TorrServe) |
 | Obtainium import | `/sdcard/tvbox/obtainium-apps.json` | [`obtainium-apps.json`](obtainium-apps.json) |
 
-Obtainium проверяет обновления напрямую в источниках приложений (Flicky удалён). Для регистрации откройте Obtainium → **Import/Export** → **Obtainium import** и выберите `/sdcard/tvbox/obtainium-apps.json`: источники VLC, TorrServe, TV Launcher, Obtainium, Hypatia и собираемых APK Panadonik. CI прикладывает APK Panadonik к каждому [GitHub Release](https://github.com/gamesmod/h96max/releases); Obtainium выбирает файл по package ID и фильтру имени. `tvboxd` и загрузочный экран остаются в подписанном OTA как системные JAR.
+Obtainium проверяет обновления напрямую в источниках приложений. Для регистрации откройте Obtainium → **Import/Export** → **Obtainium import** и выберите `/sdcard/tvbox/obtainium-apps.json`: источники VLC, TorrServe, TV Launcher, Obtainium, Hypatia и собираемых APK Panadonik. CI прикладывает APK Panadonik к каждому [GitHub Release](https://github.com/gamesmod/h96max/releases); Obtainium выбирает файл по package ID и фильтру имени. `tvboxd` и загрузочный экран остаются в подписанном OTA как системные JAR.
 
 | Документ | Содержание |
 |---|---|
