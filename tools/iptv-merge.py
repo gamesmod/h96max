@@ -5,6 +5,8 @@
 
 Rules (user, 2026-10-27): no duplicates, every channel has a working logo, every stream answers from this network.
 - sources: "group=NAME" filters a category; "set-group=NAME" assigns one; order = priority.
+  "meta=iptv-org" fills a missing tvg-logo and group-title by tvg-id from the public iptv-org API (raw stream lists
+  of iptv-org/iptv carry neither, so without it every entry would be dropped for lacking a logo).
 - logo: tvg-logo must be http(s) and return an image (or any 200 body for servers without content-type).
 - stream: HTTP 200; HLS is followed master -> first variant -> first segment (all must answer 200).
 - duplicates: same stream URL, or the same normalized name (case, HD/FHD/4K/SD/50fps/orig/[..]/(..) dropped);
@@ -12,7 +14,7 @@ Rules (user, 2026-10-27): no duplicates, every channel has a working logo, every
   --exclude-adult removes them. Детские категории и явно помеченные детские каналы всегда исключаются.
 Downloads are only parsed, never executed. Network: VLC user agent, short timeouts, 48 parallel checks.
 """
-import argparse, concurrent.futures as cf, re, shlex, shutil, subprocess, sys, urllib.parse, urllib.request
+import argparse, concurrent.futures as cf, json, re, shlex, shutil, subprocess, sys, urllib.parse, urllib.request
 
 UA = "VLC/3.0.20 LibVLC/3.0.20"
 ADULT = re.compile(r"18\+|xxx|adult|эрот|взросл|для взрослых|playboy|brazzers|hustler|private|redlight|blue hustler|секс|sex", re.I)
@@ -58,7 +60,48 @@ def fetch(url, limit=262144, timeout=8, rng=False):
     r = urllib.request.urlopen(urllib.request.Request(url, headers=h), timeout=timeout)
     return r.status, r.headers.get("Content-Type", ""), r.read(limit), r.geturl()
 
-def parse(text, only_group=None):
+IPTV_ORG_API = "https://iptv-org.github.io/api/"
+_iptv_org_meta = None
+
+def iptv_org_meta():
+    """tvg-id -> logo and first category from the iptv-org API (loaded once; empty maps if unreachable)."""
+    global _iptv_org_meta
+    if _iptv_org_meta is None:
+        logos, cats = {}, {}
+        try:
+            ranked = {}
+            for item in json.loads(fetch(IPTV_ORG_API + "logos.json", limit=64 << 20, timeout=60)[2]):
+                url = item.get("url", "")
+                if not url.startswith("https://"):
+                    continue
+                # Android не декодирует SVG как растровый логотип: растровые форматы и используемые логотипы первыми.
+                rank = (item.get("format") != "SVG", bool(item.get("in_use")), item.get("width") or 0)
+                key = (item.get("channel", ""), item.get("feed") or "")
+                if key not in ranked or rank > ranked[key][0]:
+                    ranked[key] = (rank, url)
+            logos = {key: url for key, (rank, url) in ranked.items()}
+            for ch in json.loads(fetch(IPTV_ORG_API + "channels.json", limit=64 << 20, timeout=60)[2]):
+                if ch.get("categories") and not ch.get("is_nsfw"):
+                    cats[ch["id"]] = ch["categories"][0]
+        except Exception as e:
+            print(f"iptv-org meta FAIL: {e}", file=sys.stderr)
+        _iptv_org_meta = (logos, cats)
+    return _iptv_org_meta
+
+def fill_meta(attrs, meta):
+    """Дополнить только отсутствующие логотип и категорию; данные самого источника не перезаписываются."""
+    logos, cats = meta
+    channel, _, feed = attrs.get("tvg-id", "").partition("@")
+    if not channel:
+        return
+    if not attrs.get("tvg-logo"):
+        url = logos.get((channel, feed)) or logos.get((channel, ""))
+        if url:
+            attrs["tvg-logo"] = url
+    if not attrs.get("group-title") and channel in cats:
+        attrs["group-title"] = cats[channel]
+
+def parse(text, only_group=None, meta=None):
     out, cur, opts = [], None, []
     for line in text.splitlines():
         line = line.strip()
@@ -73,6 +116,8 @@ def parse(text, only_group=None):
         elif line and not line.startswith("#") and cur is not None:
             cur["url"], cur["opts"] = line, opts
             if not only_group or cur["attrs"].get("group-title", "") == only_group:
+                if meta:
+                    fill_meta(cur["attrs"], meta)
                 cur["attrs"]["group-title"] = normalize_group(cur["attrs"].get("group-title", ""), cur["name"])
                 out.append(cur)
             cur = None
@@ -415,11 +460,12 @@ def main():
         url, opt = parsed
         grp = next((o[6:] for o in opt if o.startswith("group=")), None)
         set_grp = next((o[10:] for o in opt if o.startswith("set-group=")), None)
+        meta = iptv_org_meta() if "meta=iptv-org" in opt else None
         try:
             text = fetch(url, limit=16 << 20, timeout=60)[2].decode("utf-8", "replace")
         except Exception as e:
             print(f"source FAIL {url}: {e}", file=sys.stderr); continue
-        got = parse(text, grp)
+        got = parse(text, grp, meta)
         if set_grp:
             for e in got: e["attrs"]["group-title"] = set_grp
         print(f"source {len(got):5d} {url}", file=sys.stderr)
