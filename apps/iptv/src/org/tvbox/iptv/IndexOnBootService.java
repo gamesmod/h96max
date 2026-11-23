@@ -34,8 +34,10 @@ public class IndexOnBootService extends Service {
     Thread worker;
 
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
-        // Сразу переводим службу в foreground: Android 12 завершает её, если уведомление запаздывает.
-        startForeground(NOTIFICATION_ID, notification("Подготавливаю список ТВ-каналов", 0, 1, 0));
+        // Сразу dataSync-FGS: Android 12 убивает службу без уведомления; тип убирает ложное
+        // предупреждение про mic/camera/location у boot-индексатора.
+        Notification ready = notification("Подготавливаю список ТВ-каналов", 0, 1, 0);
+        startDataSyncForeground(NOTIFICATION_ID, ready);
         if (worker != null && worker.isAlive()) return START_NOT_STICKY;
         final File playlist = MainActivity.playlistFile(this);
         final long size = playlist.length(), modified = playlist.lastModified();
@@ -173,6 +175,19 @@ public class IndexOnBootService extends Service {
                 .setContentTitle(text).setContentText(progress >= total ? "Готово" :
                         Math.round(100f * progress / Math.max(total, 1)) + "% • осталось около " + left + " сек.")
                 .setProgress(Math.max(total, 1), progress, false).setOngoing(progress < total).build();
+    }
+
+
+    /** API 29+: startForeground(id, n, TYPE_DATA_SYNC=1); иначе обычный startForeground. */
+    void startDataSyncForeground(int id, Notification notification) {
+        if (Build.VERSION.SDK_INT >= 29) {
+            try {
+                getClass().getMethod("startForeground", int.class, Notification.class, int.class)
+                        .invoke(this, id, notification, 1 /* FOREGROUND_SERVICE_TYPE_DATA_SYNC */);
+                return;
+            } catch (Exception ignored) { }
+        }
+        startForeground(id, notification);
     }
 
     void updateNotification(int progress, int total, int left) {

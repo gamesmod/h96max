@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
     <uses-feature android:name="android.software.leanback" android:required="false"/>
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
     <application android:label="@string/app_name" android:icon="@drawable/icon" android:banner="@drawable/banner"
@@ -22,6 +23,6 @@
         <receiver android:name=".BootReceiver" android:enabled="true" android:exported="false">
             <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED"/></intent-filter>
         </receiver>
-        <service android:name=".IndexOnBootService" android:enabled="true" android:exported="false"/>
+        <service android:name=".IndexOnBootService" android:enabled="true" android:exported="false" android:foregroundServiceType="dataSync"/>
     </application>
 </manifest>
