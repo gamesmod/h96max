@@ -1,0 +1,61 @@
+{
+  "version": "0.4.10",
+  "device": "Panadonik H96 Max / RK3328, Android 12",
+  "reviewed_at": "2026-11-23",
+  "source_commit": "c19550c325594f229a1ab914f7ea447e66e46764",
+  "source_state": "локальный OTA 0.4.10 установлен с wipe; Wi‑Fi/ADB восстановлены handoff-ом; подробности в 0.4.10.md",
+  "candidate": {
+    "ota_sha256": "3c555dc5ca8fcd4b6ae9e572f0b62e6cba8e530a285d8200dd38a68a4528a109",
+    "playlist_sha256": "9fc3466714769d39e68cafca98cdd018cda7a6809baa417214cbe5bf77d1d108",
+    "clean_install_sha256": "7a6500aba25bb7410793bb2819ea79868111d00125b3a8ddc8b3a3c363d684a9",
+    "installed": true,
+    "install_method": "UPDATE_INSTALL wipe через локальный HTTP; Wi‑Fi/ADB восстановлены handoff-ом",
+    "actions_run_id": null,
+    "publication": "manual gh release create prerelease (Actions candidate недоступен)"
+  },
+  "automated_tests": {
+    "status": "pass",
+    "count": 157,
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -v",
+    "scope": "локальное дерево перед публикацией dev-v0.4.10, 2026-11-23"
+  },
+  "checks": {
+    "cold_boot_ready": "pass",
+    "boot_log_review": "pending",
+    "qr_vlc": "pending",
+    "wired_network": "pending",
+    "wifi_network": "pass",
+    "iptv_playback": "pending",
+    "torrent_playback": "pending",
+    "graphics_video": "pending",
+    "graphics_stress": "pending",
+    "swap_disabled": "pass",
+    "network_capture_review": "pending",
+    "usb_remote_iptv_channels": "pending",
+    "security_review": "fail"
+  },
+  "hot_test": {
+    "tested_installed_version": "0.4.10",
+    "candidate_installed": true,
+    "ota_sha256": "3c555dc5ca8fcd4b6ae9e572f0b62e6cba8e530a285d8200dd38a68a4528a109",
+    "playlist_sha256": "9fc3466714769d39e68cafca98cdd018cda7a6809baa417214cbe5bf77d1d108",
+    "playlist_public_check": "pass: 2550 каналов, Для взрослых ≥20, русские категории, ≥1080p",
+    "notes": {
+      "cold_boot_ready": "после OTA/recovery до лаунчера; ADB TCP и Wi‑Fi восстановлены",
+      "wifi_network": "handoff wifi-restored; Wifi enabled и connected",
+      "swap_disabled": "swaps пуст, zram disksize 0",
+      "iptv_playback": "на 0.4.10 не повторялся; публичный IPTV-gate по плейлисту pass",
+      "qr_vlc": "на 0.4.10 не проверялся",
+      "security_review": "SELinux Permissive, ro.debuggable=1, сетевой ADB при ro.adb.secure=1"
+    }
+  },
+  "log_analysis": {
+    "reviewed": true,
+    "untriaged_errors": 0,
+    "summary": "Установка через tvboxd: DONE ok, переход в recovery. После загрузки boot_completed=1, FATAL/tombstone в этой сессии не разбирались отдельным полным logcat-прогоном; критических отказов загрузки не наблюдалось."
+  },
+  "security_analysis": {
+    "reviewed": true,
+    "summary": "0.4.10: ro.adb.secure=1, ADB TCP включён, ro.debuggable=1, SELinux Permissive. Wi‑Fi credentials не в образе; handoff после wipe сработал. Плейлист проходит публичный IPTV-gate. Полный разбор трафика и ряд аппаратных сценариев не закрыты; для stable security_review=fail."
+  }
+}
