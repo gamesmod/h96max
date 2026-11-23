@@ -33,4 +33,4 @@
 
 ## Секреты GitHub Actions
 
-`tools/setup-release-secrets.sh` настраивает git/gh и шесть секретов `release.yml` из прежних ключей `secrets/` и приватного архива входов; формат секретов, требования к адресу архива и примеры — в README, раздел «Публикация релиза через GitHub Actions».
+`tools/setup-release-secrets.sh` настраивает git/gh и четыре секрета подписи `release.yml` (`TVBOX_*`, `OTA_*`) из прежних ключей `secrets/`. Стоковые входы — Git LFS приватного репозитория; приватный архив и секреты `RELEASE_INPUTS_*` больше не используются. Формат секретов и примеры — в README, раздел «Публикация релиза через GitHub Actions».

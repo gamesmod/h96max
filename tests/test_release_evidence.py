@@ -229,8 +229,13 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.assertIn("branches: [master]", workflow)
         self.assertIn("python3 -m unittest discover -s tests -v", workflow)
         self.assertIn("--fail-on-errors", workflow)
-        # prebuilt/stock-filemanager/FileExploresky.apk хранится в Git LFS
-        self.assertRegex(workflow, r"actions/checkout@v4[\s\S]*?\blfs:\s*true\b")
+        # prebuilt/stock-filemanager/FileExploresky.apk хранится в Git LFS;
+        # checkout без полного lfs:true, чтобы не качать стоковые LP-образы.
+        self.assertIn("lfs: false", workflow)
+        self.assertIn("actions/cache@v4", workflow)
+        self.assertIn("path: .git/lfs", workflow)
+        self.assertIn("git lfs pull --include=\"prebuilt/stock-filemanager/FileExploresky.apk\"", workflow)
+        self.assertNotIn("lfs: true", workflow)
 
 
 if __name__ == "__main__":

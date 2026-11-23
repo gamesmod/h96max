@@ -3,7 +3,7 @@
 #
 #   Экспорт (по умолчанию): прежние ключи из secrets/ + SHA-256 (и при желании URL) архива входов CI
 #   → зашифрованный архив вне репозитория, например ~/h96max-release-secrets-20261123-0830.tar.gz.enc
-#   Импорт (--apply FILE): расшифровать, проверить ключи и задать шесть секретов через `gh secret set` (stdin).
+#   Импорт (--apply FILE): расшифровать, проверить ключи и задать секреты подписи через `gh secret set` (stdin).
 #
 # Внутри архива (каталог h96max-release-secrets/):
 #   secrets/tvbox-key.pem, secrets/tvbox-cert.pem, secrets/ota-key.pem, secrets/ota-cert.pem

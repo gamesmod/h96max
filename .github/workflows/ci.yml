@@ -18,8 +18,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # FileExploresky.apk и прочие бинарники — Git LFS; без smudge тест SHA-256 читает pointer.
-          lfs: true
+          # FileExploresky.apk — Git LFS; без smudge тест SHA-256 читает pointer.
+          # Не скачиваем стоковые LP-образы (~1.2 ГБ): юнит-тестам они не нужны.
+          lfs: false
+
+      - name: Cache Git LFS
+        uses: actions/cache@v4
+        with:
+          path: .git/lfs
+          key: git-lfs-ci-${{ hashFiles('.gitattributes', 'prebuilt/stock-filemanager/FileExploresky.apk') }}
+          restore-keys: |
+            git-lfs-ci-
+
+      - name: Fetch Git LFS objects needed for tests
+        run: |
+          set -euo pipefail
+          git lfs install --local
+          git lfs pull --include="prebuilt/stock-filemanager/FileExploresky.apk"
+          if head -c 20 prebuilt/stock-filemanager/FileExploresky.apk | grep -q 'git-lfs'; then
+            echo "LFS object not smudged: FileExploresky.apk" >&2
+            exit 1
+          fi
 
       - name: Run full test suite and analyze its log
         run: |
