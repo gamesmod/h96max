@@ -63,6 +63,13 @@ bash tools/setup-release-secrets.sh --package-archive /ПРИВАТНЫЙ_ПУТ
 
 `--keys-only` задаёт только четыре секрета ключей, `--dispatch REF` запускает `release.yml` вручную на ветке. Теги скрипт не создаёт.
 
+Перенос секретов на другой компьютер — `bash tools/export-release-secrets.sh`. Он проверяет те же ключи и отпечатки и создаёт зашифрованный архив вне репозитория: `~/h96max-release-secrets-ГГГГММДД-ЧЧММ.tar.gz.enc` (режим 600; `openssl enc -aes-256-cbc -pbkdf2 -iter 200000`, пароль вводится скрыто дважды или берётся из `RELEASE_SECRETS_PASSPHRASE`). Внутри: `secrets/{tvbox,ota}-{key,cert}.pem`, файлы `RELEASE_INPUTS_SHA256` и (с `--ask-url` или `RELEASE_INPUTS_ARCHIVE_URL`) `RELEASE_INPUTS_ARCHIVE_URL`, а также `MANIFEST.txt` с датой, коммитом, отпечатками и командами импорта. Внутри рабочего дерева архив пишется только по пути, который игнорирует git; `--no-encrypt` оставляет ключи открытыми и допускается только явно.
+
+```sh
+bash tools/export-release-secrets.sh --archive /ПРИВАТНЫЙ_ПУТЬ/inputs.tar.zst --ask-url
+bash tools/export-release-secrets.sh --apply ~/h96max-release-secrets-ГГГГММДД-ЧЧММ.tar.gz.enc --rerun
+```
+
 Стандартный runner `ubuntu-24.04` может не иметь достаточного свободного диска для Android base и промежуточных образов. Workflow останавливается при запасе меньше 18 GB. Если это происходит, подключите GitHub-hosted larger runner с достаточным диском и задайте в Actions → Variables переменную `RELEASE_RUNNER` равной его метке. Параметры larger runner и стоимость задаются в GitHub организации/аккаунте; сам workflow не создаёт платные ресурсы.
 
 В Release прикладываются подписанный `tvbox-update-<версия>-emmc.zip`, `latest-emmc.txt`, `SHA256SUMS`, семь APK Panadonik, полный архив чистой установки `Panadonik-<версия>-emmc-clean-install.zip` с отдельным `.sha256`, а также отчёты автоматических тестов, анализа журналов и аппаратной приёмки. Установка со стока описана в [`docs/install-from-stock.md`](docs/install-from-stock.md). Версия APK берётся из `ro.tvbox.release`; Android `versionCode` растёт вместе с версией, чтобы Obtainium распознавал обновления. Новая версия tvboxd получает метаданные и OTA по HTTPS из GitHub Releases. Workflow запускает регрессионные и security-проверки и блокирует публикацию при критических ошибках. Отдельно требуется протокол проверки самой приставки: холодная загрузка до управляемого рабочего стола, журналы, QR, сеть, IPTV/торрент и графическая нагрузка. Эти проверки GitHub runner выполнить не может; выпуск допускается только после заполнения и прохождения аппаратного gate. Полный перечень находится в [`docs/release-quality-gate.md`](docs/release-quality-gate.md).
