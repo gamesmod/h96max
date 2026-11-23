@@ -15,27 +15,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
             </intent-filter>
-            <!-- Файловый менеджер по умолчанию: открытие папок и выбор файла для других приложений. -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:mimeType="resource/folder"/>
-                <data android:mimeType="inode/directory"/>
-                <data android:mimeType="vnd.android.document/directory"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="file" android:mimeType="resource/folder"/>
-                <data android:scheme="file" android:mimeType="inode/directory"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.GET_CONTENT"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.OPENABLE"/>
-                <data android:mimeType="*/*"/>
-            </intent-filter>
+            <!-- Запасной root-менеджер без плитки и без роли по умолчанию: папки и выбор файла для других
+                 приложений обслуживает штатный «Файловый менеджер» (com.android.rk). -->
         </activity>
         <provider android:name=".Provider" android:authorities="org.tvbox.files.provider"
             android:exported="false" android:grantUriPermissions="true"/>
