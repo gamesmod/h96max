@@ -58,8 +58,16 @@ def calc_id(d):
     return h.digest().ljust(32, b"\0")
 
 
-def blank_boot_logos(resource):
-    """Black out Rockchip boot logos, preserving DTB, layout and BMP headers."""
+def replace_boot_logos(resource, logo):
+    """Center an uncompressed 24-bit BMP in Rockchip logos; keep resource layout."""
+    if len(logo) < 54 or logo[:2] != b"BM":
+        raise ValueError("invalid replacement BMP")
+    source_pixels = struct.unpack_from("<I", logo, 10)[0]
+    sh, sw, sy, sp, sb, sc = struct.unpack_from("<IiiHHI", logo, 14)
+    source_stride = ((sw * 24 + 31) // 32) * 4
+    if (sh != 40 or sw <= 0 or sy == 0 or sp != 1 or sb != 24 or sc != 0
+            or source_pixels < 54 or source_pixels + source_stride * abs(sy) > len(logo)):
+        raise ValueError("unsupported replacement BMP format")
     if resource[:12] != b"RSCE\0\0\0\0\1\1\1\0":
         raise ValueError("unsupported Rockchip resource header")
     data = bytearray(resource)
@@ -85,6 +93,15 @@ def blank_boot_logos(resource):
                 or width <= 0 or height == 0 or pixels < 54 or end > size):
             raise ValueError("unsupported boot logo BMP format")
         data[start + pixels:start + end] = b"\0" * (end - pixels)
+        if sw > width or abs(sy) > abs(height):
+            raise ValueError("replacement logo does not fit boot frame")
+        left, top = (width - sw) // 2, (abs(height) - abs(sy)) // 2
+        for y in range(abs(sy)):
+            source_y = y if sy < 0 else abs(sy) - 1 - y
+            dest_y = top + y if height < 0 else abs(height) - 1 - top - y
+            src = source_pixels + source_y * source_stride
+            dst = start + pixels + dest_y * stride + left * 3
+            data[dst:dst + sw * 3] = logo[src:src + sw * 3]
         found = True
     if not found:
         raise ValueError("Rockchip boot logo missing")
@@ -184,9 +201,8 @@ def main():
         elif opt == "--cmd-append":
             cmd = cmd + " " + val
         elif opt == "--boot-logo":
-            if val != "black":
-                raise ValueError("only black boot logo is supported")
-            d["second"] = blank_boot_logos(d["second"])
+            with gzip.open(val, "rb") as logo:
+                d["second"] = replace_boot_logos(d["second"], logo.read())
         elif opt == "--rd-put":
             p, f = val.split("=", 1); puts[p] = f
         elif opt == "--rd-add":

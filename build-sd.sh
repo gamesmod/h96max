@@ -47,7 +47,7 @@ else
 python3 -I $T/bootimg.py edit $SRC/boot.img $W/boot.img \
     --cmd-sub "androidboot.boot_devices=ff520000.dwmmc|androidboot.boot_devices=$BOOTDEV" \
     --cmd-sub "androidboot.wificountrycode=HK|" \
-    --boot-logo black \
+    --boot-logo "$R/overlay/boot/android-logo.bmp.gz" \
     --cmd-append "printk.devkmsg=on" \
     --rd-put fstab.rk30board=$W/fstab.sd
 fi
