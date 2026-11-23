@@ -2,7 +2,8 @@
 
 Дата подготовки: 2026-11-23 (Europe/Moscow). Исходник: `RK3318_userdebug_H96_Max_V12_12_20221117.1447`.
 Очистка воспроизводится через `tools/prepare-ci-partitions.py` и список `tools/unused-stock-apps.txt`.
-`super.img` в репозиторий не входит.
+Обычная сборка вызывает `tools/prepare-build-inputs.sh` (LFS или `--update update.img` → extract + эта очистка).
+`super.img` в репозиторий и во входы сборки не входит.
 
 ## Аппаратно отсутствующее на H96 Max
 

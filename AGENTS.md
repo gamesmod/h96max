@@ -99,6 +99,7 @@ rg --files --hidden --no-ignore -g AGENTS.md -g '!sdk/**' -g '!dl/**' -g '!build
 | Версия сборки | `ro.tvbox.release` в `build-sd.sh` |
 | Состав собственных APK/JAR | `tools/build-release.sh`, `apps/*/build.sh` |
 | Обязательные сторонние APK | `tools/required-apps.sh`, подписи/источники в `apps-sources.md` |
+| Стоковые A12 входы | `tools/prepare-build-inputs.sh` ← `tools/extract-vendor-blobs.sh` (LFS или `update.img`) |
 | Патчи разделов, удаление ПО | `build-sd.sh`, `overlay/` |
 | Настройка установленной системы | `overlay/vendor/bin/tvbox-firstboot.sh`, `overlay/vendor/etc/init/tvbox.rc` |
 | OTA и формат метаданных | `tools/release-ota.sh`, `tools/mkota.py`, `ota/`, installer/tvboxd |
@@ -131,18 +132,19 @@ git diff --check
 
 ```sh
 R="$PWD"
+bash tools/prepare-build-inputs.sh
+# из сырого стока вместо LFS: tools/prepare-build-inputs.sh --update /path/to/update.img
 bash tools/fetch-third-party.sh
 source tools/required-apps.sh
 tvbox_require_apks
 tools/setup-sdk.sh --check
 tools/apkcert.sh dl/apk/ИМЯ_ПАКЕТА.apk
 aapt dump badging dl/apk/ИМЯ_ПАКЕТА.apk
-test -s dl/a12/Image/lp/system.img && test -s dl/a12/MiniLoaderAll.bin
 ```
 
-Успех: все обязательные APK присутствуют, package ID, версия, ABI, SHA-256 и сертификат соответствуют `tools/third-party-apps.json` / `apps-sources.md`. `tvbox_require_apks` проверяет только непустые файлы; сертификат и package ID он не проверяет. Отсутствующий файл или смена подписи блокируют продолжение; восстановить проверенный вход, не генерировать новый ключ. F-Droid и прямые релизы проектов могут быть источниками APK; клиенты магазинов приложений в систему не включать.
+Успех: `prepare-build-inputs` подтвердил smudged LP/boot в `dl/a12`; все обязательные APK присутствуют, package ID, версия, ABI, SHA-256 и сертификат соответствуют `tools/third-party-apps.json` / `apps-sources.md`. `tvbox_require_apks` проверяет только непустые файлы; сертификат и package ID он не проверяет. Отсутствующий файл или смена подписи блокируют продолжение; восстановить проверенный вход, не генерировать новый ключ. F-Droid и прямые релизы проектов могут быть источниками APK; клиенты магазинов приложений в систему не включать.
 
-Пересборка очищенных LP из полного локального стока: `tools/package-ci-inputs.sh [источник] [назначение]` → `tools/prepare-ci-partitions.py`. Сверка с `docs/stock-cleanup.md`; при изменении политики обновить LFS.
+Извлечение blobs: `tools/extract-vendor-blobs.sh` (как [LineageOS Wiki](https://wiki.lineageos.org/extracting_blobs_from_zips_manually)); для сборки — обёртка `tools/prepare-build-inputs.sh` (extract + очистка LP). Ручная пересборка LP для обновления LFS: `tools/package-ci-inputs.sh` → `tools/prepare-ci-partitions.py`. Сверка с `docs/stock-cleanup.md`.
 
 ### 3. Подготовить локальный кандидат
 
