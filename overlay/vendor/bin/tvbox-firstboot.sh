@@ -144,23 +144,11 @@ if pm path org.videolan.vlc >/dev/null 2>&1 && ! grep -q network_caching_value $
     echo "vlc: network caching 3000 ms"
 fi
 # Выдать штатным приложениям необходимые разрешения заранее, чтобы запросы не появлялись на экране ТВ.
-# Микрофон разрешается только Алисе, если она установлена; камера, геолокация и телефон приложениям не разрешены.
+# Камера, геолокация, микрофон и телефон приложениям по умолчанию не выдаются.
 g() { pm path $1 >/dev/null 2>&1 || return 0; shift_pkg=$1; shift; for perm in "$@"; do pm grant $shift_pkg android.permission.$perm 2>/dev/null; done; }
 g org.videolan.vlc READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE BLUETOOTH_CONNECT
 g ru.yourok.torrserve READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE
 g org.maintainteam.hypatia READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE
-# Алиса получает доступ к микрофону только если пользователь установил приложение.
-g com.yandex.aliceapp RECORD_AUDIO
-if pm path com.yandex.aliceapp >/dev/null 2>&1; then
-    # Применить разрешение и роль после установки Алисы, даже если её поставили уже после запуска системы.
-    appops set com.yandex.aliceapp RECORD_AUDIO allow
-    A=$(cmd role get-role-holders --user 0 android.app.role.ASSISTANT 2>/dev/null)
-    case "$A" in *com.yandex.aliceapp*) ;; *)
-        cmd role add-role-holder --user 0 android.app.role.ASSISTANT com.yandex.aliceapp >/dev/null 2>&1
-    esac
-    A=$(cmd role get-role-holders --user 0 android.app.role.ASSISTANT 2>/dev/null)
-    case "$A" in *com.yandex.aliceapp*) echo "alice: default assistant ready; USB voice key uses VOICE_ASSIST";; *) echo "alice: enable as default assistant in Android settings";; esac
-fi
 pm path ru.yourok.torrserve >/dev/null 2>&1 && appops set ru.yourok.torrserve MANAGE_EXTERNAL_STORAGE allow
 # Один раз выбрать VLC для TorrServe, чтобы убрать диалог выбора плеера (ключ player содержит пакет приложения).
 TS=/data/data/ru.yourok.torrserve/shared_prefs/ru.yourok.torrserve_preferences.xml

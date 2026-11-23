@@ -4,19 +4,45 @@
 
 Значок проекта: [`assets/icon.svg`](assets/icon.svg). Крупные образы, архивы, APK и бинарные компоненты при добавлении в Git хранятся через Git LFS; исходники, документация и SVG остаются обычными Git-файлами.
 
-Для настройки локального Git и фильтров LFS установите Git LFS, затем выполните `tools/setup-git.sh`. Маршрут сопровождения и проверки команд — [инструкции GPT‑6 Luna](docs/LUNA-WORKFLOW.md).
+| Раздел | Ссылка |
+|---|---|
+| Аппаратный паспорт | [ниже](#технический-паспорт-и-исходная-база) |
+| Установка со стока | [`docs/install-from-stock.md`](docs/install-from-stock.md) |
+| Сборка и состояние | [`BUILD-AND-STATE.md`](BUILD-AND-STATE.md) |
+| Приложения | [`APPS.MD`](APPS.MD) · [плитки](#плитки-главного-экрана) · [наши APK](#наши-приложения) |
+| IPTV | [источники](#iptv-источники-и-проверка) · [`tools/iptv-sources.txt`](tools/iptv-sources.txt) |
+| Релиз и CI | [GitHub Actions](#публикация-релиза-через-github-actions) · [`docs/release-quality-gate.md`](docs/release-quality-gate.md) |
+| Правила агентов | [`AGENTS.md`](AGENTS.md) · [`docs/LUNA-WORKFLOW.md`](docs/LUNA-WORKFLOW.md) |
+| Компоненты и подписи | [`COMPONENTS.md`](COMPONENTS.md) · [`apps-sources.md`](apps-sources.md) |
+| Репозиторий | [gamesmod/h96max](https://github.com/gamesmod/h96max) · [Releases](https://github.com/gamesmod/h96max/releases) · [Actions](https://github.com/gamesmod/h96max/actions) |
+
+Для настройки локального Git и фильтров LFS установите Git LFS, затем выполните [`tools/setup-git.sh`](tools/setup-git.sh).
+
+## Документация и источники правды
+
+| Вопрос | Документ |
+|---|---|
+| Версия сборки | `ro.tvbox.release` в [`build-sd.sh`](build-sd.sh) (сейчас **0.4.9**) |
+| Ограничения и процедуры | [`AGENTS.md`](AGENTS.md) |
+| Доказательства приёмки | [`docs/release-qa/`](docs/release-qa/) — файл для той же версии; не переносить `pass` от более ранней |
+| Критерии выпуска | [`docs/release-quality-gate.md`](docs/release-quality-gate.md) |
+| Заметки кандидата | [`release/notes/0.4.9.txt`](release/notes/0.4.9.txt) |
+| Незавершённые цели | [`REMAINING-GOALS.md`](REMAINING-GOALS.md) · [`GOALS.md`](GOALS.md) |
+| Аудит безопасности | [`security-audit.md`](security-audit.md) · [`docs/security/`](docs/security/) |
+| Исследование 4PDA / базы | [`research-4pda.md`](research-4pda.md) · [`research-base.md`](research-base.md) · [`research-apps.md`](research-apps.md) |
 
 ## Технический паспорт и исходная база
 
-| Параметр | Проверенная конфигурация |
-|---|---|
-| Приставка и плата | H96 Max, синяя ревизия, продаётся как RK3318; живой A12 BSP сообщает `rk3328_box` / RK3328 |
-| Процессор и графика | Rockchip, 4 ядра Cortex-A53; Mali-450 |
-| Память и накопитель | около 4 ГиБ ОЗУ, eMMC около 32 ГБ |
-| Экран и индикация | HDMI ограничен 1920×1080; четырёхразрядный VFD-дисплей корпуса |
-| Система и ядро | Android 12 userdebug, Linux 4.19.232 |
-| Исходный образ | `RK3318_userdebug_H96_Max_V12_12_20221117.1447`, security patch 2022-06-05 |
-| Пульт | USB-пульт с комплектным радиоприёмником; фото и проверенная USB-идентификация приведены ниже |
+| Параметр | Проверенная конфигурация | Ссылки |
+|---|---|---|
+| Приставка и плата | H96 Max, синяя ревизия, продаётся как RK3318; живой A12 BSP сообщает `rk3328_box` / RK3328 | [тема 4PDA](https://4pda.to/forum/index.php?showtopic=952710) · [`research-4pda.md`](research-4pda.md) |
+| Процессор и графика | Rockchip, 4 ядра Cortex-A53; Mali-450 | — |
+| Память и накопитель | около 4 ГиБ ОЗУ, eMMC около 32 ГБ | — |
+| Экран и индикация | HDMI ограничен 1920×1080; четырёхразрядный VFD-дисплей корпуса | — |
+| Система и ядро | Android 12 userdebug, Linux 4.19.232 | [`COMPONENTS.md`](COMPONENTS.md) |
+| Исходный образ | `RK3318_userdebug_H96_Max_V12_12_20221117.1447`, security patch 2022-06-05 | SHA-256 `update.img`: `e93ccc90…7cc5ad58` (полный — [ниже](#база-android-12)) |
+| Пульт | USB-пульт с комплектным радиоприёмником | [USB-пульт](#usb-пульт-с-радиоприёмником) |
+| Wi‑Fi / Bluetooth | Broadcom BCM4334 (SDIO + UART/HCI), firmware из стоковой A9 | [Wi‑Fi и Bluetooth](#wifi-и-bluetooth) |
 
 Сборка основана на распакованном вендорском Android 12 образе и его разделах `system`, `vendor` и `product`; `super` распаковывается в локальные build inputs. Затем скрипты проекта удаляют/настраивают OEM-компоненты, добавляют собственные приложения и сервисы и собирают подписанное OTA для eMMC. Образ Android 9 целиком не используется; из исходной стоковой A9 на этой приставке взяты только Wi‑Fi/Bluetooth firmware и конфигурационные файлы для BCM4334. Проприетарная база и ключи подписи в публичный Git не входят.
 
@@ -32,7 +58,17 @@
 
 ### USB-пульт с радиоприёмником
 
-Пульт на фото подключается через собственный USB-адаптер. На проверенном экземпляре USB-аудиоустройство определялось как `MC,LTD Mic Device` (VID:PID `1915:1025`); это идентификатор наблюдавшегося адаптера, а не гарантия для всех внешне похожих пультов. Требование проекта — поддержать кнопки питания, навигации и OK, Home/Back, меню, PAGE вверх/вниз, громкость, mute, воспроизведение/паузу, удаление и вызов голосового управления. PAGE вверх/вниз должны переключать на следующий/предыдущий канал в текущем IPTV-списке, не меняя категорию неожиданным образом. На момент этой редакции полная таблица клавиш и переключение каналов на приставке ещё не прошли аппаратную приёмку; наличие конфигурации `VOICE_ASSIST` само по себе не подтверждает работу голосового сценария. Перед каждым выпуском проверять каждую кнопку и переходы каналов в обоих направлениях.
+Пульт подключается через собственный USB-адаптер. На проверенном экземпляре USB-аудиоустройство определялось как `MC,LTD Mic Device` (VID:PID `1915:1025`); это идентификатор наблюдавшегося адаптера, а не гарантия для всех внешне похожих пультов.
+
+| Функция | Требование | Примечание |
+|---|---|---|
+| Навигация, OK, Home/Back, меню | Полная работа | Приёмка на каждой сборке |
+| Громкость, mute, play/pause, удаление | Полная работа | — |
+| PAGE вверх/вниз | Соседний канал в активном IPTV-списке/категории | Обе стороны |
+| Голосовая кнопка | Linux keycode `582` → Android `VOICE_ASSIST` | Наличие keylayout не равно проверенному сценарию |
+| Микрофон пульта | USB Audio на адаптере | Микрофон Samsung TV по HDMI приставке не передаётся |
+
+Перед каждым выпуском проверять каждую кнопку и переходы каналов в обоих направлениях.
 
 ## Публикация релиза через GitHub Actions
 
@@ -74,7 +110,7 @@ bash tools/export-release-secrets.sh --apply ~/h96max-release-secrets-ГГГГМ
 
 В Release прикладываются подписанный `tvbox-update-<версия>-emmc.zip`, `latest-emmc.txt`, `SHA256SUMS`, семь APK Panadonik, полный архив чистой установки `Panadonik-<версия>-emmc-clean-install.zip` с отдельным `.sha256`, а также отчёты автоматических тестов, анализа журналов и аппаратной приёмки. Установка со стока описана в [`docs/install-from-stock.md`](docs/install-from-stock.md). Версия APK берётся из `ro.tvbox.release`; Android `versionCode` растёт вместе с версией, чтобы Obtainium распознавал обновления. Новая версия tvboxd получает метаданные и OTA по HTTPS из GitHub Releases. Workflow запускает регрессионные и security-проверки и блокирует публикацию при критических ошибках. Отдельно требуется протокол проверки самой приставки: холодная загрузка до управляемого рабочего стола, журналы, QR, сеть, IPTV/торрент и графическая нагрузка. Эти проверки GitHub runner выполнить не может; выпуск допускается только после заполнения и прохождения аппаратного gate. Полный перечень находится в [`docs/release-quality-gate.md`](docs/release-quality-gate.md).
 
-Состояние кандидата и результаты установки ведутся в [QA 0.4.5](docs/release-qa/0.4.5.md) и [машинном протоколе](docs/release-qa/0.4.5.json). Описания возможностей ниже не являются аппаратной приёмкой. Перед выпуском сверить оба отчёта с фактическими исходниками и артефактами; завершение и публикация требуют подтверждения пользователя.
+Версия в исходниках — **0.4.9** ([`build-sd.sh`](build-sd.sh), [`release/notes/0.4.9.txt`](release/notes/0.4.9.txt)). Доказательства приёмки — в [`docs/release-qa/`](docs/release-qa/) для той же версии; последний имеющийся подробный протокол может отставать (например [0.4.6](docs/release-qa/0.4.6.md) / [JSON](docs/release-qa/0.4.6.json)). Описания возможностей ниже не являются аппаратной приёмкой. Перед выпуском сверить отчёты с фактическими исходниками и артефактами; завершение и публикация требуют подтверждения пользователя.
 
 После настройки Actions Secrets и сборки актуального кандидата обновление устанавливается из приложения **Обновление** по сети либо через штатное recovery (`Install update from SD card`); recovery проверяет подпись прежним ключом проекта. По умолчанию OTA очищает пользовательские данные. В приложении есть предупреждение и два шага подтверждения очистки; режим сохранения данных отключён до надёжной аппаратной проверки этого сценария. Отдельный образ системы для SD не собирается; загрузка и установка на SD остаются штатными возможностями A12.
 
@@ -90,25 +126,27 @@ tools/build-release.sh
 
 Домашний экран — **TV Launcher** `com.tvlauncher`, версия 1.6.2. APK берётся из [F-Droid](https://f-droid.org/repo/com.tvlauncher_10602.apk), исходники: [wiiguy/lightweight_androidtv_launcher](https://github.com/wiiguy/lightweight_androidtv_launcher). Launcher activity — `com.tvlauncher/.MainActivity`; порядок хранится в `selected_apps.xml`, ключ `apps_order`, разделитель — U+001E (`&#30;`), предел — 14 плиток. После новой установки система один раз сверяет раскладку и добавляет штатные плитки. Игры исключаются при сборке; очистка старых копий в `/data` служит миграцией прежних установок. Затем пользователь свободно меняет порядок и состав плиток; обычная перезагрузка его не меняет. OTA с очисткой данных создаёт новую исходную раскладку.
 
-Порядок по умолчанию, заданный `tvbox-firstboot.sh` для новой раскладки:
+Порядок по умолчанию задаёт [`overlay/vendor/bin/tvbox-firstboot.sh`](overlay/vendor/bin/tvbox-firstboot.sh):
 
-1. ТВ-каналы
-2. TorrServe
-3. Файловый менеджер (штатный FileExploresky `com.droidlogic.FileBrower`, системные права)
-4. Ссылки
-5. Обновление (внутри — Obtainium)
-6. Настройки Android
-7. Производительность и диагностика (внутри — журнал загрузки)
-8. Антивирус
-9. Питание
+| № | Плитка | Пакет / вход | Документация |
+|---|---|---|---|
+| 1 | ТВ-каналы | `org.tvbox.iptv` | [`apps/iptv`](https://github.com/gamesmod/h96max/tree/master/apps/iptv) |
+| 2 | TorrServe | `ru.yourok.torrserve` | [YouROK/TorrServe](https://github.com/YouROK/TorrServe) |
+| 3 | Файловый менеджер | `com.droidlogic.FileBrower` (FileExploresky) | [`prebuilt/stock-filemanager/`](prebuilt/stock-filemanager/) |
+| 4 | Ссылки | `org.tvbox.links` | [`apps/links`](https://github.com/gamesmod/h96max/tree/master/apps/links) |
+| 5 | Обновление | `org.tvbox.installer` (+ Obtainium) | [`apps/installer`](https://github.com/gamesmod/h96max/tree/master/apps/installer) · [Obtainium](https://github.com/ImranR98/Obtainium) |
+| 6 | Настройки Android | штатные Settings | — |
+| 7 | Производительность и диагностика | `org.tvbox.clean` (+ журнал загрузки) | [`apps/clean`](https://github.com/gamesmod/h96max/tree/master/apps/clean) · [`apps/bootlog`](https://github.com/gamesmod/h96max/tree/master/apps/bootlog) |
+| 8 | Антивирус | `org.tvbox.antivirus` (+ Hypatia) | [`apps/antivirus`](https://github.com/gamesmod/h96max/tree/master/apps/antivirus) · [Hypatia](https://github.com/MaintainTeam/Hypatia) |
+| 9 | Питание | `org.tvbox.power` | [`apps/power`](https://github.com/gamesmod/h96max/tree/master/apps/power) |
 
-Самостоятельные функции не дублируются плитками зависимостей: отдельной плитки VLC нет. При миграции сохраняется порядок существующих плиток, недостающие добавляются; пользователь затем свободно меняет раскладку. Журнал загрузки открывается из диагностики. Игры в выпуск не входят; удаление их старых копий из `/data` не заменяет исключение APK из образа.
+Самостоятельные функции не дублируются плитками зависимостей: отдельной плитки VLC нет. При миграции сохраняется порядок существующих плиток, недостающие добавляются; пользователь затем свободно меняет раскладку. Игры в выпуск не входят.
 
 UI-анимации окон и переходов отключены. Предусмотрен живой журнал загрузки на чёрном фоне (автоматический показ при старте требует отдельной аппаратной проверки): текущая запись выделяется и обновляется в списке, сведения о CPU/GPU, разрешении, занятой ОЗУ и температуре размещены справа. Логотип и маркировка 4K убраны. Разрешение HDMI ограничено режимом 1920×1080; аппаратное GPU-ускорение SurfaceFlinger/HWUI сохраняется. Игровые и тестовые видеоматериалы не входят в образ.
 
 ## Скриншоты интерфейса
 
-Снимки сделаны на H96 Max с Panadonik 0.4.5. Порядок плиток зависит от настроек пользователя.
+Снимки сделаны на H96 Max с установленной сборкой Panadonik (исторически 0.4.5). Порядок плиток зависит от настроек пользователя.
 
 ### Главный экран
 
@@ -236,7 +274,14 @@ python3 tools/device-monitor.py --capture-interface wlan0 --controlled-network -
 
 ## Стороннее ПО
 
-Целевой комплект сторонних приложений: TV Launcher 1.6.2, TorrServer MatriX.143.FOSS, VLC 3.7.2, Obtainium 1.7.4 и Hypatia 3.18. Файловый менеджер — штатный FileExploresky из A12-образа (`com.droidlogic.FileBrower`, плитка; копия в `prebuilt/stock-filemanager/`), запасной root-менеджер — «Файлы (root)» (`apps/files`). Ссылки на страницы проектов приведены в таблице выше. Obtainium проверяет обновления напрямую в источниках приложений; Flicky удалён. WebView — LineageOS 155.0.8059.39. TorrServer работает на порту 8090.
+| Компонент | Роль | Ссылка |
+|---|---|---|
+| TV Launcher / TorrServe / VLC / Obtainium / Hypatia | Сторонние APK образа | [таблица выше](#сторонние-приложения) |
+| FileExploresky | Штатный файловый менеджер (плитка) | [`prebuilt/stock-filemanager/`](prebuilt/stock-filemanager/) |
+| Файлы (root) | Запасной менеджер без плитки | [`apps/files`](https://github.com/gamesmod/h96max/tree/master/apps/files) |
+| LineageOS WebView | Системный WebView 155.0.8059.39 | [`COMPONENTS.md`](COMPONENTS.md) |
+| TorrServer | Порт 8090 на приставке | [TorrServe](https://github.com/YouROK/TorrServe) |
+| Obtainium import | `/sdcard/tvbox/obtainium-apps.json` | [`obtainium-apps.json`](obtainium-apps.json) |
 
 Obtainium проверяет обновления напрямую в источниках приложений (Flicky удалён). Для регистрации откройте Obtainium → **Import/Export** → **Obtainium import** и выберите `/sdcard/tvbox/obtainium-apps.json`: источники VLC, TorrServe, TV Launcher, Obtainium, Hypatia и собираемых APK Panadonik. CI прикладывает APK Panadonik к каждому [GitHub Release](https://github.com/gamesmod/h96max/releases); Obtainium выбирает файл по package ID и фильтру имени. `tvboxd` и загрузочный экран остаются в подписанном OTA как системные JAR.
 
