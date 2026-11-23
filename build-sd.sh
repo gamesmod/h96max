@@ -252,10 +252,19 @@ lbl u:object_r:system_file:s0 $MNT/system/bin/bootanimation.orig
 # Keep the native renderer's original graphics user and SELinux domain.
 lbl u:object_r:system_file:s0 $MNT/system/etc/init/bootanim.rc
 remove_unused_stock_apps system
-# Штатный «Файловый менеджер» Rockchip (RkExplorer, com.android.rk) — файловый менеджер по умолчанию и плитка
-# главного экрана; не удалять его при очистке образа.
-if ! sudo find "$MNT/system/app" "$MNT/system/priv-app" -maxdepth 2 -iname 'RkExplorer*.apk' 2>/dev/null | grep -q .; then
-    echo "Не найден штатный файловый менеджер RkExplorer в system/app или system/priv-app" >&2
+# Штатный файловый менеджер платы из A12: FileExploresky (com.droidlogic.FileBrower, uid system).
+# Копия в git — prebuilt/stock-filemanager/FileExploresky.apk; подставляем, если раздел его потерял.
+STOCK_FM_APK=$R/prebuilt/stock-filemanager/FileExploresky.apk
+[ -s "$STOCK_FM_APK" ] || { echo "missing $STOCK_FM_APK" >&2; exit 1; }
+if ! sudo find "$MNT/system/app" "$MNT/system/priv-app" -maxdepth 2 -iname 'FileExploresky*.apk' 2>/dev/null | grep -q .; then
+    log "stock file manager: install FileExploresky from prebuilt"
+    sudo mkdir -p "$MNT/system/priv-app/FileExploresky"
+    sudo install -m 0644 "$STOCK_FM_APK" "$MNT/system/priv-app/FileExploresky/FileExploresky.apk"
+    sudo chmod 0755 "$MNT/system/priv-app/FileExploresky"
+    lbl u:object_r:system_file:s0 "$MNT/system/priv-app/FileExploresky" "$MNT/system/priv-app/FileExploresky/FileExploresky.apk"
+fi
+if ! sudo find "$MNT/system/app" "$MNT/system/priv-app" -maxdepth 2 -iname 'FileExploresky*.apk' 2>/dev/null | grep -q .; then
+    echo "Не найден штатный файловый менеджер FileExploresky в system/app или system/priv-app" >&2
     exit 1
 fi
 umnt

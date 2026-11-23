@@ -33,6 +33,8 @@ media/
 *.img.xz
 *.tar.zst
 *.apk
+# Штатный FM из A12-образа платы — единственный APK в git (см. prebuilt/stock-filemanager/SOURCE.txt)
+!prebuilt/stock-filemanager/FileExploresky.apk
 *.class
 *.jar
 *.zip

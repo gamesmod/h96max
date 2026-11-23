@@ -53,7 +53,7 @@ for p in com.agateau.tinywheels.android org.supertux.supertux2 app.flicky org.sm
     if pm path "$p" >/dev/null 2>&1; then pm uninstall --user 0 "$p"; fi
 done
 # Total Commander и его плагины исключены из выпуска: файловый менеджер по умолчанию — штатный «Файловый менеджер»
-# Rockchip (RkExplorer, com.android.rk). Удалить их с уже обновлённых приставок вместе с источниками в Obtainium.
+# штатный FileExploresky (com.droidlogic.FileBrower). Удалить их с уже обновлённых приставок вместе с источниками в Obtainium.
 for p in com.ghisler.android.TotalCommander com.ghisler.tcplugins.LAN com.ghisler.tcplugins.FTP \
          com.ghisler.tcplugins.SFTP com.ghisler.tcplugins.wifitransfer; do
     if pm path "$p" >/dev/null 2>&1; then echo "remove $p: $(pm uninstall --user 0 "$p" 2>&1)"; fi
@@ -104,18 +104,18 @@ appops set org.maintainteam.hypatia MANAGE_EXTERNAL_STORAGE allow
 pm grant org.tvbox.bootlog android.permission.READ_EXTERNAL_STORAGE 2>/dev/null
 # «ТВ-каналы» записывает плейлист для VLC в /sdcard/tvbox/iptv-now.m3u, чтобы переключать CH+/CH−.
 appops set org.tvbox.iptv MANAGE_EXTERNAL_STORAGE allow
-# Файловый менеджер по умолчанию — штатный RkExplorer (com.android.rk). Он системный (sharedUserId android.uid.system,
-# uid 1000): Android не запускает приложения от uid 0, а su закрыт для приложений. Поэтому он получает максимум
-# прав, доступных системному приложению: включён, полный доступ к общей памяти и носителям выдан без запросов.
-if pm path com.android.rk >/dev/null 2>&1; then
-    pm enable com.android.rk >/dev/null 2>&1
-    appops set com.android.rk MANAGE_EXTERNAL_STORAGE allow 2>/dev/null
-    appops set com.android.rk LEGACY_STORAGE allow 2>/dev/null
+# Файловый менеджер по умолчанию — штатный FileExploresky (com.droidlogic.FileBrower) из A12-образа.
+# Он системный (sharedUserId android.uid.system, uid 1000): Android не запускает приложения от uid 0, а su
+# закрыт для приложений. Поэтому он получает максимум прав системного приложения без запросов.
+if pm path com.droidlogic.FileBrower >/dev/null 2>&1; then
+    pm enable com.droidlogic.FileBrower >/dev/null 2>&1
+    appops set com.droidlogic.FileBrower MANAGE_EXTERNAL_STORAGE allow 2>/dev/null
+    appops set com.droidlogic.FileBrower LEGACY_STORAGE allow 2>/dev/null
     for perm in READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE WRITE_MEDIA_STORAGE; do
-        pm grant com.android.rk android.permission.$perm 2>/dev/null
+        pm grant com.droidlogic.FileBrower android.permission.$perm 2>/dev/null
     done
 else
-    echo "filemanager: com.android.rk not installed"
+    echo "filemanager: com.droidlogic.FileBrower not installed"
 fi
 # Запасной «Файлы (root)» (org.tvbox.files) без плитки: системные папки открывает через tvboxd (FS_*).
 appops set org.tvbox.files MANAGE_EXTERNAL_STORAGE allow
@@ -181,7 +181,7 @@ L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
 if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initialized" ]; then
     # Атомарно записать настройки до остановки HOME; особенности запуска описаны в HANDOFF.md.
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
-    ALLOWED="org.tvbox.iptv ru.yourok.torrserve com.android.rk org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
+    ALLOWED="org.tvbox.iptv ru.yourok.torrserve com.droidlogic.FileBrower org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
     T=""; EXTRA=""; N=0
     # Сохранить установленные функции и их порядок; удалить дубли, игры и устаревшие плитки.
     for p in $(printf '%s' "$OLD" | sed 's/\&\#30;/ /g'); do
@@ -309,9 +309,9 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-flicky-removed"
     fi
     touch "$D/launcher-flicky-removed"
 fi
-# Плитка штатного файлового менеджера (com.android.rk) заменяет на своём месте плитку Total Commander или
+# Плитка штатного файлового менеджера (com.droidlogic.FileBrower) заменяет на своём месте плитку Total Commander или
 # «Файлов» (org.tvbox.files); если их не было, она встаёт после TorrServe. Один раз, порядок пользователя сохраняется.
-FM=com.android.rk
+FM=com.droidlogic.FileBrower
 if pm path com.tvlauncher >/dev/null 2>&1 && pm path $FM >/dev/null 2>&1 \
         && [ ! -e "$D/launcher-filemanager-tile" ] && [ -f "$L" ]; then
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
