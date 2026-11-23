@@ -200,6 +200,7 @@ jobs:
           cp apps/antivirus/out/TvboxAntivirus.apk release/obtainium/Panadonik-antivirus.apk
           cp apps/bootlog/out/TvboxBootLog.apk release/obtainium/Panadonik-bootlog.apk
           cp apps/clean/out/TvboxClean.apk release/obtainium/Panadonik-performance.apk
+          cp apps/files/out/TvboxFiles.apk release/obtainium/Panadonik-files.apk
           cp apps/installer/out/TvboxInstaller.apk release/obtainium/Panadonik-installer.apk
           cp apps/iptv/out/TvboxIptv.apk release/obtainium/Panadonik-iptv.apk
           cp apps/links/out/TvboxLinks.apk release/obtainium/Panadonik-links.apk
