@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- «Файлы»: папка с отметкой root. Вектор вместо PNG, чтобы значок оставался текстовым исходником. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="192dp" android:height="192dp" android:viewportWidth="192" android:viewportHeight="192">
+    <path android:fillColor="#FF263238" android:pathData="M0,0h192v192h-192z"/>
+    <path android:fillColor="#FFF9A825" android:pathData="M28,52 h50 l14,14 h72 a8,8 0 0 1 8,8 v74 a8,8 0 0 1 -8,8 h-136 a8,8 0 0 1 -8,-8 v-88 a8,8 0 0 1 8,-8 z"/>
+    <path android:fillColor="#FFFFCA28" android:pathData="M20,82 h152 v66 a8,8 0 0 1 -8,8 h-136 a8,8 0 0 1 -8,-8 z"/>
+    <path android:fillColor="#FF2E7D32" android:pathData="M120,100 a26,26 0 1 1 0,52 a26,26 0 1 1 0,-52 z"/>
+    <path android:fillColor="#FFFFFFFF" android:pathData="M106,124 h28 v20 h-28 z"/>
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="4" android:pathData="M113,124 v-6 a7,7 0 0 1 14,0 v6"/>
+</vector>

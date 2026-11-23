@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Баннер плитки «Файлы» 320×180 для домашнего экрана. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp" android:height="180dp" android:viewportWidth="320" android:viewportHeight="180">
+    <path android:fillColor="#FF263238" android:pathData="M0,0h320v180h-320z"/>
+    <path android:fillColor="#FFF9A825" android:pathData="M84,40 h56 l16,16 h72 a8,8 0 0 1 8,8 v68 a8,8 0 0 1 -8,8 h-136 a8,8 0 0 1 -8,-8 v-84 a8,8 0 0 1 8,-8 z"/>
+    <path android:fillColor="#FFFFCA28" android:pathData="M76,70 h160 v62 a8,8 0 0 1 -8,8 h-144 a8,8 0 0 1 -8,-8 z"/>
+    <path android:fillColor="#FF2E7D32" android:pathData="M196,92 a24,24 0 1 1 0,48 a24,24 0 1 1 0,-48 z"/>
+    <path android:fillColor="#FFFFFFFF" android:pathData="M183,114 h26 v18 h-26 z"/>
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="4" android:pathData="M190,114 v-6 a6,6 0 0 1 12,0 v6"/>
+</vector>
