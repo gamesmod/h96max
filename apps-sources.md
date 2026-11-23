@@ -2,8 +2,8 @@
 
 ## Штатный файловый менеджер из A12-образа платы — 2026-11-23
 
-Единственный бинарник vendor-образа в git: `prebuilt/stock-filemanager/FileExploresky.apk`.
-Остальной A12 остаётся локально в `dl/` и в git не входит.
+Единственный бинарник vendor-образа среди исходников приложений: `prebuilt/stock-filemanager/FileExploresky.apk`.
+Очищенные стоковые разделы A12 и boot-образы — в Git LFS (`dl/a12/...`); сторонние APK в git не входят (`tools/fetch-third-party.sh`).
 
 | Пакет | Источник | SHA-256 APK | SHA-256 подписанта |
 |---|---|---|---|

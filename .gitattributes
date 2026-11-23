@@ -5,3 +5,11 @@
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.bin filter=lfs diff=lfs merge=lfs -text
 
+# Stock CI inputs (cleaned A12 partitions, boot loaders, A9 Wi-Fi/BT fw, VFD)
+dl/a12/** filter=lfs diff=lfs merge=lfs -text
+a9fw/** filter=lfs diff=lfs merge=lfs -text
+stock/vfd/** filter=lfs diff=lfs merge=lfs -text
+overlay-wifi/*.apk filter=lfs diff=lfs merge=lfs -text
+# Text report next to cleaned partitions stays as normal git
+dl/a12/Image/lp/cleanup-report.json -filter -diff -merge text
+a9fw/config.txt -filter -diff -merge text

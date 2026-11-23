@@ -13,8 +13,7 @@ SCRIPT = ROOT / "tools/export-release-secrets.sh"
 TEXT = SCRIPT.read_text()
 WORKFLOW = (ROOT / ".github/workflows/release.yml").read_text()
 COMPONENTS = (ROOT / "COMPONENTS.md").read_text()
-SECRETS = ("RELEASE_INPUTS_ARCHIVE_URL", "RELEASE_INPUTS_SHA256", "TVBOX_SIGNING_KEY",
-           "TVBOX_SIGNING_CERT", "OTA_SIGNING_KEY", "OTA_SIGNING_CERT")
+SECRETS = ("TVBOX_SIGNING_KEY", "TVBOX_SIGNING_CERT", "OTA_SIGNING_KEY", "OTA_SIGNING_CERT")
 PASS = "correct horse battery staple"
 
 GH_STUB = """#!/bin/bash
@@ -75,13 +74,11 @@ class ExportReleaseSecretsTests(unittest.TestCase):
         (bin_dir / "gh").chmod(0o755)
         log = tmp / "gh"
         log.mkdir()
-        inputs = tmp / "release-inputs.tar.zst"
-        inputs.write_bytes(b"inputs")
         env = dict(os.environ, PATH=f"{bin_dir}:{os.environ['PATH']}", GH_LOG=str(log), HOME=str(tmp),
                    RELEASE_SECRETS_PASSPHRASE=PASS)
         for var in ("RELEASE_INPUTS_ARCHIVE_URL", "ARCHIVE", "SECRETS_DIR"):
             env.pop(var, None)
-        return repo, path, sec, inputs, log, env
+        return repo, path, sec, log, env
 
     def _run(self, args, env):
         return subprocess.run(["bash", *map(str, args)], env=env, capture_output=True, text=True,
@@ -90,18 +87,15 @@ class ExportReleaseSecretsTests(unittest.TestCase):
     def test_roundtrip_encrypt_then_apply(self):
         with tempfile.TemporaryDirectory() as t:
             tmp = pathlib.Path(t)
-            repo, path, sec, inputs, log, env = self._fixture(tmp)
-            url = "https://example.invalid/private/inputs.tar.zst"
+            repo, path, sec, log, env = self._fixture(tmp)
             out = tmp / "bundle.tar.gz.enc"
-            r = self._run([path, "--secrets-dir", sec, "--archive", inputs, "--output", out],
-                          dict(env, RELEASE_INPUTS_ARCHIVE_URL=url))
+            r = self._run([path, "--secrets-dir", sec, "--output", out], env)
             self.assertEqual(r.returncode, 0, r.stderr)
             data = out.read_bytes()
             self.assertTrue(data.startswith(b"Salted__"))
             self.assertNotIn(b"PRIVATE KEY", data)
             self.assertEqual(out.stat().st_mode & 0o777, 0o600)
             self.assertNotIn("PRIVATE KEY", r.stdout + r.stderr)
-            self.assertNotIn(url, r.stdout + r.stderr)
             self.assertEqual(list(log.iterdir()), [])
 
             bad = self._run([path, "--apply", out], dict(env, RELEASE_SECRETS_PASSPHRASE="wrong password!"))
@@ -115,14 +109,12 @@ class ExportReleaseSecretsTests(unittest.TestCase):
             self.assertEqual((log / "TVBOX_SIGNING_KEY").read_bytes(), (sec / "tvbox-key.pem").read_bytes())
             self.assertEqual((log / "OTA_SIGNING_KEY").read_bytes(), (sec / "ota-key.pem").read_bytes())
             self.assertEqual((log / "OTA_SIGNING_CERT").read_bytes(), (sec / "ota-cert.pem").read_bytes())
-            self.assertEqual((log / "RELEASE_INPUTS_ARCHIVE_URL").read_text(), url)
-            self.assertEqual((log / "RELEASE_INPUTS_SHA256").read_text(), hashlib.sha256(b"inputs").hexdigest())
 
     def test_default_output_is_outside_repo_in_home(self):
         with tempfile.TemporaryDirectory() as t:
             tmp = pathlib.Path(t)
-            repo, path, sec, inputs, log, env = self._fixture(tmp)
-            r = self._run([path, "--secrets-dir", sec, "--archive", inputs], env)
+            repo, path, sec, log, env = self._fixture(tmp)
+            r = self._run([path, "--secrets-dir", sec], env)
             self.assertEqual(r.returncode, 0, r.stderr)
             made = list(tmp.glob("h96max-release-secrets-*.tar.gz.enc"))
             self.assertEqual(len(made), 1)
@@ -130,27 +122,27 @@ class ExportReleaseSecretsTests(unittest.TestCase):
     def test_refuses_unignored_output_inside_work_tree(self):
         with tempfile.TemporaryDirectory() as t:
             tmp = pathlib.Path(t)
-            repo, path, sec, inputs, log, env = self._fixture(tmp)
+            repo, path, sec, log, env = self._fixture(tmp)
             out = repo / "secrets-backup.tar.gz.enc"
-            r = self._run([path, "--secrets-dir", sec, "--archive", inputs, "--output", out], env)
+            r = self._run([path, "--secrets-dir", sec, "--output", out], env)
             self.assertNotEqual(r.returncode, 0)
             self.assertFalse(out.exists())
             (repo / ".gitignore").write_text("secrets-backup.*\n")
-            r = self._run([path, "--secrets-dir", sec, "--archive", inputs, "--output", out], env)
+            r = self._run([path, "--secrets-dir", sec, "--output", out], env)
             self.assertEqual(r.returncode, 0, r.stderr)
 
     def test_refuses_foreign_keys_and_warns_on_no_encrypt(self):
         with tempfile.TemporaryDirectory() as t:
             tmp = pathlib.Path(t)
-            repo, path, sec, inputs, log, env = self._fixture(tmp)
+            repo, path, sec, log, env = self._fixture(tmp)
             real = tmp / "real.sh"
             real.write_text(TEXT)
-            r = self._run([real, "--secrets-dir", sec, "--archive", inputs, "--output", tmp / "x.enc"], env)
+            r = self._run([real, "--secrets-dir", sec, "--output", tmp / "x.enc"], env)
             self.assertNotEqual(r.returncode, 0)
             self.assertIn("COMPONENTS.md", r.stderr)
             self.assertFalse((tmp / "x.enc").exists())
             out = tmp / "plain.tar.gz"
-            r = self._run([path, "--secrets-dir", sec, "--archive", inputs, "--output", out, "--no-encrypt"], env)
+            r = self._run([path, "--secrets-dir", sec, "--output", out, "--no-encrypt"], env)
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertIn("ОТКРЫТОМ", r.stderr)
 

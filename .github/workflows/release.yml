@@ -32,8 +32,6 @@ jobs:
 
       - name: Preflight required Actions secrets
         env:
-          INPUTS_URL: ${{ secrets.RELEASE_INPUTS_ARCHIVE_URL }}
-          INPUTS_SHA256: ${{ secrets.RELEASE_INPUTS_SHA256 }}
           TVBOX_KEY: ${{ secrets.TVBOX_SIGNING_KEY }}
           TVBOX_CERT: ${{ secrets.TVBOX_SIGNING_CERT }}
           OTA_KEY: ${{ secrets.OTA_SIGNING_KEY }}
@@ -41,8 +39,6 @@ jobs:
         run: |
           set -euo pipefail
           missing=()
-          [[ -n "$INPUTS_URL" ]] || missing+=(RELEASE_INPUTS_ARCHIVE_URL)
-          [[ -n "$INPUTS_SHA256" ]] || missing+=(RELEASE_INPUTS_SHA256)
           [[ -n "$TVBOX_KEY" ]] || missing+=(TVBOX_SIGNING_KEY)
           [[ -n "$TVBOX_CERT" ]] || missing+=(TVBOX_SIGNING_CERT)
           [[ -n "$OTA_KEY" ]] || missing+=(OTA_SIGNING_KEY)
@@ -86,30 +82,37 @@ jobs:
             exit 1
           fi
 
-      - name: Verify tag and download private release inputs
-        env:
-          INPUTS_URL: ${{ secrets.RELEASE_INPUTS_ARCHIVE_URL }}
-          INPUTS_SHA256: ${{ secrets.RELEASE_INPUTS_SHA256 }}
+      - name: Verify tag, LFS stock inputs and fetch third-party apps
         run: |
           set -euo pipefail
           version="$(sed -n 's/^ro.tvbox.release=//p' build-sd.sh)"
           if [[ "$GITHUB_EVENT_NAME" != push || "$GITHUB_REF" != refs/tags/* ]]; then tag_version="$version"; elif [[ "$GITHUB_REF_NAME" == dev-v* ]]; then tag_version="${GITHUB_REF_NAME#dev-v}"; else tag_version="${GITHUB_REF_NAME#v}"; fi
           test "$tag_version" = "$version" || { echo "Tag does not match firmware version" >&2; exit 1; }
-          test -n "$INPUTS_URL" && test -n "$INPUTS_SHA256" || { echo "Configure RELEASE_INPUTS_ARCHIVE_URL and RELEASE_INPUTS_SHA256 repository secrets" >&2; exit 1; }
-          echo "::add-mask::$INPUTS_URL"
-          curl --fail --location --retry 3 --silent --show-error "$INPUTS_URL" --output /tmp/release-inputs.tar.zst
-          printf '%s  %s\n' "$INPUTS_SHA256" /tmp/release-inputs.tar.zst | sha256sum --check --status
-          tar --zstd -xf /tmp/release-inputs.tar.zst -C .
-          rm /tmp/release-inputs.tar.zst
-          test -f dl/a12/Image/lp/system.img
-          test -f dl/a12/Image/lp/vendor.img
-          test -f dl/a12/MiniLoaderAll.bin
+          # Стоковые входы — публичный Git LFS (решение владельца); сторонние APK скачивает fetch-скрипт.
+          for f in \
+            dl/a12/MiniLoaderAll.bin \
+            dl/a12/Image/boot.img dl/a12/Image/recovery.img dl/a12/Image/uboot.img \
+            dl/a12/Image/trust.img dl/a12/Image/dtbo.img dl/a12/Image/vbmeta.img \
+            dl/a12/Image/baseparameter.img \
+            dl/a12/Image/lp/system.img dl/a12/Image/lp/system_ext.img \
+            dl/a12/Image/lp/vendor.img dl/a12/Image/lp/vendor_dlkm.img \
+            dl/a12/Image/lp/odm.img dl/a12/Image/lp/odm_dlkm.img \
+            dl/a12/Image/lp/product.img \
+            a9fw/config.txt a9fw/bcm4334.hcd a9fw/fw_bcm4334b1_ag.bin a9fw/fw_bcm4334b1_ag_apsta.bin \
+            stock/vfd/vfdsrv overlay-wifi/TvboxWifiOverlay.apk
+          do
+            test -f "$f" && test -s "$f" || { echo "Missing LFS stock input: $f" >&2; exit 1; }
+            # Git LFS pointer left unsmudged is a small text file starting with "version https://git-lfs".
+            if head -c 20 "$f" | grep -q 'git-lfs'; then
+              echo "LFS object not smudged: $f" >&2
+              exit 1
+            fi
+          done
+          test ! -e dl/a12/Image/super.img || { echo "super.img must not be present in CI inputs" >&2; exit 1; }
+          bash tools/fetch-third-party.sh
           test -f dl/apk/com.tvlauncher.apk
           test -f dl/webview/webview-arm64.apk
           test -f dl/torrserver/TorrServer-android-arm64
-          test -f a9fw/fw_bcm4334b1_ag.bin
-          test -f stock/vfd/vfdsrv
-          test -f overlay-wifi/TvboxWifiOverlay.apk
 
       - name: Load existing signing keys
         env:

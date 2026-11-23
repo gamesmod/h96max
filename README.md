@@ -74,7 +74,7 @@
 
 Workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) запускается ночью по расписанию, вручную через Actions или при push в ветку `candidate/*` как сборка кандидата, а при push тега `dev-v<версия>` или `v<версия>`, совпадающего с `ro.tvbox.release` в `build-sd.sh`, — как выпуск. Ночной, ручной и веточный запуски создают Actions artifact на 3 дня, но не тег и не GitHub Release; артефакт доступен читателям репозитория, помечается как не прошедший аппаратную приёмку и не считается готовым к установке выпуском. `dev-v…` создаёт GitHub prerelease и не требует закрыть каждый известный security-риск; анализ и свежий сетевой захват обязательны, риски видны в приложенном QA-протоколе. Для стабильного `v…` нужна полная проверка безопасности. Оба типа публичного выпуска проходят сборку, автоматические и функциональные аппаратные проверки. GitHub-hosted runner собирает eMMC OTA и комплект чистой установки через Rockchip Loader, готовит changelog для приложения «Обновление» и создаёт GitHub Release с автоматически подготовленными GitHub Release Notes. До сборки workflow проверяет запас диска, SHA-256 входного архива и публичность IPTV URL. Отдельный [ежемесячный workflow](.github/workflows/monthly-security-audit.yml) проверяет полный набор тестов и свежесть очищенного аудита устройства (31 день).
 
-В Settings → Secrets and variables → Actions задаются секреты `RELEASE_INPUTS_ARCHIVE_URL`, `RELEASE_INPUTS_SHA256`, `TVBOX_SIGNING_KEY`, `TVBOX_SIGNING_CERT`, `OTA_SIGNING_KEY`, `OTA_SIGNING_CERT`. Приватный `.tar.zst` содержит A12 base и необходимые бинарные зависимости; точный состав перечислен в `tools/package-ci-inputs.sh`, архив готовится этой командой, а URL и SHA-256 задаются в Secrets. Используются прежние ключи проекта. Wi-Fi credentials не нужны: `build-sd.sh` удаляет `vendor/etc/tvbox/wifi.env` из базового образа. После сборки CI читает ext4-разделы system/vendor и блокирует выпуск при найденном Wi-Fi-профиле или сохранённых SSID/ключе в конфигурации.
+Стоковые входы A12 (очищенные разделы, boot/recovery/uboot/trust и т.д.), прошивки A9 Wi‑Fi/BT, VFD и `TvboxWifiOverlay.apk` хранятся в публичном Git LFS по решению владельца; `super.img` и секреты в репозиторий не входят. Сторонние APK и TorrServer CI скачивает через `tools/fetch-third-party.sh` по закреплённым URL/SHA-256 из `tools/third-party-apps.json`. В Settings → Secrets and variables → Actions задаются только `TVBOX_SIGNING_KEY`, `TVBOX_SIGNING_CERT`, `OTA_SIGNING_KEY`, `OTA_SIGNING_CERT` (прежние ключи проекта). Wi-Fi credentials не нужны: `build-sd.sh` удаляет `vendor/etc/tvbox/wifi.env` из базового образа. После сборки CI читает ext4-разделы system/vendor и блокирует выпуск при найденном Wi-Fi-профиле или сохранённых SSID/ключе в конфигурации.
 
 Секреты и git/gh настраивает `bash tools/setup-release-secrets.sh` (Linux, macOS; в Windows — WSL или Git Bash с установленными `gh` и `openssl`). Скрипт запускается в клоне репозитория на компьютере, где лежат прежние ключи `secrets/` и приватный архив входов. Он проверяет `git`, `gh`, `openssl`, `curl`, `sha256sum`/`shasum`; при необходимости записывает `user.name`/`user.email`, настраивает `origin`, выполняет `gh auth login` (права `repo`, `workflow`) и `gh auth setup-git`, проверяет права администратора репозитория. Новые ключи не создаются: сертификаты сверяются с отпечатками из `COMPONENTS.md`, ключ — с сертификатом, ключ с паролем отклоняется. Значения передаются в `gh secret set` только через stdin и не печатаются.
 
@@ -82,27 +82,22 @@ Workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) зап
 |---|---|
 | `TVBOX_SIGNING_KEY`, `OTA_SIGNING_KEY` | полный текст `secrets/tvbox-key.pem` и `secrets/ota-key.pem` (PEM закрытого ключа без пароля) |
 | `TVBOX_SIGNING_CERT`, `OTA_SIGNING_CERT` | полный текст `secrets/tvbox-cert.pem` и `secrets/ota-cert.pem` (PEM X.509) |
-| `RELEASE_INPUTS_ARCHIVE_URL` | HTTPS-адрес архива `.tar.zst` из `tools/package-ci-inputs.sh`; CI скачивает его `curl -L` без авторизации |
-| `RELEASE_INPUTS_SHA256` | SHA-256 архива, 64 hex-символа |
-
-Архив не публикуется: нужен приватный адрес прямого скачивания (подписанная ссылка S3/R2/B2/Object Storage или собственный HTTPS-сервер с неугадываемым путём). Release-ассеты публичного репозитория и черновики GitHub Release не подходят: первые публичны, вторые без токена не скачиваются. У подписанной ссылки ограничен срок; после истечения запустите скрипт снова с новым адресом.
 
 ```sh
 # проверка без изменений
-bash tools/setup-release-secrets.sh --dry-run --archive /ПРИВАТНЫЙ_ПУТЬ/inputs.tar.zst
-# настройка git/gh и всех шести секретов; адрес вводится скрыто по запросу или из переменной окружения
-bash tools/setup-release-secrets.sh --git-name "Имя" --git-email you@example.com \
-    --archive /ПРИВАТНЫЙ_ПУТЬ/inputs.tar.zst --verify-url
-# создать архив, задать секреты и перезапустить неуспешную сборку candidate/<версия>
-bash tools/setup-release-secrets.sh --package-archive /ПРИВАТНЫЙ_ПУТЬ/inputs.tar.zst --verify-url --rerun
+bash tools/setup-release-secrets.sh --dry-run
+# настройка git/gh и четырёх секретов подписи
+bash tools/setup-release-secrets.sh --git-name "Имя" --git-email you@example.com
+# задать секреты и перезапустить неуспешную сборку candidate/<версия>
+bash tools/setup-release-secrets.sh --rerun
 ```
 
-`--keys-only` задаёт только четыре секрета ключей, `--dispatch REF` запускает `release.yml` вручную на ветке. Теги скрипт не создаёт.
+`--dispatch REF` запускает `release.yml` вручную на ветке. Теги скрипт не создаёт. Локально: `bash tools/setup-git.sh`, затем `bash tools/fetch-third-party.sh`.
 
-Перенос секретов на другой компьютер — `bash tools/export-release-secrets.sh`. Он проверяет те же ключи и отпечатки и создаёт зашифрованный архив вне репозитория: `~/h96max-release-secrets-ГГГГММДД-ЧЧММ.tar.gz.enc` (режим 600; `openssl enc -aes-256-cbc -pbkdf2 -iter 200000`, пароль вводится скрыто дважды или берётся из `RELEASE_SECRETS_PASSPHRASE`). Внутри: `secrets/{tvbox,ota}-{key,cert}.pem`, файлы `RELEASE_INPUTS_SHA256` и (с `--ask-url` или `RELEASE_INPUTS_ARCHIVE_URL`) `RELEASE_INPUTS_ARCHIVE_URL`, а также `MANIFEST.txt` с датой, коммитом, отпечатками и командами импорта. Внутри рабочего дерева архив пишется только по пути, который игнорирует git; `--no-encrypt` оставляет ключи открытыми и допускается только явно.
+Перенос секретов на другой компьютер — `bash tools/export-release-secrets.sh`. Он проверяет те же ключи и отпечатки и создаёт зашифрованный архив вне репозитория: `~/h96max-release-secrets-ГГГГММДД-ЧЧММ.tar.gz.enc` (режим 600; `openssl enc -aes-256-cbc -pbkdf2 -iter 200000`, пароль вводится скрыто дважды или берётся из `RELEASE_SECRETS_PASSPHRASE`). Внутри: `secrets/{tvbox,ota}-{key,cert}.pem` и `MANIFEST.txt`. Внутри рабочего дерева архив пишется только по пути, который игнорирует git; `--no-encrypt` оставляет ключи открытыми и допускается только явно.
 
 ```sh
-bash tools/export-release-secrets.sh --archive /ПРИВАТНЫЙ_ПУТЬ/inputs.tar.zst --ask-url
+bash tools/export-release-secrets.sh
 bash tools/export-release-secrets.sh --apply ~/h96max-release-secrets-ГГГГММДД-ЧЧММ.tar.gz.enc --rerun
 ```
 

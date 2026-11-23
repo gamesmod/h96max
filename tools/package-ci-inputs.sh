@@ -1,38 +1,28 @@
 #!/bin/bash
-# Приватные входы CI; право распространения бинарников проверяется отдельно.
+# Локальная пересборка очищенных LP-разделов из полного стока (не для публикации).
+# Основной путь CI: стоковые входы в Git LFS + tools/fetch-third-party.sh.
+# Не включать super.img, secrets/, *.pem и сторонние APK.
 set -euo pipefail
 umask 077
 R=$(cd "$(dirname "$0")/.." && pwd); cd "$R"
-source "$R/tools/required-apps.sh"
-tvbox_require_apks || { echo "Архив не создан: комплект приложений неполный" >&2; exit 1; }
-OUT=${1:-/tmp/h96max-release-inputs.tar.zst}
-[[ ! -e "$OUT" && ! -L "$OUT" ]] || { echo "Архив уже существует; перезапись запрещена" >&2; exit 1; }
-command -v zerofree >/dev/null || { echo "Требуется zerofree для удаления остатков APK" >&2; exit 1; }
-STAGE=$(mktemp -d "${TMPDIR:-/tmp}/h96max-ci-clean.XXXXXXXX")
-trap 'rm -rf -- "$STAGE"' EXIT
-python3 -I tools/prepare-ci-partitions.py dl/a12/Image/lp "$STAGE/dl/a12/Image/lp"
-# Только входы build-sd.sh/setup-sdk.sh: не включать super.img повторно,
-# распакованные ramdisk, DTB/DTS и результаты исследования исходной прошивки.
-INPUTS=(
-    dl/a12/MiniLoaderAll.bin
-    dl/a12/Image/{boot,recovery,uboot,trust,dtbo,vbmeta,baseparameter}.img
-    dl/a12/Image/lp/{system,system_ext,vendor,vendor_dlkm,odm,odm_dlkm,product}.img
-    "${TVBOX_REQUIRED_APKS[@]/#/dl/apk/}"
-    dl/webview/webview-arm64.apk dl/torrserver/TorrServer-android-arm64
-    a9fw/config.txt a9fw/bcm4334.hcd
-    a9fw/fw_bcm4334b1_ag.bin a9fw/fw_bcm4334b1_ag_apsta.bin
-    stock/vfd/vfdsrv overlay-wifi/TvboxWifiOverlay.apk
-)
-CHECK_INPUTS=()
-for f in "${INPUTS[@]}"; do
-    if [[ "$f" == dl/a12/Image/lp/*.img ]]; then CHECK_INPUTS+=("$STAGE/$f"); else CHECK_INPUTS+=("$R/$f"); fi
-    [[ -f "$f" && -s "$f" && ! -L "$f" ]] || { echo "Отсутствует обычный непустой build input: $f" >&2; exit 1; }
+SOURCE=${1:-"$R/dl/a12/Image/lp"}
+DEST=${2:-}
+command -v zerofree >/dev/null || { echo "Требуется zerofree" >&2; exit 1; }
+command -v resize2fs >/dev/null || { echo "Требуется resize2fs" >&2; exit 1; }
+[[ -d "$SOURCE" ]] || { echo "Нет каталога исходных разделов: $SOURCE" >&2; exit 1; }
+for p in system system_ext vendor vendor_dlkm odm odm_dlkm product; do
+    [[ -f "$SOURCE/$p.img" && -s "$SOURCE/$p.img" ]] || { echo "Нет $SOURCE/$p.img" >&2; exit 1; }
 done
-python3 -I tools/check-image-wifi-secrets.py "$STAGE"/dl/a12/Image/lp/*.img
+if [[ -z "$DEST" ]]; then
+    DEST=$(mktemp -d "${TMPDIR:-/tmp}/h96max-ci-clean.XXXXXXXX")
+    echo "DEST=$DEST"
+fi
+[[ ! -e "$DEST" ]] || { echo "Каталог назначения уже существует: $DEST" >&2; exit 1; }
+python3 -I tools/prepare-ci-partitions.py "$SOURCE" "$DEST"
+python3 -I tools/check-image-wifi-secrets.py "$DEST"/*.img
 # Проверять содержимое образов, а не только имена файлов. Полный PEM-блок
 # закрытого ключа блокирует упаковку; значения никогда не печатаются.
-# Это не исчерпывающий аудит токенов/персональных данных или сжатых вложений.
-python3 - "${CHECK_INPUTS[@]}" <<'PY_CHECK_KEYS'
+python3 - "$DEST"/*.img <<'PY_CHECK_KEYS'
 import mmap
 import re
 import sys
@@ -50,13 +40,6 @@ for name in sys.argv[1:]:
 if found:
     sys.exit(1)
 PY_CHECK_KEYS
-# noclobber не позволяет перезаписать существующий архив, включая симлинк.
-TAR_INPUTS=()
-for f in "${INPUTS[@]}"; do
-    if [[ "$f" == dl/a12/Image/lp/*.img ]]; then TAR_INPUTS+=(-C "$STAGE" "$f"); else TAR_INPUTS+=(-C "$R" "$f"); fi
-done
-# Отчёт содержит исходные/очищенные хеши и список исключённых APK.
-TAR_INPUTS+=(-C "$STAGE/dl/a12/Image/lp" cleanup-report.json)
-(set -o noclobber; tar --zstd -cf - "${TAR_INPUTS[@]}" > "$OUT")
-sha256sum "$OUT"
-echo "Архив готов: $OUT"
+echo "Очищенные разделы готовы: $DEST"
+echo "Отчёт: $DEST/cleanup-report.json"
+ls -la "$DEST"
