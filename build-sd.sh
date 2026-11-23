@@ -252,6 +252,12 @@ lbl u:object_r:system_file:s0 $MNT/system/bin/bootanimation.orig
 # Keep the native renderer's original graphics user and SELinux domain.
 lbl u:object_r:system_file:s0 $MNT/system/etc/init/bootanim.rc
 remove_unused_stock_apps system
+# Штатный «Файловый менеджер» Rockchip (RkExplorer, com.android.rk) — файловый менеджер по умолчанию и плитка
+# главного экрана; не удалять его при очистке образа.
+if ! sudo find "$MNT/system/app" "$MNT/system/priv-app" -maxdepth 2 -iname 'RkExplorer*.apk' 2>/dev/null | grep -q .; then
+    echo "Не найден штатный файловый менеджер RkExplorer в system/app или system/priv-app" >&2
+    exit 1
+fi
 umnt
 
 fi # VANILLA skips debloat/apps
