@@ -64,7 +64,7 @@ tools/build-release.sh
 
 1. ТВ-каналы
 2. TorrServe
-3. Файлы (встроенный файловый менеджер, права root через tvboxd)
+3. Файловый менеджер (штатный RkExplorer `com.android.rk`, системные права)
 4. Ссылки
 5. Обновление (внутри — Obtainium)
 6. Настройки Android
@@ -145,7 +145,7 @@ USB-приёмник микрофонного пульта определяет�
 | Питание | `apps/power` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/power) | Выключение, сон, перезагрузка и переход в recovery |
 | Журнал загрузки | `apps/bootlog` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/bootlog) | Просмотр журналов загрузки |
 | Ссылки | `apps/links` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/links) | QR для TorrServer. Планируется прямой переход к добавлению торрента с телефона и действие «Смотреть на ТВ» после добавления |
-| Файлы | `apps/files` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/files) | Встроенный файловый менеджер по умолчанию; операции с правами root через tvboxd |
+| Файлы | `apps/files` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/files) | Запасной файловый менеджер «Файлы (root)» без плитки; операции с правами root через tvboxd. По умолчанию используется штатный «Файловый менеджер» (`com.android.rk`) |
 | tvboxd | `apps/tvboxd` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/tvboxd) | Привилегированный помощник OTA и eMMC |
 
 ### Сторонние приложения
@@ -211,7 +211,7 @@ python3 tools/device-monitor.py --capture-interface wlan0 --controlled-network -
 
 ## Стороннее ПО
 
-Целевой комплект сторонних приложений: TV Launcher 1.6.2, TorrServer MatriX.143.FOSS, VLC 3.7.2, Obtainium 1.7.4 и Hypatia 3.18. Файловый менеджер встроен в образ — плитка «Файлы» (`apps/files`). Ссылки на страницы проектов приведены в таблице выше. Obtainium проверяет обновления напрямую в источниках приложений; Flicky удалён. WebView — LineageOS 155.0.8059.39. TorrServer работает на порту 8090.
+Целевой комплект сторонних приложений: TV Launcher 1.6.2, TorrServer MatriX.143.FOSS, VLC 3.7.2, Obtainium 1.7.4 и Hypatia 3.18. Файловый менеджер — штатный «Файловый менеджер» Rockchip из vendor-образа (плитка), запасной root-менеджер — «Файлы (root)» (`apps/files`). Ссылки на страницы проектов приведены в таблице выше. Obtainium проверяет обновления напрямую в источниках приложений; Flicky удалён. WebView — LineageOS 155.0.8059.39. TorrServer работает на порту 8090.
 
 Для регистрации приложений откройте Obtainium → **Import/Export** → **Obtainium import** и выберите `/sdcard/tvbox/obtainium-apps.json`. Файл содержит источники VLC, TorrServe, TV Launcher, Obtainium, Hypatia и всех семи собираемых APK Panadonik. Алиса и RuStore в этом списке отсутствуют. CI прикладывает APK Panadonik к каждому GitHub Release; Obtainium выбирает нужный файл по package ID и фильтру имени. Приложение `tvboxd` и загрузочный экран остаются в подписанном OTA, поскольку это системные JAR, а не APK. Android может запросить подтверждение установки APK-обновления.
 
