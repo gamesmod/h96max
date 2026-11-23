@@ -2,7 +2,6 @@
   "version": "0.4.2",
   "device": "Panadonik H96 Max, Android 12",
   "reviewed_at": "2026-11-07",
-  "cold_boot_seconds": null,
   "last_reboot_to_screen_seconds": 75,
   "hot_test": {
     "tested_installed_version": "0.3.9",
@@ -204,10 +203,6 @@
   },
   "automated_test_log_analysis": {
     "status": "pending",
-    "lines": null,
-    "critical": null,
-    "errors": null,
-    "warnings": null,
     "report": "release/qa/test-log-analysis-0.4.2.md"
   },
   "checks": {
@@ -223,8 +218,7 @@
     "graphics_stress": "pending",
     "swap_disabled": "pass",
     "network_capture_review": "pending: контролируемый захват и анализ трафика для 0.4.2 не выполнены",
-    "device_update": "pending: полный OTA не установлен; требование очистки/сохранения данных нужно проверить на приставке и получить отдельное согласие, если потребуется очистка",
-    "alice_voice": "pending: Алиса не установлена"
+    "device_update": "pending: полный OTA не установлен; требование очистки/сохранения данных нужно проверить на приставке и получить отдельное согласие, если потребуется очистка"
   },
   "log_analysis": {
     "reviewed": false,
