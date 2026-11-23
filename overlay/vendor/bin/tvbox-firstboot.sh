@@ -52,7 +52,17 @@ done
 for p in com.agateau.tinywheels.android org.supertux.supertux2 app.flicky org.smarttube.stable org.smarttube.beta com.liskovsoft.smarttubetv; do
     if pm path "$p" >/dev/null 2>&1; then pm uninstall --user 0 "$p"; fi
 done
-pm uninstall --user 0 com.ghisler.tcplugins.wifitransfer >/dev/null 2>&1 || true
+# Total Commander и его плагины исключены из выпуска: файловый менеджер по умолчанию — встроенные «Файлы»
+# (org.tvbox.files). Удалить их с уже обновлённых приставок вместе с источниками в Obtainium.
+for p in com.ghisler.android.TotalCommander com.ghisler.tcplugins.LAN com.ghisler.tcplugins.FTP \
+         com.ghisler.tcplugins.SFTP com.ghisler.tcplugins.wifitransfer; do
+    if pm path "$p" >/dev/null 2>&1; then echo "remove $p: $(pm uninstall --user 0 "$p" 2>&1)"; fi
+    if [ -f "/sdcard/Android/data/dev.imranr.obtainium/files/app_data/$p.json" ]; then
+        am force-stop dev.imranr.obtainium
+        rm -f "/sdcard/Android/data/dev.imranr.obtainium/files/app_data/$p.json"
+    fi
+    rm -f "/sdcard/tvbox/obtainium-seed/$p.json"
+done
 appops set dev.imranr.obtainium REQUEST_INSTALL_PACKAGES allow
 # Obtainium v1.7.4: getAppStorageDir()/app_data, один JSON на пакет.
 # Добавлять только отсутствующие записи; не менять выбранные пользователем источники.
@@ -94,8 +104,10 @@ appops set org.maintainteam.hypatia MANAGE_EXTERNAL_STORAGE allow
 pm grant org.tvbox.bootlog android.permission.READ_EXTERNAL_STORAGE 2>/dev/null
 # «ТВ-каналы» записывает плейлист для VLC в /sdcard/tvbox/iptv-now.m3u, чтобы переключать CH+/CH−.
 appops set org.tvbox.iptv MANAGE_EXTERNAL_STORAGE allow
-# Total Commander получает доступ ко всем файлам, чтобы не спрашивать при каждом запуске.
-appops set com.ghisler.android.TotalCommander MANAGE_EXTERNAL_STORAGE allow
+# «Файлы» получают доступ ко всем общим файлам и без root; системные папки они открывают через tvboxd (FS_*).
+appops set org.tvbox.files MANAGE_EXTERNAL_STORAGE allow
+pm grant org.tvbox.files android.permission.READ_EXTERNAL_STORAGE 2>/dev/null
+pm grant org.tvbox.files android.permission.WRITE_EXTERNAL_STORAGE 2>/dev/null
 # Один раз выключить субтитры VLC по умолчанию; последующие настройки пользователя сохраняются.
 V=/data/data/org.videolan.vlc/shared_prefs/org.videolan.vlc_preferences.xml
 if pm path org.videolan.vlc >/dev/null 2>&1 && ! grep -q subtitle_preferred_language $V 2>/dev/null; then
@@ -136,8 +148,6 @@ if pm path com.yandex.aliceapp >/dev/null 2>&1; then
     A=$(cmd role get-role-holders --user 0 android.app.role.ASSISTANT 2>/dev/null)
     case "$A" in *com.yandex.aliceapp*) echo "alice: default assistant ready; USB voice key uses VOICE_ASSIST";; *) echo "alice: enable as default assistant in Android settings";; esac
 fi
-for p in com.ghisler.android.TotalCommander com.ghisler.tcplugins.LAN com.ghisler.tcplugins.FTP \
-         com.ghisler.tcplugins.SFTP; do g $p READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE; done
 pm path ru.yourok.torrserve >/dev/null 2>&1 && appops set ru.yourok.torrserve MANAGE_EXTERNAL_STORAGE allow
 # Один раз выбрать VLC для TorrServe, чтобы убрать диалог выбора плеера (ключ player содержит пакет приложения).
 TS=/data/data/ru.yourok.torrserve/shared_prefs/ru.yourok.torrserve_preferences.xml
@@ -158,7 +168,7 @@ L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
 if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initialized" ]; then
     # Атомарно записать настройки до остановки HOME; особенности запуска описаны в HANDOFF.md.
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
-    ALLOWED="org.tvbox.iptv ru.yourok.torrserve com.ghisler.android.TotalCommander org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
+    ALLOWED="org.tvbox.iptv ru.yourok.torrserve org.tvbox.files org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
     T=""; EXTRA=""; N=0
     # Сохранить установленные функции и их порядок; удалить дубли, игры и устаревшие плитки.
     for p in $(printf '%s' "$OLD" | sed 's/\&\#30;/ /g'); do
@@ -285,6 +295,33 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-flicky-removed"
         echo "tvlauncher: replaced Flicky tile with Obtainium"
     fi
     touch "$D/launcher-flicky-removed"
+fi
+# Плитка «Файлы» заменяет Total Commander на его месте; если его плитки не было, она встаёт после TorrServe.
+# Выполняется один раз, дальнейший порядок пользователя сохраняется.
+if pm path com.tvlauncher >/dev/null 2>&1 && pm path org.tvbox.files >/dev/null 2>&1 \
+        && [ ! -e "$D/launcher-files-tile" ] && [ -f "$L" ]; then
+    OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
+    T=""; N=" "; C=0
+    case " $(printf '%s' "$OLD" | sed 's/\&#30;/ /g') " in *" org.tvbox.files "*) PLACED=1;; *) PLACED=0;; esac
+    for p in $(printf '%s' "$OLD" | sed 's/\&#30;/ /g'); do
+        case "$p" in com.ghisler.*) [ "$PLACED" = 1 ] && continue; p=org.tvbox.files; PLACED=1;; esac
+        case "$N" in *" $p "*) continue;; esac
+        T="${T:+$T&#30;}$p"; N="$N$p "; C=$((C+1))
+        if [ "$p" = ru.yourok.torrserve ] && [ "$PLACED" = 0 ] && ! printf '%s' "$OLD" | grep -q 'com\.ghisler\.'; then
+            T="$T&#30;org.tvbox.files"; N="${N}org.tvbox.files "; C=$((C+1)); PLACED=1
+        fi
+    done
+    if [ "$PLACED" = 0 ] && [ "$C" -lt 14 ]; then T="${T:+$T&#30;}org.tvbox.files"; fi
+    if [ "$T" != "$OLD" ]; then
+        REPL=$(printf '%s' "$T" | sed 's/\&/\\\&/g')
+        sed "s|<string name=\"apps_order\">[^<]*</string>|<string name=\"apps_order\">$REPL</string>|" "$L" > "$L.new"
+        u=$(stat -c %u /data/data/com.tvlauncher)
+        chown "$u:$u" "$L.new"; chmod 660 "$L.new"; mv "$L.new" "$L"; restorecon "$L"
+        am force-stop com.tvlauncher
+        am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
+        echo "tvlauncher: Files tile replaces Total Commander"
+    fi
+    touch "$D/launcher-files-tile"
 fi
 pm disable com.mbx.settingsmbox/.OobeActivity >/dev/null 2>&1
 # Показать поверх экрана запуска краткую сводку ресурсов с временными метками; TV Launcher остаётся HOME-приложением.

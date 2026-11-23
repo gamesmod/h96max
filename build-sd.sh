@@ -129,7 +129,7 @@ ro.setupwizard.mode=DISABLED
 persist.sys.timezone=Europe/Moscow
 persist.sys.locale=ru-RU
 persist.sys.usb.config=adb
-ro.tvbox.release=0.4.8
+ro.tvbox.release=0.4.9
 EOF
 echo "ro.tvbox.build_date=$(date +%F)" | sudo tee -a $MNT/etc/build.prop >/dev/null
 umnt
@@ -225,6 +225,11 @@ sudo mkdir -p $MNT/system/app/TvboxLinks
 sudo install -m 0644 $R/apps/links/out/TvboxLinks.apk $MNT/system/app/TvboxLinks/TvboxLinks.apk
 sudo chmod 0755 $MNT/system/app/TvboxLinks
 lbl u:object_r:system_file:s0 $MNT/system/app/TvboxLinks $MNT/system/app/TvboxLinks/TvboxLinks.apk
+# "Файлы" tile (apps/files): built-in file manager, root file operations via tvboxd FS_*
+sudo mkdir -p $MNT/system/app/TvboxFiles
+sudo install -m 0644 $R/apps/files/out/TvboxFiles.apk $MNT/system/app/TvboxFiles/TvboxFiles.apk
+sudo chmod 0755 $MNT/system/app/TvboxFiles
+lbl u:object_r:system_file:s0 $MNT/system/app/TvboxFiles $MNT/system/app/TvboxFiles/TvboxFiles.apk
 # Живой журнал загрузки заменяет статичную заставку, чтобы не показывать старый логотип.
 # Оригинальный бинарник сохраняем только как резервную копию, но не запускаем.
 sudo cp -f $MNT/system/bin/bootanimation $MNT/system/bin/bootanimation.orig

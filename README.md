@@ -64,7 +64,7 @@ tools/build-release.sh
 
 1. ТВ-каналы
 2. TorrServe
-3. Total Commander
+3. Файлы (встроенный файловый менеджер, права root через tvboxd)
 4. Ссылки
 5. Обновление (внутри — Obtainium)
 6. Настройки Android
@@ -145,6 +145,7 @@ USB-приёмник микрофонного пульта определяет�
 | Питание | `apps/power` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/power) | Выключение, сон, перезагрузка и переход в recovery |
 | Журнал загрузки | `apps/bootlog` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/bootlog) | Просмотр журналов загрузки |
 | Ссылки | `apps/links` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/links) | QR для TorrServer. Планируется прямой переход к добавлению торрента с телефона и действие «Смотреть на ТВ» после добавления |
+| Файлы | `apps/files` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/files) | Встроенный файловый менеджер по умолчанию; операции с правами root через tvboxd |
 | tvboxd | `apps/tvboxd` | [Исходники](https://github.com/gamesmod/h96max/tree/master/apps/tvboxd) | Привилегированный помощник OTA и eMMC |
 
 ### Сторонние приложения
@@ -156,7 +157,6 @@ USB-приёмник микрофонного пульта определяет�
 | TV Launcher | `com.tvlauncher` | [wiiguy/lightweight_androidtv_launcher](https://github.com/wiiguy/lightweight_androidtv_launcher) |
 | Obtainium | `dev.imranr.obtainium` | [ImranR98/Obtainium](https://github.com/ImranR98/Obtainium) |
 | Hypatia | `org.maintainteam.hypatia` | [MaintainTeam/Hypatia](https://github.com/MaintainTeam/Hypatia) |
-| Total Commander | `com.ghisler.android.TotalCommander` | [Страница приложения](https://www.ghisler.com/android.htm); [репозиторий плагинов](https://raw.githubusercontent.com/chrisgch/tca/master/fdroid/repo) |
 
 Плитка **Обновление** показывает источник загрузки и состояние eMMC, ищет подписанные OTA на носителе и в сети, редактирует источники и показывает журнал. Во время операции видны строки журнала с временными метками и текущий этап; ход загрузки и сверки тоже записывается с локальным временем. Установка по сети загружает eMMC OTA и передаёт его штатному recovery. SD-обновление использует тот же recovery-пакет с карты.
 
@@ -211,9 +211,9 @@ python3 tools/device-monitor.py --capture-interface wlan0 --controlled-network -
 
 ## Стороннее ПО
 
-Целевой комплект сторонних приложений: TV Launcher 1.6.2, TorrServer MatriX.143.FOSS, VLC 3.7.2, Obtainium 1.7.4, Total Commander 3.62d с плагинами LAN/FTP/SFTP и Hypatia 3.18. Плагин WiFi Transfer удалён. Ссылки на страницы проектов приведены в таблице выше. Obtainium проверяет обновления напрямую в источниках приложений; Flicky удалён. WebView — LineageOS 155.0.8059.39. TorrServer работает на порту 8090.
+Целевой комплект сторонних приложений: TV Launcher 1.6.2, TorrServer MatriX.143.FOSS, VLC 3.7.2, Obtainium 1.7.4 и Hypatia 3.18. Файловый менеджер встроен в образ — плитка «Файлы» (`apps/files`). Ссылки на страницы проектов приведены в таблице выше. Obtainium проверяет обновления напрямую в источниках приложений; Flicky удалён. WebView — LineageOS 155.0.8059.39. TorrServer работает на порту 8090.
 
-Для регистрации приложений откройте Obtainium → **Import/Export** → **Obtainium import** и выберите `/sdcard/tvbox/obtainium-apps.json`. Файл содержит источники VLC, TorrServe, TV Launcher, Obtainium, Hypatia и всех семи собираемых APK Panadonik. Алиса и RuStore в этом списке отсутствуют. CI прикладывает APK Panadonik к каждому GitHub Release; Obtainium выбирает нужный файл по package ID и фильтру имени. Приложение `tvboxd` и загрузочный экран остаются в подписанном OTA, поскольку это системные JAR, а не APK. Для Total Commander и его плагинов используйте репозиторий разработчика, описанный в [`apps-sources.md`](apps-sources.md), и выберите тип источника **F-Droid Third Party Repo**. Android может запросить подтверждение установки APK-обновления.
+Для регистрации приложений откройте Obtainium → **Import/Export** → **Obtainium import** и выберите `/sdcard/tvbox/obtainium-apps.json`. Файл содержит источники VLC, TorrServe, TV Launcher, Obtainium, Hypatia и всех семи собираемых APK Panadonik. Алиса и RuStore в этом списке отсутствуют. CI прикладывает APK Panadonik к каждому GitHub Release; Obtainium выбирает нужный файл по package ID и фильтру имени. Приложение `tvboxd` и загрузочный экран остаются в подписанном OTA, поскольку это системные JAR, а не APK. Android может запросить подтверждение установки APK-обновления.
 
 
 Источники и контрольные суммы компонентов указаны в [COMPONENTS.md](COMPONENTS.md). Изменения выпуска — в `release/notes/`.

@@ -27,9 +27,11 @@ import java.util.zip.GZIPOutputStream;
 
 /**
  * tvboxd: root helper for the "Установка" tile (eMMC install/verify/backup/restore, updates) and the "Антивирус"
- * tile (Hypatia signatures, realtime scanner) and the "Производительность" tile (metrics while it is open) — everything on demand, no background jobs. Runs via app_process as an init service. Clients talk over the abstract
+ * tile (Hypatia signatures, realtime scanner), the "Производительность" tile (metrics while it is open) and the "Файлы" tile
+ * (root file manager, Files.java) — everything on demand, no background jobs. Runs via app_process as an init service. Clients talk over the abstract
  * local socket "tvboxd": one command line in, "PROGRESS pct text" / "LOG text" / "KEY value" lines out,
- * last line "DONE ok|fail message". Only the installer app's uid (and root/shell for debugging) may connect.
+ * last line "DONE ok|fail message". Only the installer app's uid (and root/shell for debugging) may use every command;
+ * the other tiles are limited to their own command prefixes.
  * All sizes are long: Android mksh arithmetic is 32-bit, Java is not.
  */
 public class Main {
@@ -46,6 +48,7 @@ public class Main {
     static final String ANTIVIRUS = "org.tvbox.antivirus";   // may only use the AV_* / HYPATIA_UPDATE commands
     static final String POWER = "org.tvbox.power";           // may only use STATUS / REBOOT_EMMC
     static final String PERF = "org.tvbox.clean";            // "Производительность": only the PERF_* commands
+    static final String FILES = "org.tvbox.files";           // "Файлы": only the FS_* root file commands (Files.java)
     static final String EMMC_OK = STATE + "/emmc-verified";  // md5 of the image manifest the eMMC last matched
     static final String SD = "/dev/block/mmcblk0";
     static final byte[] EMMCBOOT_TAG = "TVBOX-EMMCBOOT".getBytes();   // sector 63 of the SD, see tvbox-sdboot.sh
@@ -123,21 +126,24 @@ public class Main {
             out = new PrintWriter(new java.io.OutputStreamWriter(s.getOutputStream(), "UTF-8"), true);
             int uid = s.getPeerCredentials().getUid();
             boolean full = uid == 0 || uid == 2000 || uid == uidOf(INSTALLER), av = uid == uidOf(ANTIVIRUS), pw = uid == uidOf(POWER),
-                    pf = uid == uidOf(PERF);
-            if (!full && !av && !pw && !pf) {
+                    pf = uid == uidOf(PERF), fs = uid == 0 || uid == 2000 || uid == uidOf(FILES);
+            if (!full && !av && !pw && !pf && !fs) {
                 out.println("DONE fail доступ запрещён (uid " + uid + ")");
                 return;
             }
             String cmd = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF-8")).readLine();
             if (cmd == null) return;
             cmd = cmd.trim();
-            if (!full && !(av && (cmd.startsWith("AV_") || cmd.equals("HYPATIA_UPDATE")))
+            // Root file operations belong only to the "Файлы" tile (and root/shell), not to the installer.
+            if (cmd.startsWith("FS_") ? !fs
+                    : !full && !(av && (cmd.startsWith("AV_") || cmd.equals("HYPATIA_UPDATE")))
                       && !(pw && (cmd.equals("STATUS") || cmd.equals("REBOOT_EMMC")))
                       && !(pf && cmd.startsWith("PERF_"))) {
                 out.println("DONE fail команда недоступна этому приложению");
                 return;
             }
             Op op = new Op(out);
+            if (cmd.startsWith("FS_")) { Files.handle(s, op, cmd); return; }
             if (cmd.equals("STATUS")) { status(op); op.done(true, "состояние"); return; }
             if (cmd.equals("LOG")) { op.dumpLast(); op.done(true, "журнал"); return; }
             if (cmd.equals("UPDATE_CHECK")) { updateCheck(op); return; }

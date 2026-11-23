@@ -2,10 +2,6 @@
 # Эти APK нужны на приставке после чистой установки и обновления с очисткой.
 TVBOX_REQUIRED_APKS=(
     com.tvlauncher.apk
-    com.ghisler.android.TotalCommander.apk
-    com.ghisler.tcplugins.FTP.apk
-    com.ghisler.tcplugins.LAN.apk
-    com.ghisler.tcplugins.SFTP.apk
     dev.imranr.obtainium.apk
     org.maintainteam.hypatia.apk
     org.videolan.vlc.apk

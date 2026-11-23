@@ -20,17 +20,12 @@ class ObtainiumTests(unittest.TestCase):
                 self.assertIsNone(app['installedVersion'])
                 self.assertIsInstance(json.loads(app['additionalSettings']), dict)
                 self.assertEqual(json.loads(app['apkUrls'])[0][1], 'placeholder')
-            tc = [a for a in records if a['id'].startswith('com.ghisler.')]
-            self.assertEqual(len(tc), 4)
-            for app in tc:
-                self.assertEqual(app['overrideSource'], 'FDroidRepo')
-                self.assertEqual(json.loads(app['additionalSettings'])['appIdOrName'], app['id'])
 
     def test_missing_source_blocks_image_preparation(self):
         with tempfile.TemporaryDirectory() as d:
             source = Path(d) / 'apps.json'
             apps = json.loads((ROOT / 'obtainium-apps.json').read_text())
-            source.write_text(json.dumps([a for a in apps if a['id'] != 'com.ghisler.tcplugins.FTP']))
+            source.write_text(json.dumps([a for a in apps if a['id'] != 'org.videolan.vlc']))
             with self.assertRaisesRegex(ValueError, 'Missing Obtainium sources'):
                 module.prepare(source, Path(d) / 'out')
             self.assertFalse((Path(d) / 'out').exists())
