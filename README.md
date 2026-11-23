@@ -192,13 +192,7 @@ UI-анимации окон и переходов отключены. Пред�
 
 Это описание подозрительных или ненужных OEM-компонентов, а не утверждение, что подтверждено вредоносное ПО. Предыдущая проверка извлечённого образа не нашла известных файловых индикаторов BADBOX 2.0, Vo1d или Triada, но статический поиск не доказывает отсутствие всех угроз. Повторная проверка на приставке `0.3.9` подтвердила критическую уязвимость: сетевой ADB открыт на всех интерфейсах без авторизации (`ro.adb.secure=0`), `su` доступен приложениям, SELinux permissive. Исправления включены в исходники сборки `0.4.0` (ключевая авторизация ADB, отключение сетевого ADB по умолчанию, ограничение `su` до root и группы shell), но ещё не применены и не проверены на приставке. До успешной горячей проверки обновлённого образа выпуск заблокирован; SELinux остаётся отдельной открытой задачей.
 
-### Голосовой вызов Алисы AI с пульта
-
-USB-приёмник микрофонного пульта определяется как `MC,LTD Mic Device` (VID:PID `1915:1025`, USB Audio). Сборка закрепляет стандартную раскладку клавиш Android для этого USB-устройства: Linux keycode `582` сопоставлен с `VOICE_ASSIST`. RuStore в образ не входит и для Алисы не требуется. Само приложение Алисы не включено в прошивку; способ установки через официальный источник без RuStore пока проверяется. После установки Алисе назначаются разрешение `RECORD_AUDIO` и режим `appops`, затем её нужно выбрать помощником Android и проверить кнопку и микрофон на приставке.
-
-Логи загрузки подтверждают обнаружение USB-аудиоустройства. Нажатие кнопки и разговор с установленной Алисой нужно проверить на приставке; сохранённые логи сделаны без установленного пакета Алисы. Микрофон Samsung UE70TU7090 работает внутри его Tizen-системы и не передаётся приставке через HDMI.
-
-В плитке **Производительность и диагностика** настройка zRAM удалена по требованию пользователя. Сжатая и дисковая подкачка отключены; на обновлённой живой системе их состояние проверяется отдельно после каждой загрузки.
+В плитке **Производительность и диагностика** настройка zRAM удалена по требованию пользователя. Сжатая и дисковая подкачка отключены; на обновлённой живой системе их состояние проверяется отдельно после каждой загрузки. Правила — [`AGENTS.md`](AGENTS.md).
 
 ## Наши приложения
 
@@ -218,13 +212,14 @@ USB-приёмник микрофонного пульта определяет�
 
 ### Сторонние приложения
 
-| Приложение | Пакет | Проект/репозиторий |
-|---|---|---|
-| VLC | `org.videolan.vlc` | [VideoLAN VLC for Android](https://github.com/videolan/vlc-android) |
-| TorrServe | `ru.yourok.torrserve` | [YouROK/TorrServe](https://github.com/YouROK/TorrServe) |
-| TV Launcher | `com.tvlauncher` | [wiiguy/lightweight_androidtv_launcher](https://github.com/wiiguy/lightweight_androidtv_launcher) |
-| Obtainium | `dev.imranr.obtainium` | [ImranR98/Obtainium](https://github.com/ImranR98/Obtainium) |
-| Hypatia | `org.maintainteam.hypatia` | [MaintainTeam/Hypatia](https://github.com/MaintainTeam/Hypatia) |
+| Приложение | Пакет | Версия в образе | Проект / APK |
+|---|---|---|---|
+| VLC | `org.videolan.vlc` | 3.7.2 | [vlc-android](https://github.com/videolan/vlc-android) |
+| TorrServe | `ru.yourok.torrserve` | MatriX.143.FOSS | [TorrServe](https://github.com/YouROK/TorrServe) |
+| TV Launcher | `com.tvlauncher` | 1.6.2 | [launcher](https://github.com/wiiguy/lightweight_androidtv_launcher) · [F-Droid APK](https://f-droid.org/repo/com.tvlauncher_10602.apk) |
+| Obtainium | `dev.imranr.obtainium` | 1.7.4 | [Obtainium](https://github.com/ImranR98/Obtainium) |
+| Hypatia | `org.maintainteam.hypatia` | 3.18 | [Hypatia](https://github.com/MaintainTeam/Hypatia) |
+| FileExploresky | `com.droidlogic.FileBrower` | из A12-образа | [`prebuilt/stock-filemanager/`](prebuilt/stock-filemanager/) |
 
 Плитка **Обновление** показывает источник загрузки и состояние eMMC, ищет подписанные OTA на носителе и в сети, редактирует источники и показывает журнал. Во время операции видны строки журнала с временными метками и текущий этап; ход загрузки и сверки тоже записывается с локальным временем. Установка по сети загружает eMMC OTA и передаёт его штатному recovery. SD-обновление использует тот же recovery-пакет с карты.
 
@@ -247,7 +242,7 @@ USB-приёмник микрофонного пульта определяет�
 | `Nexonic IPTV` | Отключён 2026-11-23: плейлист отвечает HTTP 404 | [Репозиторий](https://github.com/Shahrukhalid/nexonic-iptv) |
 | `TDTChannels` | Преимущественно испанские каналы | [Репозиторий](https://github.com/LaQuay/TDTChannels) |
 
-Адреса 60 списков заданы в [`tools/iptv-sources.txt`](tools/iptv-sources.txt). Часть издателей использует общие базы и пересекается; результаты после удаления дублей и проверки качества нельзя суммировать по источникам. Доступность самих списков проверена, но новые каналы ещё не прошли полную проверку с приставки и анализ истории. Текущий кандидат 0.4.5 не подтвердил требование о 20 каналах для взрослых. Подробности — в [исследовании источников](docs/iptv-source-research-2026-11-10.md). Перед выпуском требуются измерение 1080p+, проверка воспроизведения и не менее 20 доступных каналов 18+.
+Адреса списков заданы в [`tools/iptv-sources.txt`](tools/iptv-sources.txt). Часть издателей использует общие базы и пересекается; результаты после удаления дублей и проверки качества нельзя суммировать по источникам. Доступность самих списков проверена, но новые каналы ещё не прошли полную проверку с приставки и анализ истории. Подробности — в [исследовании источников](docs/iptv-source-research-2026-11-10.md) и [`release/notes/0.4.9.txt`](release/notes/0.4.9.txt). Перед выпуском требуются измерение 1080p+, проверка воспроизведения и не менее 20 доступных каналов 18+.
 
 Все категории, включая 18+, находятся в одном плейлисте и доступны через группировку на плитке ТВ-каналов; список категорий начинается с «Для взрослых». Страны и распознанные области/штаты отмечаются флагом. Сборщик убирает дубли без учёта отметки качества. Доступность сторонних потоков меняется; перед конкретной сборкой их проверяют тем же верификатором.
 
@@ -279,9 +274,20 @@ python3 tools/device-monitor.py --capture-interface wlan0 --controlled-network -
 
 ## Стороннее ПО
 
-Целевой комплект сторонних приложений: TV Launcher 1.6.2, TorrServer MatriX.143.FOSS, VLC 3.7.2, Obtainium 1.7.4 и Hypatia 3.18. Файловый менеджер — штатный FileExploresky из A12-образа (`com.droidlogic.FileBrower`, плитка; копия в `prebuilt/stock-filemanager/`), запасной root-менеджер — «Файлы (root)» (`apps/files`). Ссылки на страницы проектов приведены в таблице выше. Obtainium проверяет обновления напрямую в источниках приложений; Flicky удалён. WebView — LineageOS 155.0.8059.39. TorrServer работает на порту 8090.
+| Компонент | Роль | Ссылка |
+|---|---|---|
+| TV Launcher / TorrServe / VLC / Obtainium / Hypatia | Сторонние APK образа | [таблица выше](#сторонние-приложения) |
+| FileExploresky | Штатный файловый менеджер (плитка) | [`prebuilt/stock-filemanager/`](prebuilt/stock-filemanager/) |
+| Файлы (root) | Запасной менеджер без плитки | [`apps/files`](https://github.com/gamesmod/h96max/tree/master/apps/files) |
+| LineageOS WebView | Системный WebView 155.0.8059.39 | [`COMPONENTS.md`](COMPONENTS.md) |
+| TorrServer | Порт 8090 на приставке | [TorrServe](https://github.com/YouROK/TorrServe) |
+| Obtainium import | `/sdcard/tvbox/obtainium-apps.json` | [`obtainium-apps.json`](obtainium-apps.json) |
 
-Для регистрации приложений откройте Obtainium → **Import/Export** → **Obtainium import** и выберите `/sdcard/tvbox/obtainium-apps.json`. Файл содержит источники VLC, TorrServe, TV Launcher, Obtainium, Hypatia и всех семи собираемых APK Panadonik. Алиса и RuStore в этом списке отсутствуют. CI прикладывает APK Panadonik к каждому GitHub Release; Obtainium выбирает нужный файл по package ID и фильтру имени. Приложение `tvboxd` и загрузочный экран остаются в подписанном OTA, поскольку это системные JAR, а не APK. Android может запросить подтверждение установки APK-обновления.
+Obtainium проверяет обновления напрямую в источниках приложений (Flicky удалён). Для регистрации откройте Obtainium → **Import/Export** → **Obtainium import** и выберите `/sdcard/tvbox/obtainium-apps.json`: источники VLC, TorrServe, TV Launcher, Obtainium, Hypatia и собираемых APK Panadonik. CI прикладывает APK Panadonik к каждому [GitHub Release](https://github.com/gamesmod/h96max/releases); Obtainium выбирает файл по package ID и фильтру имени. `tvboxd` и загрузочный экран остаются в подписанном OTA как системные JAR.
 
-
-Источники и контрольные суммы компонентов указаны в [COMPONENTS.md](COMPONENTS.md). Изменения выпуска — в `release/notes/`.
+| Документ | Содержание |
+|---|---|
+| [`COMPONENTS.md`](COMPONENTS.md) | Источники и контрольные суммы |
+| [`release/notes/`](release/notes/) | Изменения по версиям |
+| [`docs/install-from-stock.md`](docs/install-from-stock.md) | Чистая установка со стока |
+| [`docs/release-quality-gate.md`](docs/release-quality-gate.md) | Аппаратный и security gate |

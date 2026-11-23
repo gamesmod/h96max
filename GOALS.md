@@ -43,6 +43,7 @@
 - Игры SuperTux и Pixel Wheels; удалены из образа.
 - Ретро-геймпады — не цель для A12.
 - Сторонний файловый менеджер и его плагины исключены из образа; файловый менеджер по умолчанию и плитка — штатный FileExploresky из A12 (`com.droidlogic.FileBrower`, uid system; копия в `prebuilt/stock-filemanager/`); запасные «Файлы (root)» (`org.tvbox.files`) без плитки выполняют root-операции через `tvboxd`.
+- Алиса (`com.yandex.aliceapp`), RuStore и иные магазины приложений — не входят в образ и цели; см. [`AGENTS.md`](AGENTS.md).
 
 ## Безопасность (цель 11) — текущее состояние
 
