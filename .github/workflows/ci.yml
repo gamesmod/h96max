@@ -17,6 +17,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # FileExploresky.apk и прочие бинарники — Git LFS; без smudge тест SHA-256 читает pointer.
+          lfs: true
 
       - name: Run full test suite and analyze its log
         run: |
