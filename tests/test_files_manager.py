@@ -1,4 +1,4 @@
-"""Встроенный файловый менеджер «Файлы» (apps/files) вместо Total Commander: плитка, root через tvboxd, сборка."""
+"""Файловый менеджер по умолчанию — штатный RkExplorer (com.android.rk) вместо Total Commander; запасные «Файлы (root)»."""
 import pathlib
 import re
 import subprocess
@@ -9,6 +9,8 @@ FIRSTBOOT = (ROOT / "overlay/vendor/bin/tvbox-firstboot.sh").read_text()
 DAEMON = (ROOT / "apps/tvboxd/src/org/tvbox/daemon/Main.java").read_text()
 FILES_OPS = (ROOT / "apps/tvboxd/src/org/tvbox/daemon/Files.java").read_text()
 MANIFEST = (ROOT / "apps/files/AndroidManifest.xml").read_text()
+BUILD = (ROOT / "build-sd.sh").read_text()
+UNUSED = (ROOT / "tools/unused-stock-apps.txt").read_text()
 TC = re.compile(r"total\s*commander|ghisler|tcplugins|chrisgch/tca", re.I)
 # Исторические отчёты и журналы прошлых выпусков описывают то, что было выпущено, и не переписываются.
 HISTORY = ("docs/release-notes/", "docs/release-qa/", "release/notes/")
@@ -40,11 +42,19 @@ class FilesManagerTests(unittest.TestCase):
                 self.assertNotRegex(line, r"appops set|pm grant|pm install|ALLOWED=|^g ")
         self.assertIn('pm uninstall --user 0 "$p"', FIRSTBOOT)
 
-    def test_files_tile_is_default_on_home_screen(self):
+    def test_stock_file_manager_tile_is_default_on_home_screen(self):
         allowed = re.search(r'ALLOWED="([^"]+)"', FIRSTBOOT).group(1).split()
-        self.assertEqual(allowed[:3], ["org.tvbox.iptv", "ru.yourok.torrserve", "org.tvbox.files"])
-        self.assertIn("launcher-files-tile", FIRSTBOOT)
-        self.assertIn("appops set org.tvbox.files MANAGE_EXTERNAL_STORAGE allow", FIRSTBOOT)
+        self.assertEqual(allowed[:3], ["org.tvbox.iptv", "ru.yourok.torrserve", "com.android.rk"])
+        self.assertNotIn("org.tvbox.files", allowed)
+        self.assertIn("launcher-filemanager-tile", FIRSTBOOT)
+        self.assertIn("com.ghisler.*|org.tvbox.files) [ \"$PLACED\" = 1 ] && continue; p=$FM", FIRSTBOOT)
+        self.assertIn("appops set com.android.rk MANAGE_EXTERNAL_STORAGE allow", FIRSTBOOT)
+        self.assertIn("pm enable com.android.rk", FIRSTBOOT)
+
+    def test_stock_file_manager_is_kept_in_image(self):
+        self.assertNotRegex(UNUSED, r"(?i)rkexplorer|com\.android\.rk\b")
+        self.assertIn("-iname 'RkExplorer*.apk'", BUILD)
+        self.assertLess(BUILD.index("remove_unused_stock_apps system\n"), BUILD.index("RkExplorer*.apk"))
 
     def test_root_operations_only_for_files_app(self):
         self.assertIn('static final String FILES = "org.tvbox.files";', DAEMON)
@@ -55,11 +65,11 @@ class FilesManagerTests(unittest.TestCase):
         self.assertNotIn("Runtime.getRuntime", FILES_OPS)
         self.assertNotRegex((ROOT / "apps/files/src/org/tvbox/files/Root.java").read_text(), r'"su"|xbin/su')
 
-    def test_manifest_handles_folders_and_file_picking(self):
-        for action in ("android.intent.action.MAIN", "android.intent.action.VIEW", "android.intent.action.GET_CONTENT"):
-            self.assertIn(action, MANIFEST)
-        self.assertIn('android:mimeType="resource/folder"', MANIFEST)
-        self.assertIn("android.intent.category.LEANBACK_LAUNCHER", MANIFEST)
+    def test_fallback_files_app_does_not_take_default_role(self):
+        self.assertIn("android.intent.action.MAIN", MANIFEST)
+        for action in ("android.intent.action.VIEW", "android.intent.action.GET_CONTENT"):
+            self.assertNotIn(action, MANIFEST)
+        self.assertNotIn("resource/folder", MANIFEST)
         self.assertRegex(MANIFEST, r'android:name="\.Provider"[^>]*android:exported="false"')
 
     def test_files_app_is_built_and_installed(self):
