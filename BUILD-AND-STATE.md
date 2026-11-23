@@ -3,7 +3,7 @@
 > Архивный снимок, не инструкция для текущей сборки. SD-образ исключён из проекта; старые SD-команды, отключение ADB-авторизации и состав ПО ниже не применять. Актуальные команды и условия — `docs/LUNA-WORKFLOW.md`, статус — в `docs/release-qa/`.
 
 ## Метод сборки (хост)
-- Исходник: вендорский A12 `RK3318_userdebug_H96_Max_V12_12_20221117.1447` → `dl/a12/Image` (распакован `tools/rkunpack.py`), super распакован в `dl/a12/Image/lp/` (`tools/lpunpack.py`).
+- Исходник: вендорский A12 `RK3318_userdebug_H96_Max_V12_12_20221117.1447` → `dl/a12` через `tools/prepare-build-inputs.sh` (`extract-vendor-blobs.sh` = `rkunpack`+`lpunpack`, затем очистка LP; либо уже очищенные образы из Git LFS).
 - Образ: `./build-sd.sh` (SD, по умолчанию) или `MEDIA=emmc ./build-sd.sh` (вариант eMMC → `build/out-emmc`).
   Нужны: sgdisk e2fsck resize2fs debugfs python3 gzip setfattr, sudo (loop-mount), aarch64-linux-gnu-gcc (fblog).
   Выход: `build/out/regions/NN-name.bin.gz` + `build/out/manifest.txt` (offset_sector size file md5).

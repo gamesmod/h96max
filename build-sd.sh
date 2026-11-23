@@ -1,13 +1,16 @@
 #!/bin/bash
 # Build the vendor-derived system image. Release builds target eMMC; SD boot/update use the stock A12 recovery path.
 # Output: build/out-emmc/regions/*.bin.gz + build/out-emmc/manifest.txt (offset_sector size file md5)
+# Стоковые входы: dl/a12 после tools/prepare-build-inputs.sh (Git LFS или extract из update.img).
 set -euo pipefail
 R=$(cd "$(dirname "$0")" && pwd)
 source "$R/tools/required-apps.sh"
 tvbox_require_apks || { echo "Сборка остановлена: комплект приложений неполный" >&2; exit 1; }
+# Проверка вендорских разделов (аналог Finishing из LineageOS extract-blobs wiki).
+bash "$R/tools/prepare-build-inputs.sh" --check-only
 T=$R/tools
-SRC=$R/dl/a12/Image          # unpacked vendor update.img
-LP=$SRC/lp                   # unpacked super partitions (pristine)
+SRC=$R/dl/a12/Image          # prepared stock Image/ (from LFS or extract-vendor-blobs)
+LP=$SRC/lp                   # cleaned LP partitions for the build
 W=$R/build/work
 O=$R/build/out
 MEDIA=${MEDIA:-emmc}               # emmc; custom SD images are not part of the release workflow

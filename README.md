@@ -173,7 +173,7 @@ UI-анимации окон и переходов отключены. Пред�
 
 ### База Android 12
 
-Основа — vendor image `RK3318_userdebug_H96_Max_V12_12_20221117.1447`: Android 12, ядро 4.19.232, security patch 2022-06-05, userdebug. SHA-256 исходного `update.img`: `e93ccc90e5a41fbc430c1f9b3f4621989945ff5a6e9685de6d228f5e7cc5ad58`. Архив получен по ссылке из описания видеоматериала; точный исходный URL в заметках проекта не восстановлен. Контрольная сумма зафиксирована, но независимую доступность первоисточника подтвердить нельзя. Проприетарный образ и извлечённые vendor-файлы хранятся только в локальных build inputs и в публичный Git не включаются. Распаковка выполняется `tools/rkunpack.py` и `tools/lpunpack.py`; состав компонентов описан в [`COMPONENTS.md`](COMPONENTS.md).
+Основа — vendor image `RK3318_userdebug_H96_Max_V12_12_20221117.1447`: Android 12, ядро 4.19.232, security patch 2022-06-05, userdebug. SHA-256 исходного `update.img`: `e93ccc90e5a41fbc430c1f9b3f4621989945ff5a6e9685de6d228f5e7cc5ad58`. Архив получен по ссылке из описания видеоматериала; точный исходный URL в заметках проекта не восстановлен. Контрольная сумма зафиксирована, но независимую доступность первоисточника подтвердить нельзя. Очищенные разделы для сборки — в публичном Git LFS (`dl/a12`); сырой `update.img`/`super.img` в git не входят. Подготовка входов: `tools/prepare-build-inputs.sh` (из LFS или `--update update.img` через `tools/extract-vendor-blobs.sh`, по шагам как [LineageOS Wiki](https://wiki.lineageos.org/extracting_blobs_from_zips_manually)). Состав — [`COMPONENTS.md`](COMPONENTS.md).
 
 ### Удалённые OEM-службы и оставшиеся риски
 

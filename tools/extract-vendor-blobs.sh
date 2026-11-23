@@ -6,6 +6,9 @@
 # Дополнительно поддерживаются zip с payload.bin, block-based OTA (*.transfer.list)
 # и уже распакованные LP-образы (Git LFS: dl/a12/Image/lp).
 #
+# Для сборки предпочтите обёртку tools/prepare-build-inputs.sh (проверка LFS,
+# либо --update/--zip с очисткой LP). Этот скрипт — низкоуровневое извлечение.
+#
 # Примеры:
 #   tools/extract-vendor-blobs.sh --update /path/to/update.img
 #   tools/extract-vendor-blobs.sh --zip /path/to/rom.zip --dump build/system_dump

@@ -1,6 +1,7 @@
 #!/bin/bash
 # Локальная пересборка очищенных LP-разделов из полного стока (не для публикации).
-# Основной путь CI: стоковые входы в Git LFS + tools/fetch-third-party.sh.
+# Обычный путь сборки: tools/prepare-build-inputs.sh (LFS или --update update.img).
+# Этот скрипт — ручная пересборка LP для обновления Git LFS; CI берёт уже очищенные входы.
 # Не включать super.img, secrets/, *.pem и сторонние APK.
 set -euo pipefail
 umask 077

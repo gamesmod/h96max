@@ -39,6 +39,7 @@ class ThirdPartyFetchTests(unittest.TestCase):
 
     def test_release_uses_lfs_and_fetch_without_private_archive(self):
         self.assertIn("lfs: true", RELEASE)
+        self.assertIn("tools/prepare-build-inputs.sh", RELEASE)
         self.assertIn("tools/fetch-third-party.sh", RELEASE)
         self.assertNotIn("RELEASE_INPUTS_ARCHIVE_URL", RELEASE)
         self.assertNotIn("RELEASE_INPUTS_SHA256", RELEASE)
