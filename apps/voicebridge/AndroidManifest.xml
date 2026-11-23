@@ -1,0 +1,19 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.tvbox.voicebridge">
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="29"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
+    <application android:label="Голосовой пульт" android:allowBackup="false" android:theme="@android:style/Theme.NoDisplay">
+        <activity android:name=".MainActivity" android:exported="true" android:excludeFromRecents="true" android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VOICE_ASSIST"/>
+                <action android:name="android.speech.action.WEB_SEARCH"/>
+                <action android:name="android.intent.action.ASSIST"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <service android:name=".ListeningService" android:exported="false" android:foregroundServiceType="microphone"/>
+    </application>
+</manifest>
