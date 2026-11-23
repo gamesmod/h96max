@@ -331,6 +331,31 @@ class PublicReleaseSecurityTests(unittest.TestCase):
             self.assertEqual(MERGE.parse(output.read_text(encoding="utf-8"))[0]["url"],
                              "https://example.invalid/safe")
 
+    def test_merge_includes_adult_without_allowlist_by_default(self):
+        playlist = ('#EXTM3U\n'
+                    '#EXTINF:-1 tvg-id="9999" tvg-logo="https://example.invalid/logo" '
+                    'group-title="Для взрослых",Adult One\n'
+                    'https://example.invalid/adult\n'
+                    '#EXTINF:-1 tvg-id="1" tvg-logo="https://example.invalid/logo" '
+                    'group-title="News",News One\n'
+                    'https://example.invalid/news\n')
+        with tempfile.TemporaryDirectory() as tmp:
+            sources = pathlib.Path(tmp) / "sources.txt"
+            output = pathlib.Path(tmp) / "out.m3u"
+            allow = pathlib.Path(tmp) / "allow.txt"
+            sources.write_text("https://example.invalid/list\n", encoding="utf-8")
+            allow.write_text("# empty allowlist\n", encoding="utf-8")
+            with mock.patch.object(MERGE.sys, "argv", ["iptv-merge", "--sources", str(sources),
+                                                      "--out", str(output),
+                                                      "--adult-allowlist", str(allow)]), \
+                 mock.patch.object(MERGE, "fetch", return_value=(200, "", playlist.encode(), "")), \
+                 mock.patch.object(MERGE, "logo_ok", return_value=True), \
+                 mock.patch.object(MERGE, "stream_resolution", return_value=1080):
+                MERGE.main()
+            groups = [e["attrs"]["group-title"] for e in MERGE.parse(output.read_text(encoding="utf-8"))]
+            self.assertEqual(groups[0], "Для взрослых")
+            self.assertIn("Новости", groups)
+
     def test_iptv_org_meta_fills_only_missing_logo_and_group(self):
         meta = ({("Perviy.ru", "HD"): "https://example.invalid/hd.png", ("Perviy.ru", ""): "https://example.invalid/sd.png",
                  ("Sport.ru", ""): "https://example.invalid/sport.png"},

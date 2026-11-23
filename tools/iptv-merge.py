@@ -10,8 +10,9 @@ Rules (user, 2026-10-27): no duplicates, every channel has a working logo, every
 - logo: tvg-logo must be http(s) and return an image (or any 200 body for servers without content-type).
 - stream: HTTP 200; HLS is followed master -> first variant -> first segment (all must answer 200).
 - duplicates: same stream URL, or the same normalized name (case, HD/FHD/4K/SD/50fps/orig/[..]/(..) dropped);
-  the first working entry in source order wins. Adult channels are included in the main playlist by default;
-  --exclude-adult removes them. Детские категории и явно помеченные детские каналы всегда исключаются.
+  the first working entry in source order wins. Adult channels are included in the main playlist by default
+  (все с логотипом и ≥1080p); --exclude-adult removes them; --adult-allowlist-only оставляет только ID из
+  allowlist устройства. Детские категории и явно помеченные детские каналы всегда исключаются.
 Downloads are only parsed, never executed. Network: VLC user agent, short timeouts, 48 parallel checks.
 """
 import argparse, concurrent.futures as cf, json, os, re, shlex, shutil, subprocess, sys, urllib.parse, urllib.request
@@ -438,10 +439,14 @@ def main():
     ap.add_argument("--sources", default="tools/iptv-sources.txt")
     ap.add_argument("--out", default="overlay/system/etc/tvbox/iptv.m3u")
     ap.add_argument("--exclude-adult", action="store_true", help="исключить каналы 18+ из общего списка")
+    ap.add_argument("--adult-allowlist-only", action="store_true",
+                    help="оставить только 18+ с tvg-id из allowlist устройства (по умолчанию все 18+)")
     ap.add_argument("--adult-allowlist", default="tools/iptv-adult-allowlist.txt",
                     help="EPG IDs взрослых каналов, проверенных на целевом устройстве")
     ap.add_argument("--dedupe-file", help="only re-run duplicate removal on an already checked playlist (no network)")
     a = ap.parse_args()
+    if a.exclude_adult and a.adult_allowlist_only:
+        ap.error("нельзя сочетать --exclude-adult и --adult-allowlist-only")
     if a.dedupe_file:
         ent = parse(open(a.dedupe_file, encoding="utf-8").read())
         filtered = [e for e in ent if not is_child_channel(e)]
@@ -480,7 +485,7 @@ def main():
     print(f"детские каналы исключены: {before_children - len(entries)}", file=sys.stderr)
     if a.exclude_adult:
         entries = [e for e in entries if not ADULT.search(e["name"] + " " + e["attrs"].get("group-title", ""))]
-    else:
+    elif a.adult_allowlist_only:
         with open(a.adult_allowlist, encoding="utf-8") as f:
             adult_ids = {line.strip() for line in f if line.strip() and not line.lstrip().startswith("#")}
         before_adult = sum(e["attrs"].get("group-title") == "Для взрослых" for e in entries)
@@ -488,7 +493,13 @@ def main():
                    e["attrs"].get("tvg-id", "").strip() in adult_ids]
         kept_adult = sum(e["attrs"].get("group-title") == "Для взрослых" for e in entries)
         print(f"взрослые каналы по allowlist устройства: {before_adult} -> {kept_adult}", file=sys.stderr)
-    print(f"entries {total}, with name+logo{', excluding adult' if a.exclude_adult else ', adult included'}: {len(entries)}", file=sys.stderr)
+    else:
+        kept_adult = sum(e["attrs"].get("group-title") == "Для взрослых" for e in entries)
+        print(f"взрослые каналы без allowlist-фильтра: {kept_adult}", file=sys.stderr)
+    adult_mode = ("excluding adult" if a.exclude_adult
+                  else "adult allowlist-only" if a.adult_allowlist_only
+                  else "adult included")
+    print(f"entries {total}, with name+logo, {adult_mode}: {len(entries)}", file=sys.stderr)
     seen_url, cand = set(), {}
     for e in entries:                                   # exact-URL duplicates, then group by name
         if e["url"] in seen_url: continue
