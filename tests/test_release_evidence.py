@@ -66,6 +66,52 @@ class ReleaseChannelEvidenceTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("(dev)", result.stdout)
         self.assertIn("security_review не блокирует", result.stdout)
+        self.assertIn("ota_sha256:", result.stdout)
+        self.assertIn("evidence:", result.stdout)
+
+    def test_release_gate_help_includes_copy_paste_examples(self):
+        result = subprocess.run(
+            [sys.executable, str(CHECKER), "--help"],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("Examples:", result.stdout)
+        self.assertIn("--file docs/release-qa/", result.stdout)
+        self.assertIn("--channel", result.stdout)
+
+    def test_missing_evidence_file_prints_example_invocation(self):
+        missing = pathlib.Path(self.tmp.name) / "missing.json"
+        result = subprocess.run(
+            [sys.executable, str(CHECKER), "--file", str(missing), "--version", "9.9.9",
+             "--channel", "dev", "--ota", str(self.ota)],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Нет протокола аппаратной приёмки", result.stderr)
+        self.assertIn("tools/check-release-evidence.py", result.stderr)
+        self.assertIn("--file docs/release-qa/", result.stderr)
+
+    def test_candidate_run_cli_prints_machine_useful_success(self):
+        sha = "a" * 40
+        run_path = pathlib.Path(self.tmp.name) / "run.json"
+        run_path.write_text(json.dumps({
+            "databaseId": 42,
+            "head_sha": sha,
+            "status": "completed",
+            "conclusion": "success",
+            "path": ".github/workflows/release.yml",
+            "event": "workflow_dispatch",
+            "head_branch": "master",
+        }), encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "tools/check-candidate-run.py"),
+             "--run", str(run_path), "--source-sha", sha],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("candidate_run_ok: 42", result.stdout)
+        self.assertIn(f"head_sha: {sha}", result.stdout)
+        self.assertIn("event: workflow_dispatch", result.stdout)
 
     def test_rejects_rebuilt_or_missing_ota(self):
         self.ota.write_bytes(b"different OTA")

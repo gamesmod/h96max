@@ -6,6 +6,7 @@ import hashlib
 import json
 import pathlib
 import sys
+import textwrap
 
 
 FUNCTIONAL_CHECKS = (
@@ -15,23 +16,54 @@ FUNCTIONAL_CHECKS = (
 )
 STABLE_SECURITY_CHECKS = ("security_review",)
 
+EXAMPLE_INVOCATION = (
+    "python3 -I tools/check-release-evidence.py "
+    "--file docs/release-qa/<версия>.json --version <версия> "
+    "--channel dev --ota /path/to/tvbox-update-<версия>-emmc.zip"
+)
 
-def main():
-    parser = argparse.ArgumentParser(description="Проверить аппаратный протокол выпуска.")
+
+def build_parser():
+    parser = argparse.ArgumentParser(
+        description="Проверить аппаратный протокол выпуска.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent(f"""\
+            Examples:
+              {EXAMPLE_INVOCATION}
+              python3 -I tools/check-release-evidence.py \\
+                --file docs/release-qa/0.4.11.json --version 0.4.11 --channel stable \\
+                --ota /path/to/tvbox-update-0.4.11-emmc.zip
+
+            Notes:
+              Для channel=dev security_review не блокирует выпуск, но security_analysis обязателен.
+              Успех идемпотентен: повторный запуск с теми же входами безопасен (только чтение).
+            """),
+    )
     parser.add_argument("--file", required=True, help="JSON с результатами аппаратной приёмки")
     parser.add_argument("--version", required=True, help="ожидаемая версия выпуска")
     parser.add_argument("--ota", required=True, help="OTA-файл, который предполагается выпустить")
-    parser.add_argument("--channel", choices=("dev", "stable"), default="stable",
-                        help="для dev security_review публикуется как известный риск, но не блокирует выпуск")
-    args = parser.parse_args()
+    parser.add_argument(
+        "--channel",
+        choices=("dev", "stable"),
+        default="stable",
+        help="для dev security_review публикуется как известный риск, но не блокирует выпуск",
+    )
+    return parser
+
+
+def main(argv=None):
+    parser = build_parser()
+    args = parser.parse_args(argv)
     path = pathlib.Path(args.file)
     if not path.is_file():
         print(f"Нет протокола аппаратной приёмки: {path}", file=sys.stderr)
+        print(f"  {EXAMPLE_INVOCATION}", file=sys.stderr)
         return 1
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         print(f"Не удалось прочитать протокол: {error}", file=sys.stderr)
+        print(f"  {EXAMPLE_INVOCATION}", file=sys.stderr)
         return 1
 
     failures = []
@@ -41,14 +73,16 @@ def main():
         failures.append("не указано целевое устройство")
     candidate = data.get("candidate", {})
     expected_sha = candidate.get("ota_sha256") if isinstance(candidate, dict) else None
+    digest = hashlib.sha256()
     try:
-        digest = hashlib.sha256()
         with open(args.ota, "rb") as ota:
             for block in iter(lambda: ota.read(1024 * 1024), b""):
                 digest.update(block)
-        if not isinstance(expected_sha, str) or digest.hexdigest() != expected_sha.lower():
+        ota_sha = digest.hexdigest()
+        if not isinstance(expected_sha, str) or ota_sha != expected_sha.lower():
             failures.append("SHA-256 OTA не совпадает с артефактом в протоколе приёмки")
     except OSError:
+        ota_sha = None
         failures.append("не удалось прочитать OTA для проверки SHA-256")
     tests = data.get("automated_tests", {})
     if tests.get("status") != "pass" or type(tests.get("count")) is not int or tests["count"] < 1:
@@ -98,8 +132,12 @@ def main():
         print("Релиз не прошёл аппаратный gate:", file=sys.stderr)
         for failure in failures:
             print(f"- {failure}", file=sys.stderr)
+        print(f"  Повторите после исправления: {EXAMPLE_INVOCATION}", file=sys.stderr)
         return 1
     print(f"Аппаратный протокол {args.version} ({args.channel}): все обязательные проверки пройдены")
+    if ota_sha:
+        print(f"ota_sha256: {ota_sha}")
+    print(f"evidence: {path}")
     return 0
 
 

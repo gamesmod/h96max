@@ -53,6 +53,15 @@ class CaptureTests(unittest.TestCase):
                     with self.assertRaises(OSError):
                         MONITOR.traffic_capture("test0", 1)
 
+    def test_help_and_capture_errors_include_copy_paste_examples(self):
+        help_text = MONITOR.build_parser().format_help()
+        self.assertIn("Examples:", help_text)
+        self.assertIn("--controlled-network", help_text)
+        self.assertIn("--capture-interface", help_text)
+        with mock.patch.object(MONITOR, "adb", return_value="List of devices attached\none\tdevice\n"):
+            code = MONITOR.main(["--capture-interface", "wlan0"])
+        self.assertEqual(code, 2)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,8 +10,15 @@ import re
 import tempfile
 import subprocess
 import sys
+import textwrap
 import time
 from datetime import datetime, timezone
+
+
+CAPTURE_EXAMPLE = (
+    "python3 -I tools/device-monitor.py --serial <SERIAL> "
+    "--capture-interface <IFACE> --controlled-network --capture-seconds 30"
+)
 
 
 def adb(args, timeout=15):
@@ -148,25 +155,57 @@ def traffic_capture(interface, seconds):
                 pass
 
 
-def main():
-    ap = argparse.ArgumentParser(description="Снять краткий read-only отчёт о состоянии приставки")
+def build_parser():
+    ap = argparse.ArgumentParser(
+        description="Снять краткий read-only отчёт о состоянии приставки",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent(f"""\
+            Examples:
+              python3 -I tools/device-monitor.py --serial <SERIAL>
+              {CAPTURE_EXAMPLE}
+
+            Notes:
+              Без --serial допускается ровно одно online-устройство.
+              Захват требует --controlled-network и 5–120 секунд; сырой PCAP удаляется.
+              Повторный запуск безопасен: только чтение ADB и краткий захват.
+            """),
+    )
     ap.add_argument("--serial", help="серийный номер ADB-устройства (не включается в отчёт)")
     ap.add_argument("--capture-interface", help="интерфейс компьютера для захвата (например, wlan0)")
-    ap.add_argument("--controlled-network", action="store_true", help="подтвердить, что приставка и сеть находятся в контролируемом тестовом сегменте")
-    ap.add_argument("--capture-seconds", type=int, default=30, help="длительность захвата, 5–120 секунд (по умолчанию 30)")
-    ns = ap.parse_args()
+    ap.add_argument(
+        "--controlled-network",
+        action="store_true",
+        help="подтвердить, что приставка и сеть находятся в контролируемом тестовом сегменте",
+    )
+    ap.add_argument(
+        "--capture-seconds",
+        type=int,
+        default=30,
+        help="длительность захвата, 5–120 секунд (по умолчанию 30)",
+    )
+    return ap
+
+
+def main(argv=None):
+    ap = build_parser()
+    ns = ap.parse_args(argv)
     global adb
     original_adb = adb
     try:
         device = select_adb_device(ns.serial, original_adb(["devices"]))
     except ValueError as error:
-        print(error)
+        print(error, file=sys.stderr)
+        print("  python3 -I tools/device-monitor.py --serial <SERIAL>", file=sys.stderr)
         return 2
     def selected(args, timeout=15):
         return original_adb(["-s", device, *args], timeout)
     adb = selected
     if ns.capture_interface and (not ns.controlled_network or not 5 <= ns.capture_seconds <= 120):
-        print("Для захвата укажите --controlled-network и длительность от 5 до 120 секунд.")
+        print(
+            "Для захвата укажите --controlled-network и длительность от 5 до 120 секунд.",
+            file=sys.stderr,
+        )
+        print(f"  {CAPTURE_EXAMPLE}", file=sys.stderr)
         return 2
 
     findings = []
