@@ -14,18 +14,6 @@ GitHub APK сверены с SHA-256 релиза и проверены `apksign
 Проверка подписи: `tools/apkcert.sh` (apksigner 35.0.2 + apksig из sdk/x, схемы v1/v2/v3). Файлы лежат в `dl/apk/<пакет>.apk`,
 ставятся при первой загрузке как пользовательские (`tvbox-firstboot.sh`, из /product/tvbox/apk) — для проверки новых версий установлен Obtainium.
 
-## Total Commander и плагины — F-Droid-репозиторий разработчика
-Источник: https://raw.githubusercontent.com/chrisgch/tca/master/fdroid/repo (index-v1.json, имена пакетов и sha256 файлов взяты из него).
-Для обновлений через Obtainium нужно выбрать источник `F-Droid Third Party Repo` и указать этот репозиторий вместе с нужным package ID.
-Требуемая подпись TC: E50EB216A57D5EB0B1E67802E783DF7B587BDBDC379E3E296F89B49ED32F00FD — **совпала**; плагины подписаны тем же ключом.
-
-| Пакет | Версия | Файл в репо | SHA-256 файла (= index) | SHA-256 сертификата (apksigner) |
-|---|---|---|---|---|
-| `com.ghisler.android.TotalCommander` | 3.62d | tcandroid-down362d-universal.apk | `d918ccc0506f6ac3b72fb2cc4dc1eccb3f83eb873077d982a79054d8d65467e4` | `e50eb216a57d5eb0b1e67802e783df7b587bdbdc379e3e296f89b49ed32f00fd` |
-| `com.ghisler.tcplugins.LAN` | 3.60 | tcandroidlan360.apk | `c3091b317e4f4c4a0139a98830cef4269a79fc18bd27dce6c94d10e7bae308e8` | `e50eb216a57d5eb0b1e67802e783df7b587bdbdc379e3e296f89b49ed32f00fd` |
-| `com.ghisler.tcplugins.FTP` | 3.0 | tcandroidftp30.apk | `aa5608bf13826f086c00a6fa161ecc197e4d2bfed15b55810c7eee517ba4a5bc` | `e50eb216a57d5eb0b1e67802e783df7b587bdbdc379e3e296f89b49ed32f00fd` |
-| `com.ghisler.tcplugins.SFTP` | 2.94 | tcandroidsftp294.apk | `10b08c835d4b7d1f65a61a1c027fbe0d87ed5c7a79ea4b54240e43a87d4e2090` | `e50eb216a57d5eb0b1e67802e783df7b587bdbdc379e3e296f89b49ed32f00fd` |
-
 ## Pixel Wheels — f-droid.org
 Индекс https://f-droid.org/repo/index-v1.jar: подпись JAR проверена вручную (CMS + дайджесты SF→MANIFEST→index-v1.json, SHA1withRSA),
 сертификат индекса 43238d512c1e5eb2d6569f4a3afbf5523418b82e0a3ed1552770abb9a9c9ccab = опубликованный отпечаток репозитория F-Droid.
