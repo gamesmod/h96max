@@ -44,6 +44,12 @@ def fetch_http(url: str, dest: pathlib.Path) -> None:
 
 
 def fetch_git_lfs(spec: dict, dest: pathlib.Path) -> None:
+    """Fetch one LFS-tracked path at a pinned commit.
+
+    Partial clone with LFS smudge disabled leaves a pointer and cannot scan the
+    LFS tree (missing git objects). Clone with smudge enabled, fetch the
+    commit, then check it out so git-lfs materializes the blob.
+    """
     repo = spec["repo"]
     commit = spec["commit"]
     path = spec["path"]
@@ -53,20 +59,23 @@ def fetch_git_lfs(spec: dict, dest: pathlib.Path) -> None:
         raise SystemExit("git-lfs required to fetch " + path)
     with tempfile.TemporaryDirectory(prefix="tvbox-gitfetch-") as tmp:
         tmp_path = pathlib.Path(tmp)
+        src = tmp_path / "src"
         subprocess.run(
-            [
-                "git", "-c", "filter.lfs.smudge=", "-c", "filter.lfs.process=",
-                "clone", "--filter=blob:none", "--no-checkout", repo, str(tmp_path / "src"),
-            ],
+            ["git", "clone", "--no-checkout", repo, str(src)],
             check=True,
             cwd=tmp_path,
         )
-        src = tmp_path / "src"
-        subprocess.run(["git", "checkout", commit, "--", path], check=True, cwd=src)
-        subprocess.run(["git", "lfs", "pull", "-I", path], check=True, cwd=src)
+        subprocess.run(
+            ["git", "fetch", "--depth", "1", "origin", commit],
+            check=True,
+            cwd=src,
+        )
+        subprocess.run(["git", "checkout", commit], check=True, cwd=src)
         blob = src / path
         if not blob.is_file() or blob.stat().st_size < 1024:
-            raise SystemExit(f"git lfs pull left empty file for {path}")
+            raise SystemExit(f"git checkout left empty/missing file for {path}")
+        if b"git-lfs.github.com/spec/v1" in blob.read_bytes()[:200]:
+            raise SystemExit(f"git-lfs did not smudge {path}")
         shutil.copyfile(blob, dest)
 
 
