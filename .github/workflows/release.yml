@@ -160,6 +160,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 -I tools/check-public-release.py --sources tools/iptv-sources.txt
+          mkdir -p overlay/system/etc/tvbox
           python3 -I tools/iptv-merge.py --out overlay/system/etc/tvbox/iptv.m3u
           candidate_args=()
           if [[ "$GITHUB_EVENT_NAME" != push || "$GITHUB_REF" != refs/tags/* ]]; then

@@ -530,6 +530,10 @@ def write(out, path, epg_url=None):
     header = "#EXTM3U"
     if epg_url:
         header += f' url-tvg="{epg_url}"'
+    parent = os.path.dirname(path)
+    if parent:
+        # На чистом раннере каталога overlay/system/etc/tvbox нет: файл игнорируется git.
+        os.makedirs(parent, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(header + "\n")
         for e in out:

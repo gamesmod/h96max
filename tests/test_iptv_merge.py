@@ -154,6 +154,21 @@ class IptvCategoryTests(unittest.TestCase):
         self.assertEqual(MERGE.probe_segment_resolution(result.stdout), 1080)
 
 
+class IptvWriteTests(unittest.TestCase):
+    def test_write_creates_missing_output_directory(self):
+        entry = {"name": "Канал (1080p)", "url": "https://example.com/a.m3u8", "opts": [],
+                 "attrs": {"tvg-logo": "https://example.com/a.png", "group-title": "Новости"}}
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp) / "overlay/system/etc/tvbox/iptv.m3u"
+            MERGE.write([entry], str(out), epg_url="")
+            self.assertTrue(out.is_file())
+            self.assertEqual(len(MERGE.parse(out.read_text(encoding="utf-8"))), 1)
+
+    def test_release_step_creates_overlay_directory(self):
+        workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
+        self.assertIn("mkdir -p overlay/system/etc/tvbox", workflow)
+
+
 class IptvDuplicateTests(unittest.TestCase):
     def test_quality_variants_collapse_to_one_channel(self):
         def entry(name, url):
