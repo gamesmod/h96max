@@ -1,4 +1,5 @@
-"""Файловый менеджер по умолчанию — штатный RkExplorer (com.android.rk) вместо Total Commander; запасные «Файлы (root)»."""
+"""Файловый менеджер по умолчанию — штатный FileExploresky (com.droidlogic.FileBrower) вместо Total Commander; запасные «Файлы (root)»."""
+import hashlib
 import pathlib
 import re
 import subprocess
@@ -11,6 +12,8 @@ FILES_OPS = (ROOT / "apps/tvboxd/src/org/tvbox/daemon/Files.java").read_text()
 MANIFEST = (ROOT / "apps/files/AndroidManifest.xml").read_text()
 BUILD = (ROOT / "build-sd.sh").read_text()
 UNUSED = (ROOT / "tools/unused-stock-apps.txt").read_text()
+STOCK_FM = ROOT / "prebuilt/stock-filemanager/FileExploresky.apk"
+STOCK_FM_PKG = "com.droidlogic.FileBrower"
 TC = re.compile(r"total\s*commander|ghisler|tcplugins|chrisgch/tca", re.I)
 # Исторические отчёты и журналы прошлых выпусков описывают то, что было выпущено, и не переписываются.
 HISTORY = ("docs/release-notes/", "docs/release-qa/", "release/notes/")
@@ -44,17 +47,24 @@ class FilesManagerTests(unittest.TestCase):
 
     def test_stock_file_manager_tile_is_default_on_home_screen(self):
         allowed = re.search(r'ALLOWED="([^"]+)"', FIRSTBOOT).group(1).split()
-        self.assertEqual(allowed[:3], ["org.tvbox.iptv", "ru.yourok.torrserve", "com.android.rk"])
+        self.assertEqual(allowed[:3], ["org.tvbox.iptv", "ru.yourok.torrserve", STOCK_FM_PKG])
         self.assertNotIn("org.tvbox.files", allowed)
         self.assertIn("launcher-filemanager-tile", FIRSTBOOT)
         self.assertIn("com.ghisler.*|org.tvbox.files) [ \"$PLACED\" = 1 ] && continue; p=$FM", FIRSTBOOT)
-        self.assertIn("appops set com.android.rk MANAGE_EXTERNAL_STORAGE allow", FIRSTBOOT)
-        self.assertIn("pm enable com.android.rk", FIRSTBOOT)
+        self.assertIn(f"appops set {STOCK_FM_PKG} MANAGE_EXTERNAL_STORAGE allow", FIRSTBOOT)
+        self.assertIn(f"pm enable {STOCK_FM_PKG}", FIRSTBOOT)
 
     def test_stock_file_manager_is_kept_in_image(self):
-        self.assertNotRegex(UNUSED, r"(?i)rkexplorer|com\.android\.rk\b")
-        self.assertIn("-iname 'RkExplorer*.apk'", BUILD)
-        self.assertLess(BUILD.index("remove_unused_stock_apps system\n"), BUILD.index("RkExplorer*.apk"))
+        removed = "\n".join(
+            line for line in UNUSED.splitlines() if line.strip() and not line.lstrip().startswith("#")
+        )
+        self.assertNotRegex(removed, r"(?i)fileexploresky|FileBrower")
+        self.assertIn("-iname 'FileExploresky*.apk'", BUILD)
+        self.assertIn("prebuilt/stock-filemanager/FileExploresky.apk", BUILD)
+        self.assertLess(BUILD.index("remove_unused_stock_apps system\n"), BUILD.index("FileExploresky*.apk"))
+        self.assertTrue(STOCK_FM.is_file() and STOCK_FM.stat().st_size > 0)
+        digest = hashlib.sha256(STOCK_FM.read_bytes()).hexdigest()
+        self.assertEqual(digest, "e7bdfdc011c17f8df3875b4c77a654ba47ee50efa8186026ef72c470cba740aa")
 
     def test_root_operations_only_for_files_app(self):
         self.assertIn('static final String FILES = "org.tvbox.files";', DAEMON)

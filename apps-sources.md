@@ -1,5 +1,14 @@
 # Сторонние APK в образе: источники и подписи (проверено 2026-10-27)
 
+## Штатный файловый менеджер из A12-образа платы — 2026-11-23
+
+Единственный бинарник vendor-образа в git: `prebuilt/stock-filemanager/FileExploresky.apk`.
+Остальной A12 остаётся локально в `dl/` и в git не входит.
+
+| Пакет | Источник | SHA-256 APK | SHA-256 подписанта |
+|---|---|---|---|
+| `com.droidlogic.FileBrower` | `dl/a12/Image/lp/system.img` → `/system/priv-app/FileExploresky/FileExploresky.apk` | `e7bdfdc011c17f8df3875b4c77a654ba47ee50efa8186026ef72c470cba740aa` | `2d370c21f5dfd553d2a796314b70925fb38adeef90864c920bbbbb12887d3522` |
+
 ## Восстановленный комплект — 2026-11-10
 
 | Пакет | Источник и версия | SHA-256 APK | SHA-256 подписанта |

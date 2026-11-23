@@ -1,0 +1,10 @@
+FileExploresky.apk — штатный файловый менеджер платы из исходного A12-образа.
+
+Путь в образе: /system/priv-app/FileExploresky/FileExploresky.apk
+Пакет: com.droidlogic.FileBrower (sharedUserId android.uid.system)
+Извлечено из: dl/a12/Image/lp/system.img
+SHA-256 APK: e7bdfdc011c17f8df3875b4c77a654ba47ee50efa8186026ef72c470cba740aa
+SHA-256 сертификата (v3): 2d370c21f5dfd553d2a796314b70925fb38adeef90864c920bbbbb12887d3522
+
+В git только этот APK из vendor-образа: он нужен сборке и firstboot. Остальной A12
+остаётся локально в dl/ (не коммитится).

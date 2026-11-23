@@ -1,4 +1,5 @@
 # partition absolute-path-inside-filesystem; only apps excluded from Panadonik
+# Не удалять FileExploresky (com.droidlogic.FileBrower) — штатный файловый менеджер платы.
 product /app/GoogleCalendarSyncAdapter
 product /app/GoogleContactsSyncAdapter
 product /app/GoogleLocationHistory
