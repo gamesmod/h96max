@@ -10,7 +10,7 @@
 |---|---|---|---|
 | Образ Rockchip `update.img` | RK3318_userdebug_H96_Max_V12_12_20221117.1447 (Android 12, ядро 4.19.232) | sha256 `e93ccc90e5a41fbc430c1f9b3f4621989945ff5a6e9685de6d228f5e7cc5ad58` (`dl/fw/a12.sha256`) | mega.nz из описания видео на Rutube; **точная ссылка — уточнить**, кандидаты в журнале: `mega.nz/file/nxRzxZ6b`, `mega.nz/file/OhZVVIxb`, `mega.nz/file/LkYQmARJ` (последняя рядом с `a11-v11-20211029.7z`). Распаковка: `tools/rkunpack.py`, `tools/lpunpack.py` → `dl/a12/Image` |
 
-Из прошивки удаляются GMS, телеметрия (datadis, user_drmservice), стресс-тесты, Kodi, MediaCenter, камера (HAL), см. build-sd.sh.
+Из прошивки удаляются GMS, телеметрия (datadis, user_drmservice), стресс-тесты, OEM MediaCenter, камера (HAL) и прочий вендорский мусор по спискам `build-sd.sh`.
 
 ## 2. Сторонние приложения (ставятся при первой загрузке из /product/tvbox/apk; Obtainium проверяет обновления из источников приложений)
 | Пакет | Версия | Источник (скачано отсюда) | SHA-256 файла | SHA-256 сертификата |

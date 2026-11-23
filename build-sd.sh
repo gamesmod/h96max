@@ -189,7 +189,7 @@ sudo mkdir -p $MNT/system/app/TvboxBootLog
 sudo install -m 0644 $R/apps/bootlog/out/TvboxBootLog.apk $MNT/system/app/TvboxBootLog/TvboxBootLog.apk
 sudo chmod 0755 $MNT/system/app/TvboxBootLog
 lbl u:object_r:system_file:s0 $MNT/system/app/TvboxBootLog $MNT/system/app/TvboxBootLog/TvboxBootLog.apk
-# IPTV tile (apps/iptv): M3U groups -> channels -> VLC (replaces Kodi pvr.iptvsimple)
+# IPTV tile (apps/iptv): M3U groups -> channels -> VLC
 sudo mkdir -p $MNT/system/app/TvboxIptv
 sudo install -m 0644 $R/apps/iptv/out/TvboxIptv.apk $MNT/system/app/TvboxIptv/TvboxIptv.apk
 sudo chmod 0755 $MNT/system/app/TvboxIptv
@@ -300,9 +300,9 @@ lbl u:object_r:vendor_keylayout_file:s0 $MNT/usr/keylayout/ff1b0030_pwm.kl $MNT/
 # vendor OTA server (same vendor as the removed datadis telemetry): no client left, drop the address anyway
 sudo sed -i '/^ro\.product\.ota\.host2\?=/d' $MNT/build.prop
 lbl u:object_r:vendor_file:s0 $MNT/build.prop
-# Kodi removed (2026-10-27): vendor first-boot hook unpacks a Kodi bundle, preinstall grants Kodi perms -> drop both
+# Drop vendor xbmc_copy_folder hook and related preinstall grants (not part of the image app set).
 sudo sed -i 's/^\([[:space:]]*\)start xbmc_copy_folder/\1# start xbmc_copy_folder/' $MNT/etc/init/hw/init.hcy.rc
-sudo sed -i '/^service xbmc_copy_folder /,/^[[:space:]]*$/d' $MNT/etc/init/hw/init.hcy.rc   # the service itself too
+sudo sed -i '/^service xbmc_copy_folder /,/^[[:space:]]*$/d' $MNT/etc/init/hw/init.hcy.rc
 sudo sed -i '/org\.xbmc\.kodi/d' $MNT/bin/preinstall.sh
 sudo rm -f $MNT/bin/xbmc_copy_folder.sh
 lbl u:object_r:vendor_configs_file:s0 $MNT/etc/init/hw/init.hcy.rc

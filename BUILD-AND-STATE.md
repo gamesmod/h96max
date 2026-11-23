@@ -17,9 +17,7 @@
 
 ## Состав ПО на текущем A12 (живая система, SD)
 - Лаунчер: TV Launcher `com.tvlauncher` (домашний по умолчанию, плитки).
-- Samba и Termux убраны 2026-10-27 (безопасность + ресурсы): архив, конфиг и APK в dl/apk-removed/.
-- Kodi убран 2026-10-27 (пользователь предпочитает VLC): APK и настройки IPTV в dl/apk-removed/; build-sd.sh отключает vendor xbmc_copy_folder и гранты Kodi в preinstall.sh.
-- IPTV: своя плитка «ТВ-каналы» `org.tvbox.iptv` (apps/iptv, `./build.sh`) — плейлист из бывших настроек Kodi, кэш в files/, каналы открываются в VLC.
+- IPTV: своя плитка «ТВ-каналы» `org.tvbox.iptv` (apps/iptv, `./build.sh`) — плейлист в files/, каналы открываются в VLC; build-sd.sh отключает vendor `xbmc_copy_folder` и связанные гранты в preinstall.sh.
 - Пользовательские (из /product/tvbox/apk, ставит tvbox-firstboot.sh): TorrServe `ru.yourok.torrserve`, VLC `org.videolan.vlc`, Obtainium `dev.imranr.obtainium` (+ REQUEST_INSTALL_PACKAGES).
 - Свои: «Питание» `org.tvbox.power` (/system/priv-app, REBOOT/SHUTDOWN), «Журнал загрузки» `org.tvbox.bootlog` (читает /sdcard/tvbox/), «Файлы (root)» `org.tvbox.files` (запасной файловый менеджер без плитки; root-операции через tvboxd `FS_*`). Файловый менеджер по умолчанию и плитка — штатный FileExploresky `com.droidlogic.FileBrower` (uid system; копия в `prebuilt/stock-filemanager/`).
 - WebView: `com.android.webview` (LineageOS prebuilt, /product/app/webview).
