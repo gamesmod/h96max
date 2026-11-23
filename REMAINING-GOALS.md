@@ -32,5 +32,5 @@
 ## Не делать без отдельного решения
 
 - Публикационный тег, GitHub Release, установка OTA с wipe, force-push.
-- Возврат Алисы/RuStore/игр/стороннего файлового менеджера/`allsettings`/zRAM-bench.
+- Добавление в образ или цели ПО вне комплекта [`APPS.MD`](APPS.MD) / [`apps-sources.md`](apps-sources.md) / `tools/required-apps.sh`; включение zRAM на приставке.
 - Объявление `security_review=pass` или аппаратного `pass` без свежих доказательств на том же SHA-256 артефакта.

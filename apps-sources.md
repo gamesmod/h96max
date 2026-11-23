@@ -22,5 +22,3 @@ GitHub APK сверены с SHA-256 релиза и проверены `apksign
 
 Проверка подписи: `tools/apkcert.sh` (apksigner 35.0.2 + apksig из sdk/x, схемы v1/v2/v3). Файлы лежат в `dl/apk/<пакет>.apk`,
 ставятся при первой загрузке как пользовательские (`tvbox-firstboot.sh`, из /product/tvbox/apk) — для проверки новых версий установлен Obtainium.
-
-Игры SuperTux и Pixel Wheels в образ и в этот список не входят; firstboot удаляет оставшиеся пользовательские копии при обновлении.
