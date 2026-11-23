@@ -17,11 +17,11 @@ step() { echo; echo "=== [$(date +%T)] $*"; }
 step "1/5 toolchain"
 tools/setup-sdk.sh --check || tools/setup-sdk.sh
 step "2/5 own apps"
-for app in antivirus bootlog bootscreen clean installer iptv links power tvboxd; do
+for app in antivirus bootlog bootscreen clean files installer iptv links power tvboxd; do
     echo "-- apps/$app/build.sh"
     bash "apps/$app/build.sh"
 done
-for a in antivirus/TvboxAntivirus bootlog/TvboxBootLog clean/TvboxClean installer/TvboxInstaller iptv/TvboxIptv \
+for a in antivirus/TvboxAntivirus bootlog/TvboxBootLog clean/TvboxClean files/TvboxFiles installer/TvboxInstaller iptv/TvboxIptv \
          links/TvboxLinks power/TvboxPower; do
     ls apps/${a%%/*}/out/*.apk >/dev/null 2>&1 || { echo "no apk from apps/${a%%/*}"; exit 1; }; done
 [ -f apps/tvboxd/out/tvboxd.jar ]
@@ -45,6 +45,7 @@ mkdir -p release/obtainium
 cp apps/antivirus/out/TvboxAntivirus.apk release/obtainium/Panadonik-antivirus.apk
 cp apps/bootlog/out/TvboxBootLog.apk release/obtainium/Panadonik-bootlog.apk
 cp apps/clean/out/TvboxClean.apk release/obtainium/Panadonik-performance.apk
+cp apps/files/out/TvboxFiles.apk release/obtainium/Panadonik-files.apk
 cp apps/installer/out/TvboxInstaller.apk release/obtainium/Panadonik-installer.apk
 cp apps/iptv/out/TvboxIptv.apk release/obtainium/Panadonik-iptv.apk
 cp apps/links/out/TvboxLinks.apk release/obtainium/Panadonik-links.apk
