@@ -9,7 +9,6 @@
     "playlist_sha256": "e1b9e0f33f65d350397a9db17d9a35577d8ab057bc6691e4d9cd12a63f7c1bc1",
     "installed": false
   },
-  "cold_boot_seconds": null,
   "automated_tests": {
     "status": "pass",
     "count": 63,
@@ -34,17 +33,10 @@
   "hot_test": {
     "tested_installed_version": "0.4.5; целостность после горячих изменений не подтверждена",
     "candidate_installed": false,
-    "network_capture": {
-      "captured_at": null,
-      "duration_seconds": null,
-      "packets": null,
-      "auth_cookie_or_token_patterns": null,
-      "raw_capture_retained": null
-    }
+    "network_capture": {}
   },
   "log_analysis": {
     "reviewed": false,
-    "untriaged_errors": null,
     "summary": "Журнал сборки проанализирован; журналы и трафик целевого устройства для нового кандидата не проверены."
   },
   "security_analysis": {
@@ -272,8 +264,7 @@
     "connection": {
       "adb_devices": 0,
       "usb_rockchip_detected": false,
-      "adb_mdns_services": 0,
-      "installed_version": null
+      "adb_mdns_services": 0
     },
     "data_reset_consent": false,
     "installed": false,
@@ -311,22 +302,6 @@
       "Native TorrServer service and system WebView remain firmware/OTA components; Obtainium APK inventory does not demonstrate their independent updateability",
       "No release or hardware acceptance claimed"
     ]
-  },
-  "smarttube_removal": {
-    "date": "2026-11-14",
-    "source_parent": "5edb874ddc7057003d444e7e27e6c49b0cd8dc2e",
-    "target_release": "0.4.6",
-    "code": "implemented",
-    "installed_release": "0.4.5",
-    "device_package_and_data": "absent_verified",
-    "obtainium_record": "removed_verified",
-    "import_sha256": "e6cc114f81387fae11e47ebe5d30fba581398663e53d3a2443cc06478997276d",
-    "tests_worktree": 82,
-    "tests_index_snapshot": 81,
-    "new_ota": "not_built",
-    "hardware_acceptance": "pending",
-    "traffic_analysis": "pending",
-    "published": false
   },
   "ddr_init_fix": {
     "date": "2026-11-14",

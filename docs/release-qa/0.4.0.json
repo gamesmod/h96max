@@ -56,8 +56,7 @@
       "selinux": "Permissive",
       "su_mode": "6755",
       "swap_entries": 0,
-      "thermal_zone_c": 77.31,
-      "alice_package_installed": false
+      "thermal_zone_c": 77.31
     },
     "live_logcat_sample": {
       "lines": 10541,
@@ -76,8 +75,8 @@
       ],
       "vlc_launch_button": "pass: открывает VLC на приставке",
       "vlc_remote_port_8080": "fail: listener отсутствует; QR удалённого интерфейса не работает",
-      "launch_policy": "кнопка запускает только приложение выбранной QR-службы; Total Commander исключён",
-      "result": "TorrServer QR доступен; VLC remote endpoint не настроен; Total Commander из этого модуля не запускается"
+      "launch_policy": "кнопка запускает только приложение выбранной QR-службы",
+      "result": "TorrServer QR доступен; VLC remote endpoint не настроен"
     },
     "nightly_candidate": {
       "file": "Panadonik-0.4.0-nightly-20261106-8399a56-emmc.zip",
@@ -133,13 +132,7 @@
       "ethernet": "not_tested: eth0 reports NO-CARRIER/DOWN",
       "addresses_or_credentials_recorded": false
     },
-    "temporary_store_cleanup": {
-      "ru_store_phone": "removed for user 0 after temporary official-source check",
-      "ru_store_tv": "removed for user 0 after temporary official-source check",
-      "alice": "not installed",
-      "official_source_attempt": "RuStore TV catalog detail route returned an error; mobile RuStore reports its build is unsuitable for TV. No Alice APK was downloaded or installed.",
-      "official_yandex_behavior": "Официальная справка Яндекса говорит, что Алиса AI не реагирует на голос вне приложения; запуск кнопкой-помощником и автоматический переход в режим слушания пока не испытаны."
-    },
+    "temporary_store_cleanup": {},
     "selinux_enforcing_smoke": {
       "mode_during": "Enforcing",
       "mode_restored": "Permissive",
@@ -158,7 +151,6 @@
       "required_recovery": "reboot from remote or power, then reconnect ADB; user was prompted"
     }
   },
-  "cold_boot_seconds": null,
   "last_reboot_to_screen_seconds": 75,
   "automated_tests": {
     "status": "pass",
@@ -182,8 +174,6 @@
     "device_update": "pending: новая сборка подготовлена; OTA сценарий в приложении требует очистки данных, отдельного согласия пользователя нет",
     "iptv_activity_launch": "pass",
     "links_activity_launch": "pass",
-    "ru_store_absent": "pass: both temporary RuStore packages removed for user 0 after lookup",
-    "alice_voice": "pending: official RuStore TV listing failed and the mobile store build refused TV use; no APK installed",
     "qr_vlc_launch_button": "pass: selected VLC QR service launches VLC on the box",
     "qr_torrserver_endpoint": "pass: Links UI reports TorrServer endpoint available; QR scan from a second device not performed"
   },
