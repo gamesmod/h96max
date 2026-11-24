@@ -127,6 +127,20 @@ class IptvCategoryTests(unittest.TestCase):
              mock.patch.object(MERGE, "probe_segment_resolution", return_value=0):
             self.assertEqual(MERGE.stream_resolution("https://example.invalid/master.m3u8"), 0)
 
+    def test_hls_without_resolution_metadata_uses_measured_segment(self):
+        responses = [
+            (200, "application/vnd.apple.mpegurl",
+             b"#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=4000000\nhigh.m3u8\n",
+             "https://example.invalid/master.m3u8"),
+            (200, "application/vnd.apple.mpegurl", b"#EXTM3U\nsegment.ts\n",
+             "https://example.invalid/high.m3u8"),
+            (206, "video/mp2t", b"segment", "https://example.invalid/segment.ts"),
+        ]
+        with mock.patch.object(MERGE, "fetch", side_effect=responses), \
+             mock.patch.object(MERGE, "probe_segment_resolution", return_value=1080) as probe:
+            self.assertEqual(MERGE.stream_resolution("https://example.invalid/master.m3u8"), 1080)
+            probe.assert_called_once_with(b"segment")
+
     def test_unknown_transport_stream_resolution_is_not_replaced_by_url_label(self):
         with mock.patch.object(MERGE, "fetch", return_value=(
                 200, "video/mp2t", b"unrecognized transport stream",
