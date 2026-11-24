@@ -14,7 +14,7 @@ def replace_once(text, old, new):
 
 def transform(path, text):
     if path == "smarttubetv/build.gradle":
-        text = replace_once(text, 'applicationId "app.smarttube.fdroid"', 'applicationId "org.tvbox.panadoniktube"')
+        text = replace_once(text, 'applicationId "app.smarttube.fdroid"', 'applicationId "org.tvbox.panadoniktube"\n            resConfigs "ru", "en"')
         text = replace_once(text, "include 'armeabi-v7a', 'arm64-v8a', 'x86' //", "include 'armeabi-v7a', 'arm64-v8a' //")
         text = replace_once(text, "universalApk true", "universalApk false")
         text = replace_once(text, "abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'", "abiFilters 'armeabi-v7a', 'arm64-v8a'")
