@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * «Производительность и диагностика»: метрики, журнал загрузки и подробный локальный журнал событий по запросу.
+ * «Производительность и диагностика»: метрики, журнал загрузки и подробный локальный журнал событий по умолчанию.
  * Метрики опрашиваются только пока открыт экран; CSV-история хранится семь дней с шагом одна минута.
  */
 public class MainActivity extends Activity {
@@ -91,7 +91,7 @@ public class MainActivity extends Activity {
         LinearLayout diagnostics = new LinearLayout(this);
         diagnostics.setGravity(Gravity.CENTER_VERTICAL);
         diagnostics.setPadding(0, 12, 0, 0);
-        debugLogInfo = text("Подробный системный журнал выключен", 18, 0xFFB0BEC5);
+        debugLogInfo = text("Проверка подробного системного журнала…", 18, 0xFFB0BEC5);
         diagnostics.addView(debugLogInfo, new LinearLayout.LayoutParams(0, -2, 1));
         diagnostics.addView(button("Журнал загрузки", new View.OnClickListener() {
             public void onClick(View v) { openBootLog(); }
@@ -382,7 +382,7 @@ public class MainActivity extends Activity {
         catch (Exception e) { Toast.makeText(this, "Журнал загрузки не установлен", Toast.LENGTH_LONG).show(); }
     }
 
-    /** Запросить состояние необязательного подробного системного журнала. */
+    /** Запросить фактическое состояние подробного системного журнала. */
     void refreshDebugLog() {
         new Thread(new Runnable() { public void run() {
             final Map<String, List<String>> m = call("PERF_SYSLOG_STATUS");
@@ -396,7 +396,7 @@ public class MainActivity extends Activity {
         } }).start();
     }
 
-    /** Глубокий сбор запускается только по явному нажатию и ограничен ротацией файлов на приставке. */
+    /** Переключить запись до следующего запуска службы; по умолчанию запись включена. */
     void toggleDebugLog() {
         debugLogButton.setEnabled(false);
         new Thread(new Runnable() { public void run() {

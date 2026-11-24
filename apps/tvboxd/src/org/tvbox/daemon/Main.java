@@ -28,7 +28,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * tvboxd: root helper for the "Установка" tile (eMMC install/verify/backup/restore, updates) and the "Антивирус"
  * tile (Hypatia signatures, realtime scanner), the "Производительность" tile (metrics while it is open) and the "Файлы" tile
- * (root file manager, Files.java) — everything on demand, no background jobs. Runs via app_process as an init service. Clients talk over the abstract
+ * (root file manager, Files.java) — with bounded background diagnostic logging enabled by default. Runs via app_process as an init service. Clients talk over the abstract
  * local socket "tvboxd": one command line in, "PROGRESS pct text" / "LOG text" / "KEY value" lines out,
  * last line "DONE ok|fail message". Only the installer app's uid (and root/shell for debugging) may use every command;
  * the other tiles are limited to their own command prefixes.
@@ -99,6 +99,7 @@ public class Main {
         clearStaleBcb();
         LocalServerSocket server = new LocalServerSocket("tvboxd");
         log("tvboxd started");
+        startDebugSyslog(new Op(new PrintWriter(System.out, true)));
         while (true) {
             final LocalSocket s = server.accept();
             new Thread(new Runnable() {
@@ -205,7 +206,7 @@ public class Main {
         } catch (Exception e) { debugSyslog = null; op.done(false, "не удалось запустить logcat: " + e.getMessage()); }
     }
 
-    /** Остановить необязательный сбор подробных журналов. */
+    /** Остановить подробный журнал до следующего запуска службы. */
     static synchronized void stopDebugSyslog() {
         if (debugSyslog != null) { debugSyslog.destroy(); debugSyslog = null; }
     }
