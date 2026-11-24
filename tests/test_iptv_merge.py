@@ -127,6 +127,20 @@ class IptvCategoryTests(unittest.TestCase):
              mock.patch.object(MERGE, "probe_segment_resolution", return_value=0):
             self.assertEqual(MERGE.stream_resolution("https://example.invalid/master.m3u8"), 0)
 
+    def test_hls_without_resolution_metadata_uses_measured_segment(self):
+        responses = [
+            (200, "application/vnd.apple.mpegurl",
+             b"#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=4000000\nhigh.m3u8\n",
+             "https://example.invalid/master.m3u8"),
+            (200, "application/vnd.apple.mpegurl", b"#EXTM3U\nsegment.ts\n",
+             "https://example.invalid/high.m3u8"),
+            (206, "video/mp2t", b"segment", "https://example.invalid/segment.ts"),
+        ]
+        with mock.patch.object(MERGE, "fetch", side_effect=responses), \
+             mock.patch.object(MERGE, "probe_segment_resolution", return_value=1080) as probe:
+            self.assertEqual(MERGE.stream_resolution("https://example.invalid/master.m3u8"), 1080)
+            probe.assert_called_once_with(b"segment")
+
     def test_unknown_transport_stream_resolution_is_not_replaced_by_url_label(self):
         with mock.patch.object(MERGE, "fetch", return_value=(
                 200, "video/mp2t", b"unrecognized transport stream",
@@ -152,6 +166,21 @@ class IptvCategoryTests(unittest.TestCase):
              "-frames:v", "1", "-c:v", "libx264", "-f", "mpegts", "pipe:1"],
             stdout=subprocess.PIPE, check=True)
         self.assertEqual(MERGE.probe_segment_resolution(result.stdout), 1080)
+
+
+class IptvWriteTests(unittest.TestCase):
+    def test_write_creates_missing_output_directory(self):
+        entry = {"name": "Канал (1080p)", "url": "https://example.com/a.m3u8", "opts": [],
+                 "attrs": {"tvg-logo": "https://example.com/a.png", "group-title": "Новости"}}
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp) / "overlay/system/etc/tvbox/iptv.m3u"
+            MERGE.write([entry], str(out), epg_url="")
+            self.assertTrue(out.is_file())
+            self.assertEqual(len(MERGE.parse(out.read_text(encoding="utf-8"))), 1)
+
+    def test_release_step_creates_overlay_directory(self):
+        workflow = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
+        self.assertIn("mkdir -p overlay/system/etc/tvbox", workflow)
 
 
 class IptvDuplicateTests(unittest.TestCase):

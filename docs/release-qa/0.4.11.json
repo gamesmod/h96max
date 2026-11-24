@@ -2,22 +2,33 @@
   "version": "0.4.11",
   "device": "Panadonik H96 Max / RK3328, Android 12",
   "reviewed_at": "2026-11-23",
-  "source_commit": null,
-  "source_state": "заготовка кандидата после dev-v0.4.10; сборка и приёмка ещё не закрыты",
+  "source_commit": "7287fa8bed790ef6608a39fcb9db067386c73666",
+  "source_state": "локальный OTA-кандидат 0.4.11 собран на hpprobuntu; не установлен; тег/Release не публиковались",
   "candidate": {
-    "ota_sha256": null,
-    "playlist_sha256": null,
-    "clean_install_sha256": null,
+    "ota_sha256": "ad337e09a00caaf1126921b7f89bb9d0626dcb48aadf15f2b3afc16a1892105d",
+    "playlist_sha256": "9fc3466714769d39e68cafca98cdd018cda7a6809baa417214cbe5bf77d1d108",
+    "clean_install_sha256": "15f2053984fbce2603afc6f66de09f1b5b025db06e3cadb0b39d1b294b689c2b",
     "installed": false,
     "install_method": null,
     "actions_run_id": null,
-    "publication": null
+    "publication": null,
+    "paths": {
+      "ota": "release/updates/emmc/tvbox-update-0.4.11-emmc.zip",
+      "emmc_release": "release/0.4.11/emmc/",
+      "clean_install": "release/Panadonik-0.4.11-emmc-clean-install.zip",
+      "obtainium": "release/obtainium/"
+    }
   },
   "automated_tests": {
-    "status": "pending",
-    "count": null,
+    "status": "pass",
+    "count": 157,
     "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -v",
-    "scope": "локальное дерево перед/после сборки кандидата 0.4.11"
+    "scope": "локальное дерево перед bump 0.4.11, 2026-11-23"
+  },
+  "host_artifact_checks": {
+    "wifi_secrets_scanner": "pass",
+    "sha256sums": "pass",
+    "ota_cms_verify": "pass"
   },
   "checks": {
     "cold_boot_ready": "pending",
@@ -38,16 +49,53 @@
     "tested_installed_version": null,
     "candidate_installed": false,
     "notes": {
-      "security_review": "не переносить pass/fail с 0.4.10; заполнить после анализа этого артефакта"
+      "security_review": "не переносить pass/fail с 0.4.10; заполнить после анализа установленного 0.4.11"
     }
   },
   "log_analysis": {
-    "reviewed": false,
-    "untriaged_errors": null,
-    "summary": "ожидает журнал сборки/установки 0.4.11"
+    "reviewed": true,
+    "untriaged_errors": 0,
+    "summary": "Журнал локальной сборки tools/build-release.sh завершился BUILD_EXIT=0; CMS Verification successful. Аппаратный logcat/dmesg для установленного 0.4.11 не разбирался."
   },
   "security_analysis": {
-    "reviewed": false,
-    "summary": "ожидает сканер Wi‑Fi credentials и анализ после сборки кандидата 0.4.11"
+    "reviewed": true,
+    "summary": "Сканер Wi‑Fi credentials на финальных system/vendor ext4: находок нет. Подпись OTA прежним сертификатом OK. Аппаратный security_review и network capture для установленного 0.4.11 не выполнялись; для stable security_review остаётся pending/fail до приёмки."
+  },
+  "revalidation_2026_11_24": {
+    "source_commit": "15dc1c7ee844ef8ae6976fc8e1b71d4d6b3bd623",
+    "automated_tests": {
+      "status": "pass",
+      "count": 159,
+      "command": "PATH=<existing-project-jdk>/bin:$PATH PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -v",
+      "scope": "master sources, not installed candidate; initial isolated worktree run lacked javac"
+    },
+    "ota_sha256": "ad337e09a00caaf1126921b7f89bb9d0626dcb48aadf15f2b3afc16a1892105d",
+    "sha256sums": "pass",
+    "ota_signature_existing_certificate": "pass",
+    "dev_gate": "fail",
+    "stable_gate": "fail",
+    "device": {
+      "transport": "network ADB",
+      "installed_version": "0.4.10",
+      "boot_completed": true,
+      "swap_entries": 0,
+      "private_snapshot_sha256_verified": true
+    },
+    "limitations": [
+      "No candidate installation or hardware acceptance of 0.4.11 performed",
+      "Existing OTA predates current master source changes",
+      "No capture or router diagnostics performed; no Wi-Fi fault established",
+      "Image credential scan not repeated in this revalidation"
+    ]
+  },
+  "actions_candidate_hardware_progress": {
+    "actions_run_id": 45325191600,
+    "source_commit": "135f4175a70350573e4e86ac0802216395c425f9",
+    "ota_sha256": "7487e4e1f5b4c5878438ce187e3fb611b578dbc67c888e2beac0ced472ad0478",
+    "installed_release": "0.4.11",
+    "installation": "OTA с очисткой, Wi-Fi ADB; маркер восстановления совпал с SHA-256",
+    "usb_acceptance": "pending",
+    "iptv": "Два канала выводили кадры; первый при повторной попытке после первоначального сбоя. Для второго: 837 кадров за 33,43 с, медиана 33,34 мс, максимум 69,06 мс.",
+    "release_gate": "pending"
   }
 }

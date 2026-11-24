@@ -1,36 +1,33 @@
-# rk3318-android: исторический снимок сборки (снято 2026-10-26)
+# Panadonik: сборка и состояние
 
-> Архивный снимок, не инструкция для текущей сборки. SD-образ исключён из проекта; старые SD-команды, отключение ADB-авторизации и состав ПО ниже не применять. Актуальные команды и условия — `docs/LUNA-WORKFLOW.md`, статус — в `docs/release-qa/`.
+Актуальная инструкция для релизного контура eMMC. Версия определяется `ro.tvbox.release` в [build-sd.sh](build-sd.sh) (0.4.11). История прежней сборки доступна в Git; старые команды не являются инструкцией.
 
-## Метод сборки (хост)
-- Исходник: вендорский A12 `RK3318_userdebug_H96_Max_V12_12_20221117.1447` → `dl/a12` через `tools/prepare-build-inputs.sh` (`extract-vendor-blobs.sh` = `rkunpack`+`lpunpack`, затем очистка LP; либо уже очищенные образы из Git LFS).
-- Образ: `./build-sd.sh` (SD, по умолчанию) или `MEDIA=emmc ./build-sd.sh` (вариант eMMC → `build/out-emmc`).
-  Нужны: sgdisk e2fsck resize2fs debugfs python3 gzip setfattr, sudo (loop-mount), aarch64-linux-gnu-gcc (fblog).
-  Выход: `build/out/regions/NN-name.bin.gz` + `build/out/manifest.txt` (offset_sector size file md5).
-- Запись на SD (с приставки, загруженной не с SD): `device/sd-write.sh` (проверки ff500000, размер 31116288, не смонтировано; верификация чанками по 64 MiB).
-- Что делает build-sd.sh: правит cmdline boot/recovery (boot_devices → ff500000 для SD, wificountrycode US), dtbo (bootargs_ext boot_devices), fstab (без FBE, без SD voldmanaged, /metadata без first_stage_mount) в ramdisk и vendor; recovery.fstab без eMMC; удаляет GMS/Google и вендорский мусор; ставит WebView LineageOS, APK в /product/tvbox/apk, свои приложения, TorrServer, bootanimation; vendor: tvbox.rc + скрипты; Wi-Fi credentials не вшиваются; прошивки Wi‑Fi/BT от A9 (a9fw/), RRO TvboxWifiOverlay, pmf=0/oce=0, baseparameter by-name, блокировка rpmb; модель panadonik; сборка super 4 GiB (`tools/lpbuild.py`), IDB (`tools/rkidb.py`, sdboot_tag=1), GPT (как вендор, super 0x800000 сек.).
-- **Сборка выпуска с нуля одной командой:** `tools/build-release.sh` (версия = `ro.tvbox.release` в build-sd.sh, нужен `release/notes/ВЕРСИЯ.txt`): тулчейн → все свои приложения → ota/tvbox-flash → `rm -rf build` → eMMC-образ → SD-образ → `release/ВЕРСИЯ/{sd,emmc}` + SHA256SUMS → подписанные OTA.
-- Тулчейн (`tools/setup-sdk.sh`, ничего не ставит в систему): `sdk/jdk` OpenJDK 21 (`javac --release 8`) и `sdk/x` (android-23 android.jar + dx) из `sdk/debs/*.deb` (недостающие — `apt-get download`), `sdk/framework/framework-res.apk` из `dl/a12/Image/lp/system.img` (aapt -I для атрибутов A12, нужен apps/bootlog). Eclipse больше не нужен (удалён с ПК 2026-10-27). Системные: aapt, aarch64-linux-gnu-gcc, sgdisk, e2fsprogs, debugfs, openssl, python3, sudo.
-- Свои APK/jar (apps/*/build.sh, у каждого свой): javac → dx → aapt → подпись v1 `tools/v1sign.py` ключом `secrets/tvbox-key.pem`/`tvbox-cert.pem`. Список собираемых приложений — `tools/build-release.sh`.
-  Пакеты для sdk/: `apt-get download dalvik-exchange android-sdk-platform-23 libandroid-23-java` + `dpkg -x` в `sdk/x` (раньше лежали в /tmp/r и пропали).
-- Бут-анимация Matrix: `tools/mkbootanim.py` → `media/bootanimation.zip` (заменяется экраном логов, см. apps/bootscreen).
+## Подготовка и сборка
 
-## Состав ПО на текущем A12 (живая система, SD)
-- Лаунчер: TV Launcher `com.tvlauncher` (домашний по умолчанию, плитки).
-- IPTV: своя плитка «ТВ-каналы» `org.tvbox.iptv` (apps/iptv, `./build.sh`) — плейлист в files/, каналы открываются в VLC; build-sd.sh отключает vendor `xbmc_copy_folder` и связанные гранты в preinstall.sh.
-- Пользовательские (из /product/tvbox/apk, ставит tvbox-firstboot.sh): TorrServe `ru.yourok.torrserve`, VLC `org.videolan.vlc`, Obtainium `dev.imranr.obtainium` (+ REQUEST_INSTALL_PACKAGES).
-- Свои: «Питание» `org.tvbox.power` (/system/priv-app, REBOOT/SHUTDOWN), «Журнал загрузки» `org.tvbox.bootlog` (читает /sdcard/tvbox/), «Файлы (root)» `org.tvbox.files` (запасной файловый менеджер без плитки; root-операции через tvboxd `FS_*`). Файловый менеджер по умолчанию и плитка — штатный FileExploresky `com.droidlogic.FileBrower` (uid system; копия в `prebuilt/stock-filemanager/`).
-- WebView: `com.android.webview` (LineageOS prebuilt, /product/app/webview).
-- Службы (vendor/etc/init/tvbox.rc): tvbox-emmc-ro.sh (eMMC force_ro при загрузке с SD), tvbox_bootlog (dmesg/logcat → /sdcard/tvbox), tvbox_firstboot, torrserver :8090 (/data/vendor/torrserver), adb tcp 5555.
-- Удалено: GMS/Play/YouTube/Google*, /system/preinstall (TikTok, Netflix, Aptoide…), datadis (телеметрия monitor.hcybox.com:41523), user_drmservice (UDP 33334), stress-тесты, katniss, chrome_hcy, RKHcyUpdate и пр. (список в build-sd.sh).
+- Платформа: H96 Max RK3318/RK3328, проверенная синяя плата, вендорский Android 12 / Linux 4.19.232. Происхождение компонентов — [COMPONENTS.md](COMPONENTS.md).
+- Использовать Linux-хост с Git LFS, SDK и утилитами из `tools/setup-sdk.sh` и [AGENTS.md](AGENTS.md); CI требует не менее 18 GB свободного места. Дисковая подкачка запрещена.
+- Входы: очищенные стоковые разделы из Git LFS, firmware Wi-Fi/BT из A9, закреплённые сторонние APK и системные компоненты из `tools/third-party-apps.json`, прежние ключи подписи в `secrets/`, заметки `release/notes/<версия>.txt`. При необходимости подготовить входы из исходного `update.img` командой `tools/prepare-build-inputs.sh --update /path/to/update.img`.
 
-## Настройки
-- build.prop: ro.adb.secure=0, ro.setupwizard.mode=DISABLED, persist.sys.timezone=Europe/Moscow, persist.sys.locale=ru-RU, persist.sys.usb.config=adb, persist.sys.bootvideo.enable=false.
-- settings: device_name=panadonik, wifi_p2p_device_name=panadonik, device_provisioned=1, user_setup_complete=1, captive_portal_mode=0, wifi_connected_mac_randomization_enabled=0, auto_time=1, screen_off_timeout=2147483647, install_non_market_apps=1, IME LatinIME, OOBE com.mbx.settingsmbox/.OobeActivity отключён.
-- Wi‑Fi: страна US (cmdline), WPA3‑апгрейд выключен (RRO), pmf=0/oce=0, сеть пользователя не вшивается в образ.
-- SELinux: Permissive (вендорский userdebug).
-- Живые отличия от build-sd.sh: ro.product.model на живой ещё H96_Max_V12 (в сборке panadonik); часть плиток могла стоять как user-приложения после горячей установки.
+```bash
+ git lfs pull
+ tools/build-release.sh
+```
 
-## Секреты GitHub Actions
+Скрипт готовит входы и SDK, собирает восемь APK и два системных JAR, очищает производный каталог build, собирает eMMC через `MEDIA=emmc ./build-sd.sh`, подписывает OTA и формирует комплект чистой установки. Не менять входы во время сборки.
 
-`tools/setup-release-secrets.sh` настраивает git/gh и шесть секретов `release.yml` из прежних ключей `secrets/` и приватного архива входов; формат секретов, требования к адресу архива и примеры — в README, раздел «Публикация релиза через GitHub Actions».
+## Выходы
+
+| Артефакт | Путь |
+|---|---|
+| eMMC OTA | `release/updates/emmc/tvbox-update-<версия>-emmc.zip` |
+| Разделы eMMC | `release/<версия>/emmc/` |
+| Чистая установка | `release/Panadonik-<версия>-emmc-clean-install.zip` |
+| Восемь APK Panadonik | `release/obtainium/` (название каталога историческое; собственные APK не регистрируются в Obtainium) |
+
+Состав ПО — [APPS.MD](APPS.MD), порядок плиток — [README.md](README.md#плитки-главного-экрана). Установка — [docs/install-from-stock.md](docs/install-from-stock.md). Настройка четырёх секретов подписи GitHub Actions — `tools/setup-release-secrets.sh`, см. README. Закрытые ключи и Wi-Fi credentials не публиковать.
+
+## Состояние кандидата
+
+По [протоколу 0.4.11](docs/release-qa/0.4.11.md) от 2026-11-24 кандидат Actions установлен с очисткой: загрузка завершена, Wi-Fi и сетевой ADB восстановились, подкачка отключена. На одном IPTV-канале подтверждён вывод кадров, на другом наблюдался сбой первого запуска. USB, пульт, TorrServer, сетевой аудит и итоговая приёмка ожидаются. Это относится только к артефакту Actions `45325191600`, не ко всем изменениям master; полный gate и публикация 0.4.11 не подтверждены.
+
+Новая сборка требует проверки собственных контрольных сумм, подписи, отсутствия credentials, IPTV и аппаратной приёмки по [release-quality-gate.md](docs/release-quality-gate.md). Публикационные теги и установка с очисткой требуют отдельного подтверждения.

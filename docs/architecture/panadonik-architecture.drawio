@@ -235,7 +235,7 @@
 <mxCell id="34" value="Panadonik-ВЕР-&#xa;emmc-clean-install.zip" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="31">
   <mxGeometry x="20" y="125" width="240" height="55" as="geometry"/>
 </mxCell>
-<mxCell id="35" value="Obtainium APK ×7" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="31">
+<mxCell id="35" value="APK Panadonik ×8" style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Helvetica;fontSize=12;" vertex="1" parent="31">
   <mxGeometry x="280" y="125" width="160" height="55" as="geometry"/>
 </mxCell>
 <mxCell id="36" value="CI и продвижение (GitHub Actions)" style="swimlane;startSize=28;html=1;whiteSpace=wrap;convertToSvg=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=14;fontStyle=1;" vertex="1" parent="1">

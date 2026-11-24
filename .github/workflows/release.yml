@@ -28,7 +28,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          lfs: true
+          lfs: false
+
+      - name: Cache Git LFS
+        uses: actions/cache@v4
+        with:
+          path: .git/lfs
+          key: git-lfs-${{ hashFiles('.gitattributes', 'dl/a12/**', 'a9fw/**', 'stock/vfd/**', 'overlay-wifi/*.apk', 'prebuilt/stock-filemanager/FileExploresky.apk') }}
+          restore-keys: |
+            git-lfs-
 
       - name: Preflight required Actions secrets
         env:
@@ -55,6 +63,12 @@ jobs:
           if [ -n "${ANDROID_HOME:-}" ]; then sudo rm -rf "$ANDROID_HOME"; fi
           sudo apt-get clean
           df -h /
+
+      - name: Fetch Git LFS objects
+        run: |
+          set -euo pipefail
+          git lfs install --local
+          git lfs pull
 
       - name: Run automated release tests
         run: |
@@ -146,6 +160,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 -I tools/check-public-release.py --sources tools/iptv-sources.txt
+          mkdir -p overlay/system/etc/tvbox
           python3 -I tools/iptv-merge.py --out overlay/system/etc/tvbox/iptv.m3u
           candidate_args=()
           if [[ "$GITHUB_EVENT_NAME" != push || "$GITHUB_REF" != refs/tags/* ]]; then
@@ -266,7 +281,25 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          lfs: true
+          lfs: false
+
+      - name: Cache Git LFS
+        uses: actions/cache@v4
+        with:
+          path: .git/lfs
+          key: git-lfs-${{ hashFiles('.gitattributes', 'prebuilt/stock-filemanager/FileExploresky.apk') }}
+          restore-keys: |
+            git-lfs-
+
+      - name: Fetch Git LFS objects needed for tests
+        run: |
+          set -euo pipefail
+          git lfs install --local
+          git lfs pull --include="prebuilt/stock-filemanager/FileExploresky.apk"
+          if head -c 20 prebuilt/stock-filemanager/FileExploresky.apk | grep -q 'git-lfs'; then
+            echo "LFS object not smudged: FileExploresky.apk" >&2
+            exit 1
+          fi
 
       - name: Run automated release tests
         run: |

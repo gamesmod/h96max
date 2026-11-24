@@ -1,0 +1,82 @@
+name: SmartTube Proxy candidate
+on:
+  pull_request:
+    paths: ['apps/smarttube-proxy/**', '.github/workflows/smarttube-proxy.yml']
+  push:
+    branches: ['master']
+    paths: ['apps/smarttube-proxy/**', '.github/workflows/smarttube-proxy.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - name: Python tests and shell syntax
+        working-directory: apps/smarttube-proxy
+        run: |
+          python3 -m unittest -v
+          python3 -m json.tool sources.json >/dev/null
+          bash -n build.sh adb-diagnose.sh
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Android SDK command-line tools
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-32 build-tools;35.0.0'
+          log-accepted-android-sdk-licenses: 'false'
+      - name: Android SDK and compile
+        run: |
+          command -v sdkmanager
+          test -f "$ANDROID_HOME/platforms/android-32/android.jar"
+          test -x "$ANDROID_HOME/build-tools/35.0.0/d8"
+          mkdir -p /tmp/proxy-classes
+          javac --release 8 -encoding UTF-8 -classpath "$ANDROID_HOME/platforms/android-32/android.jar" -d /tmp/proxy-classes apps/smarttube-proxy/src/org/tvbox/smarttubeproxy/*.java
+  signed-apk:
+    needs: test
+    if: ${{ github.ref == 'refs/heads/master' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Android SDK command-line tools
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-32 build-tools;35.0.0'
+          log-accepted-android-sdk-licenses: 'false'
+      - name: Build with existing Panadonik key
+        env:
+          TVBOX_KEY: ${{ secrets.TVBOX_SIGNING_KEY }}
+          TVBOX_CERT: ${{ secrets.TVBOX_SIGNING_CERT }}
+        run: |
+          set -euo pipefail
+          command -v sdkmanager
+          test -f "$ANDROID_HOME/platforms/android-32/android.jar"
+          test -x "$ANDROID_HOME/build-tools/35.0.0/d8"
+          umask 077
+          mkdir -p secrets
+          trap 'rm -f secrets/tvbox-key.pem secrets/tvbox-cert.pem' EXIT
+          test -n "$TVBOX_KEY" && test -n "$TVBOX_CERT"
+          printf '%s\n' "$TVBOX_KEY" > secrets/tvbox-key.pem
+          printf '%s\n' "$TVBOX_CERT" > secrets/tvbox-cert.pem
+          bash apps/smarttube-proxy/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: smarttube-proxy-unaccepted-candidate
+          path: |
+            apps/smarttube-proxy/out/TvboxSmartTubeProxy.apk
+            apps/smarttube-proxy/out/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 3

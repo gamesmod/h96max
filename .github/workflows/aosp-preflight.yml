@@ -1,0 +1,27 @@
+name: AOSP preflight
+on:
+  pull_request:
+    paths: ['aosp/**', 'docs/aosp/**', '.github/workflows/aosp-preflight.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+          persist-credentials: false
+      - run: bash -n aosp/panadonik.sh && bash aosp/panadonik.sh test
+  host:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, linux, x64, panadonik-aosp]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+          persist-credentials: false
+      - run: bash aosp/panadonik.sh doctor

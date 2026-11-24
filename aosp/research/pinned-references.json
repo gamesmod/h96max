@@ -1,0 +1,66 @@
+[
+  {
+    "repo": "rockchip-linux/kernel",
+    "ref": "develop-4.19",
+    "sha": "f39b590ea11da2d897644e42119ba5099b2eefc8",
+    "version": "4.19.232",
+    "role": "primary kernel comparison; exact OEM provenance unproven",
+    "paths": [
+      "Makefile",
+      "drivers/devfreq/devfreq.c",
+      "drivers/devfreq/rockchip_dmc.c",
+      "arch/arm64/configs/rockchip_defconfig",
+      "arch/arm64/boot/dts/rockchip/rk3328.dtsi"
+    ]
+  },
+  {
+    "repo": "friendlyarm/kernel-rockchip",
+    "ref": "nanopi4-v4.19.y",
+    "sha": "758118c9a424038bfb5fef63bcac0d2dd9c67a84",
+    "version": "4.19.232",
+    "role": "secondary kernel comparison, NanoPi not H96",
+    "paths": [
+      "Makefile"
+    ]
+  },
+  {
+    "repo": "android-rockchip/build",
+    "ref": "master",
+    "sha": "0a4cfba5c1b5b4704bcb98019e8a5bcffd0f79ae",
+    "role": "RKR12/RKR14 manifest references, explicit RK3588 product, not target",
+    "paths": [
+      "Android12_rkr12_base.xml",
+      "Android12_rkr14_base.xml"
+    ]
+  },
+  {
+    "repo": "TinkerBoard-Android/rockchip-android-manifest",
+    "ref": "android12-rockchip",
+    "sha": "63216f0fbd65385b71cea3fb228c7cb2da28153d",
+    "role": "A12.1 manifest candidates, not RK3328 product",
+    "paths": [
+      "android-12.1.0_r8.xml",
+      "android-12.1.0_r11.xml",
+      "default.xml"
+    ]
+  },
+  {
+    "repo": "TinkerBoard-Android/rockchip-android-device-rockchip-rksdk",
+    "ref": "android12-rockchip",
+    "sha": "ca9cd2d3577fa9f80187b75558f06fa32e353b3e",
+    "role": "RKR12 common product reference",
+    "paths": [
+      "device.mk",
+      "BoardConfig.mk"
+    ]
+  },
+  {
+    "repo": "armbian/build",
+    "ref": "main",
+    "sha": "73bf6d94d07eb22ce696dfab124d60e716f18488",
+    "role": "RK3318 Linux board/overlay reference; no port without validation",
+    "paths": [
+      "config/boards/rk3318-box.tvb"
+    ]
+  }
+]

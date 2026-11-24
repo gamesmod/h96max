@@ -75,3 +75,16 @@ https://iptv-org.github.io/iptv/categories/comedy.m3u
 https://iptv-org.github.io/iptv/categories/classic.m3u
 https://iptv-org.github.io/iptv/categories/weather.m3u
 https://iptv-org.github.io/iptv/categories/relax.m3u
+
+# 2026-11-24: Nexonic IPTV — публичные бесплатные телеканалы, каталог издателя:
+# https://github.com/nexonic-technologies/nexonic-iptv/blob/main/PLAYLISTS.md
+# Адреса сверены с каталогом; live/1080p/логотипы и прирост уникальных каналов ещё не измерены.
+# Дополнение общего списка, не доказательство выполнения порога 18+.
+https://nexonic-technologies.github.io/nexonic-iptv/playlists/languages/ru.m3u
+https://nexonic-technologies.github.io/nexonic-iptv/playlists/countries/ru.m3u
+https://nexonic-technologies.github.io/nexonic-iptv/playlists/countries/by.m3u
+https://nexonic-technologies.github.io/nexonic-iptv/playlists/countries/kz.m3u
+https://nexonic-technologies.github.io/nexonic-iptv/playlists/countries/md.m3u
+https://nexonic-technologies.github.io/nexonic-iptv/playlists/countries/am.m3u
+https://nexonic-technologies.github.io/nexonic-iptv/playlists/countries/az.m3u
+https://nexonic-technologies.github.io/nexonic-iptv/playlists/countries/ge.m3u
