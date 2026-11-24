@@ -60,5 +60,32 @@
   "security_analysis": {
     "reviewed": true,
     "summary": "Сканер Wi‑Fi credentials на финальных system/vendor ext4: находок нет. Подпись OTA прежним сертификатом OK. Аппаратный security_review и network capture для установленного 0.4.11 не выполнялись; для stable security_review остаётся pending/fail до приёмки."
+  },
+  "revalidation_2026_11_24": {
+    "source_commit": "15dc1c7ee844ef8ae6976fc8e1b71d4d6b3bd623",
+    "automated_tests": {
+      "status": "pass",
+      "count": 159,
+      "command": "PATH=<existing-project-jdk>/bin:$PATH PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -v",
+      "scope": "master sources, not installed candidate; initial isolated worktree run lacked javac"
+    },
+    "ota_sha256": "ad337e09a00caaf1126921b7f89bb9d0626dcb48aadf15f2b3afc16a1892105d",
+    "sha256sums": "pass",
+    "ota_signature_existing_certificate": "pass",
+    "dev_gate": "fail",
+    "stable_gate": "fail",
+    "device": {
+      "transport": "network ADB",
+      "installed_version": "0.4.10",
+      "boot_completed": true,
+      "swap_entries": 0,
+      "private_snapshot_sha256_verified": true
+    },
+    "limitations": [
+      "No candidate installation or hardware acceptance of 0.4.11 performed",
+      "Existing OTA predates current master source changes",
+      "No capture or router diagnostics performed; no Wi-Fi fault established",
+      "Image credential scan not repeated in this revalidation"
+    ]
   }
 }
