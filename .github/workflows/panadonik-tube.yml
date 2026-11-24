@@ -1,0 +1,42 @@
+name: Panadonik Tube source candidate
+on:
+  pull_request:
+    paths: ['apps/panadonik-tube/**', '.github/workflows/panadonik-tube.yml']
+  push:
+    branches: ['master']
+    paths: ['apps/panadonik-tube/**', '.github/workflows/panadonik-tube.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+          persist-credentials: false
+      - name: Tests
+        working-directory: apps/panadonik-tube
+        run: |
+          python3 -m unittest -v
+          python3 -m json.tool source.lock.json >/dev/null
+          bash -n build.sh
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;30.0.3 ndk;21.0.6113669'
+          log-accepted-android-sdk-licenses: 'false'
+      - name: Compile upstream source and verify APKs
+        working-directory: apps/panadonik-tube
+        run: bash build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: panadonik-tube-unsigned-unaccepted
+          path: apps/panadonik-tube/out/
+          if-no-files-found: error
+          retention-days: 3
