@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/yuliskov/SmartTube.git",
+  "commit": "b6a1c8221fa395f91786d29202454b864df2a91e",
+  "upstreamVersion": "32.83",
+  "variant": "stfdroidRelease",
+  "applicationId": "org.tvbox.panadoniktube",
+  "abis": [
+    "armeabi-v7a",
+    "arm64-v8a"
+  ],
+  "compileSdk": 34,
+  "buildTools": "30.0.3",
+  "ndk": "21.0.6113669"
+}
