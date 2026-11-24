@@ -87,5 +87,15 @@
       "No capture or router diagnostics performed; no Wi-Fi fault established",
       "Image credential scan not repeated in this revalidation"
     ]
+  },
+  "actions_candidate_hardware_progress": {
+    "actions_run_id": 45325191600,
+    "source_commit": "135f4175a70350573e4e86ac0802216395c425f9",
+    "ota_sha256": "7487e4e1f5b4c5878438ce187e3fb611b578dbc67c888e2beac0ced472ad0478",
+    "installed_release": "0.4.11",
+    "installation": "OTA с очисткой, Wi-Fi ADB; маркер восстановления совпал с SHA-256",
+    "usb_acceptance": "pending",
+    "iptv": "Два канала выводили кадры; первый при повторной попытке после первоначального сбоя. Для второго: 837 кадров за 33,43 с, медиана 33,34 мс, максимум 69,06 мс.",
+    "release_gate": "pending"
   }
 }
