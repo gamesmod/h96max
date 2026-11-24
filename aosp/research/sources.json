@@ -1,0 +1,192 @@
+[
+  {
+    "repository": "a9rock64/manifests",
+    "category": "A",
+    "notes": "Historical Android 9; API 404, historical PINE64 link only"
+  },
+  {
+    "repository": "rock64-android/manifests",
+    "category": "A",
+    "notes": "default: RK3328 Nougat manifests, not Android 12"
+  },
+  {
+    "repository": "rockchip-android/device-rockchip-rk3328",
+    "category": "B",
+    "notes": "rk3328-box-7.1 product; historical reference"
+  },
+  {
+    "repository": "android-rockchip/build",
+    "category": "B",
+    "notes": "RKR12/RKR14 XML manifests; SoC support unproven"
+  },
+  {
+    "repository": "TinkerBoard-Android/rockchip-android-manifest",
+    "category": "B",
+    "notes": "main contains README; inspect Android 12 branches"
+  },
+  {
+    "repository": "TinkerBoard-Android/rockchip-android-device-rockchip-rksdk",
+    "category": "B",
+    "notes": "android12-rockchip; shared gralloc/HWC and MPP configuration"
+  },
+  {
+    "repository": "radxa/manifests",
+    "category": "B",
+    "notes": "Android12_Radxa_rk14 documented for other SoC; default not Android 12"
+  },
+  {
+    "repository": "vicharak-in/rockchip-android-manifest",
+    "category": "B",
+    "notes": "Candidate"
+  },
+  {
+    "repository": "armbian/build",
+    "category": "C",
+    "notes": "rk3318-box.tvb; upstream DTS and overlays, not Android BSP"
+  },
+  {
+    "repository": "paolosabatino/armbian-build",
+    "category": "C",
+    "notes": "Historical rk3318 branch/patch; current main available"
+  },
+  {
+    "repository": "jphein/rk3318-tvbox-kvm",
+    "category": "F",
+    "notes": "Device diagnostics/configfs"
+  },
+  {
+    "repository": "Moxnatiy/rk3318-box-revival",
+    "category": "F",
+    "notes": "Diagnostics only; do not reproduce overclock"
+  },
+  {
+    "repository": "sholehbaktiabadi/rockchip-rk3318-armbian-os",
+    "category": "F",
+    "notes": "Candidate"
+  },
+  {
+    "repository": "rockchip-linux/kernel",
+    "category": "C",
+    "notes": "develop-6.1 default; search 4.19"
+  },
+  {
+    "repository": "friendlyarm/kernel-rockchip",
+    "category": "C",
+    "notes": "nanopi6-v6.1.y default; search 4.19"
+  },
+  {
+    "repository": "friendlyarm/uboot-rockchip",
+    "category": "C",
+    "notes": "Candidate"
+  },
+  {
+    "repository": "torvalds/linux",
+    "category": "C",
+    "notes": "Mainline alternative only"
+  },
+  {
+    "repository": "LibreELEC/LibreELEC.tv",
+    "category": "C",
+    "notes": "Media/DT reference"
+  },
+  {
+    "repository": "rockchip-linux/mpp",
+    "category": "D",
+    "notes": "MPP reference"
+  },
+  {
+    "repository": "HermanChen/mpp",
+    "category": "D",
+    "notes": "Check duplication"
+  },
+  {
+    "repository": "rockchip-linux/libmali",
+    "category": "D",
+    "notes": "Binary licenses/ABI"
+  },
+  {
+    "repository": "airockchip/librga",
+    "category": "D",
+    "notes": "RGA"
+  },
+  {
+    "repository": "tsukumijima/mpp-rockchip",
+    "category": "D",
+    "notes": "Candidate"
+  },
+  {
+    "repository": "rockchip-linux/u-boot",
+    "category": "C",
+    "notes": "Boot reference"
+  },
+  {
+    "repository": "rockchip-linux/rkbin",
+    "category": "E",
+    "notes": "Loader binaries; rights required"
+  },
+  {
+    "repository": "u-boot/u-boot",
+    "category": "C",
+    "notes": "Mainline boot reference"
+  },
+  {
+    "repository": "ARM-software/arm-trusted-firmware",
+    "category": "C",
+    "notes": "Trust reference"
+  },
+  {
+    "repository": "rockchip-linux/rkdeveloptool",
+    "category": "E",
+    "notes": "Recovery tools"
+  },
+  {
+    "repository": "linux-rockchip/rkflashtool",
+    "category": "E",
+    "notes": "Recovery tools"
+  },
+  {
+    "repository": "ArmSoM/rockchip-tools",
+    "category": "E",
+    "notes": "Candidate"
+  },
+  {
+    "repository": "hiifong/rkdevtool",
+    "category": "E",
+    "notes": "Candidate"
+  },
+  {
+    "repository": "arthur-liberman/linux_openvfd",
+    "category": "C",
+    "notes": "VFD"
+  },
+  {
+    "repository": "arthur-liberman/vfd-configurations",
+    "category": "F",
+    "notes": "VFD configs"
+  },
+  {
+    "repository": "FFmpeg/FFmpeg",
+    "category": "D",
+    "notes": "Codec reference"
+  },
+  {
+    "repository": "xbmc/xbmc",
+    "category": "D",
+    "notes": "Video pipeline reference"
+  },
+  {
+    "repository": "yuliskov/SmartTube",
+    "category": "F",
+    "notes": "App ABI/minSdk"
+  },
+  {
+    "repository": "YouROK/TorrServer",
+    "category": "F",
+    "notes": "App ABI/minSdk"
+  },
+  {
+    "repository": "videolan/vlc-android",
+    "category": "F",
+    "notes": "App ABI/minSdk"
+  }
+]
