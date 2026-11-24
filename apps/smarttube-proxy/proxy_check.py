@@ -31,7 +31,8 @@ def normalize(line, protocol):
     try:
         host, port = line.rsplit(":", 1)
         ip = ipaddress.ip_address(host.strip("[]"))
-        if not ip.is_global or not port.isascii() or not port.isdecimal():
+        if (not ip.is_global or ip.is_multicast or ip.is_reserved or ip.is_loopback or
+            (ip.version == 6 and ip.ipv4_mapped is not None) or not port.isascii() or not port.isdecimal()):
             return None
         n = int(port)
         if not 1 <= n <= 65535:
