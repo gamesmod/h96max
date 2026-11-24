@@ -11,3 +11,10 @@ Base: 52fb6dc97b05d3f7f49338384730f854c8840f0e. Only feature branch; no deployme
 | M19 | PARTIAL | Separate static and manual self-hosted preflight workflow. |
 | M20 | NOT STARTED | No firmware/OTA/release candidate. |
 The existing release evidence is not carried forward. No performance claims.
+
+## Second research pass — 2026-11-24
+- Previous PR #22 merged externally; Repository CI and AOSP preflight succeeded for prior SHA.
+- M3/M4: six source references pinned to commit SHA; RKR12/RKR14 base manifests inspected; original RK3328 Android 12 SDK still not acquired. PINE64 published Android 9 SDK archive listing found, download unverified.
+- M5/M6: offline kernel config, manifest, VINTF and ELF inventory comparison implemented; actual stock input and compatibility checks remain BLOCKED.
+- M11: Android 9 archive is a credible alternative to investigate after Android 12 baseline.
+- No build or physical tests; no release candidate. See kernel.md, architecture.md, platform-comparison.md and compatibility-tools.md.
