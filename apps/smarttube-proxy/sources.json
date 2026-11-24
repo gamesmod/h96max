@@ -1,0 +1,82 @@
+[
+  {
+    "id": "proxifly",
+    "format": "txt",
+    "urls": [
+      "https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/{protocol}/data.txt",
+      "https://cdn.jsdelivr.net/gh/proxifly/free-proxy-list@main/proxies/protocols/{protocol}/data.txt"
+    ],
+    "periodMinutes": 5
+  },
+  {
+    "id": "proxyscrape",
+    "format": "txt",
+    "urls": [
+      "https://cdn.jsdelivr.net/gh/proxyscrape/free-proxy-list@main/proxies/protocols/{protocol}/data.txt",
+      "https://raw.githubusercontent.com/proxyscrape/free-proxy-list/main/proxies/protocols/{protocol}/data.txt"
+    ],
+    "periodMinutes": 5
+  },
+  {
+    "id": "vakhov",
+    "format": "txt",
+    "urls": [
+      "https://vakhov.github.io/fresh-proxy-list/{protocol}.txt",
+      "https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/{protocol}.txt"
+    ],
+    "periodMinutes": null
+  },
+  {
+    "id": "proxmint",
+    "format": "txt",
+    "urls": [
+      "https://raw.githubusercontent.com/proxmint/free-proxy-list/main/proxies/{protocol}.txt",
+      "https://proxmint.com/api/free-proxies?protocol={protocol}&format=txt"
+    ],
+    "periodMinutes": 30
+  },
+  {
+    "id": "monosans",
+    "format": "txt",
+    "urls": [
+      "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/{protocol}.txt",
+      "https://cdn.jsdelivr.net/gh/monosans/proxy-list@main/proxies/{protocol}.txt"
+    ],
+    "periodMinutes": 60
+  },
+  {
+    "id": "geonode",
+    "format": "geonode",
+    "urls": [
+      "https://proxylist.geonode.com/api/proxy-list?limit=100&page=1&sort_by=lastChecked&sort_type=desc&protocols={protocol}"
+    ],
+    "periodMinutes": 1
+  },
+  {
+    "id": "dahono",
+    "format": "txt",
+    "urls": [
+      "https://raw.githubusercontent.com/Dahono-com/free-proxy-list/main/proxies/{protocol}.txt",
+      "https://router.dahono.com/api/proxy/free?protocol={protocol}&format=txt&limit=100"
+    ],
+    "periodMinutes": 180
+  },
+  {
+    "id": "fusionproxies",
+    "format": "txt",
+    "urls": [
+      "https://raw.githubusercontent.com/FusionProxies/free-proxy-list/main/proxies/{protocol}.txt",
+      "https://cdn.jsdelivr.net/gh/FusionProxies/free-proxy-list@main/proxies/{protocol}.txt"
+    ],
+    "periodMinutes": 30
+  },
+  {
+    "id": "maximilianfeix",
+    "format": "txt",
+    "urls": [
+      "https://raw.githubusercontent.com/maximilianfeix/free-proxy-list/main/{protocol}.txt",
+      "https://cdn.jsdelivr.net/gh/maximilianfeix/free-proxy-list@main/{protocol}.txt"
+    ],
+    "periodMinutes": 60
+  }
+]
