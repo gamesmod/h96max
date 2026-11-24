@@ -2,6 +2,9 @@ name: SmartTube Proxy candidate
 on:
   pull_request:
     paths: ['apps/smarttube-proxy/**', '.github/workflows/smarttube-proxy.yml']
+  push:
+    branches: ['master']
+    paths: ['apps/smarttube-proxy/**', '.github/workflows/smarttube-proxy.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -23,14 +26,21 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Set up Android SDK command-line tools
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-32 build-tools;35.0.0'
+          log-accepted-android-sdk-licenses: 'false'
       - name: Android SDK and compile
         run: |
-          sdkmanager 'platforms;android-32' 'build-tools;35.0.0'
+          command -v sdkmanager
+          test -f "$ANDROID_HOME/platforms/android-32/android.jar"
+          test -x "$ANDROID_HOME/build-tools/35.0.0/d8"
           mkdir -p /tmp/proxy-classes
           javac --release 8 -encoding UTF-8 -classpath "$ANDROID_HOME/platforms/android-32/android.jar" -d /tmp/proxy-classes apps/smarttube-proxy/src/org/tvbox/smarttubeproxy/*.java
   signed-apk:
     needs: test
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feature/smarttube-proxy-manager') }}
+    if: ${{ github.ref == 'refs/heads/master' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -41,13 +51,20 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Set up Android SDK command-line tools
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-32 build-tools;35.0.0'
+          log-accepted-android-sdk-licenses: 'false'
       - name: Build with existing Panadonik key
         env:
           TVBOX_KEY: ${{ secrets.TVBOX_SIGNING_KEY }}
           TVBOX_CERT: ${{ secrets.TVBOX_SIGNING_CERT }}
         run: |
           set -euo pipefail
-          sdkmanager 'platforms;android-32' 'build-tools;35.0.0'
+          command -v sdkmanager
+          test -f "$ANDROID_HOME/platforms/android-32/android.jar"
+          test -x "$ANDROID_HOME/build-tools/35.0.0/d8"
           umask 077
           mkdir -p secrets
           trap 'rm -f secrets/tvbox-key.pem secrets/tvbox-cert.pem' EXIT
