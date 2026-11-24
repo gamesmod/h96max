@@ -17,7 +17,7 @@ git -C "$W" checkout --detach FETCH_HEAD
 test "$(git -C "$W" rev-parse HEAD)" = "$SHA"
 git -C "$W" -c protocol.file.allow=never submodule update --init --recursive
 python3 "$ROOT/patch_source.py" "$W"
-git -C "$W" diff --check
+git -C "$W" -c core.whitespace=cr-at-eol diff --check
 mkdir -p out
 git -C "$W" submodule status --recursive > out/SUBMODULES.txt
 git -C "$W" diff --binary > out/PANADONIK.patch
