@@ -411,16 +411,12 @@ def stream_resolution(url):
                 if not uri: continue
                 height = hls_variant_resolution(line)
                 bandwidth = int(re.search(r"BANDWIDTH=(\d+)", line).group(1)) if re.search(r"BANDWIDTH=(\d+)", line) else 0
-                if height > 0: variants.append((height, bandwidth, uri))
+                variants.append((height, bandwidth, uri))
             if not variants: return 0
-            height, _, v = max(variants)
+            _, _, v = max(variants)
             st, ct, body, final = fetch(urllib.parse.urljoin(final, v))
             if st not in (200, 206) or b"#EXTM3U" not in body[:1024]: return 0
             lines = [l.strip() for l in body.decode("utf-8", "replace").splitlines()]
-        else:
-            height = 0
-        if not height:
-            height = hls_variant_resolution("\n".join(lines))
         seg = next((l for l in lines if l and not l.startswith("#")), None)
         if not seg: return 0
         st, _, data, _ = fetch(urllib.parse.urljoin(final, seg), limit=65536, rng=True)
