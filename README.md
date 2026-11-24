@@ -286,3 +286,7 @@ Obtainium проверяет обновления напрямую в источ
 | [`release/notes/`](release/notes/) | Изменения по версиям |
 | [`docs/install-from-stock.md`](docs/install-from-stock.md) | Чистая установка со стока |
 | [`docs/release-quality-gate.md`](docs/release-quality-gate.md) | Аппаратный и security gate |
+
+## Panadonik Tube (в разработке)
+
+[Сборка SmartTube из исходников](apps/panadonik-tube/README.md): зафиксированная upstream версия, отдельный ARM-профиль, RU/EN, локальный proxy media route. Кандидат не входит в образ до аппаратной приёмки и подтверждённой сборки.
