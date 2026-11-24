@@ -287,3 +287,7 @@ Obtainium проверяет обновления напрямую в источ
 | [`release/notes/`](release/notes/) | Изменения по версиям |
 | [`docs/install-from-stock.md`](docs/install-from-stock.md) | Чистая установка со стока |
 | [`docs/release-quality-gate.md`](docs/release-quality-gate.md) | Аппаратный и security gate |
+
+## SmartTube Proxy Manager (в разработке)
+
+[Отдельный компонент для Android TV](apps/smarttube-proxy/README.md). Кандидат APK, не входит в текущую прошивку. Аппаратная приёмка, работа из РФ и автономная медиапроверка пока не подтверждены.

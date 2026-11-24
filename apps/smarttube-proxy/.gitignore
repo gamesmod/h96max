@@ -1,0 +1,7 @@
+/out/
+/obj/
+/gen/
+/assets/
+/__pycache__/
+*.pyc
+private-media.txt
