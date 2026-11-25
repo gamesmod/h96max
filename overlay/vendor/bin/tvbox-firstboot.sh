@@ -103,9 +103,7 @@ appops set org.maintainteam.hypatia MANAGE_EXTERNAL_STORAGE allow
 pm grant org.tvbox.bootlog android.permission.READ_EXTERNAL_STORAGE 2>/dev/null
 # «ТВ-каналы» записывает плейлист для VLC в /sdcard/tvbox/iptv-now.m3u, чтобы переключать CH+/CH−.
 appops set org.tvbox.iptv MANAGE_EXTERNAL_STORAGE allow
-# Файловый менеджер по умолчанию — штатный FileExploresky (com.droidlogic.FileBrower) из A12-образа.
-# Он системный (sharedUserId android.uid.system, uid 1000): Android не запускает приложения от uid 0, а su
-# закрыт для приложений. Поэтому он получает максимум прав системного приложения без запросов.
+# Штатный FileExploresky сохраняется как резервный системный менеджер общей памяти.
 if pm path com.droidlogic.FileBrower >/dev/null 2>&1; then
     pm enable com.droidlogic.FileBrower >/dev/null 2>&1
     appops set com.droidlogic.FileBrower MANAGE_EXTERNAL_STORAGE allow 2>/dev/null
@@ -116,7 +114,8 @@ if pm path com.droidlogic.FileBrower >/dev/null 2>&1; then
 else
     echo "filemanager: com.droidlogic.FileBrower not installed"
 fi
-# Запасной «Файлы (root)» (org.tvbox.files) без плитки: системные папки открывает через tvboxd (FS_*).
+# Основной «Файлы (root)»: UI остаётся изолированным Android-приложением, а полный доступ выполняет
+# запущенный от root tvboxd через ограниченные uid приложения команды FS_*.
 appops set org.tvbox.files MANAGE_EXTERNAL_STORAGE allow
 pm grant org.tvbox.files android.permission.READ_EXTERNAL_STORAGE 2>/dev/null
 pm grant org.tvbox.files android.permission.WRITE_EXTERNAL_STORAGE 2>/dev/null
@@ -162,13 +161,33 @@ if pm path ru.yourok.torrserve >/dev/null 2>&1 && pm path org.videolan.vlc >/dev
 fi
 # Назначить TV Launcher главным экраном и пропустить штатный мастер первого запуска.
 pm path com.tvlauncher >/dev/null 2>&1 && cmd package set-home-activity com.tvlauncher/.MainActivity
+# Преднастроить обе штатные галочки TV Launcher конфигурацией, без автоматизации UI:
+# «Override TV Default Launcher» и «Kill Stock Launcher Background RAM».
+LS=/data/data/com.tvlauncher/shared_prefs/launcher_settings.xml
+if pm path com.tvlauncher >/dev/null 2>&1; then
+    am force-stop com.tvlauncher
+    mkdir -p "${LS%/*}"
+    { grep -v -e '</map>' -e 'name="home_override_enabled"' -e 'name="suppress_stock_launcher"' "$LS" 2>/dev/null \
+          || printf "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n<map>\n"
+      echo '    <boolean name="home_override_enabled" value="true" />'
+      echo '    <boolean name="suppress_stock_launcher" value="true" />'
+      echo '</map>'; } > "$LS.new" && mv "$LS.new" "$LS"
+    u=$(stat -c %u /data/data/com.tvlauncher)
+    chown "$u:$u" "${LS%/*}" "$LS"; chmod 771 "${LS%/*}"; chmod 660 "$LS"; restorecon -R "${LS%/*}"
+    A11Y=com.tvlauncher/com.tvlauncher.TvHomeOverrideService
+    ENABLED=$(settings get secure enabled_accessibility_services)
+    [ "$ENABLED" = null ] && ENABLED=
+    case ":$ENABLED:" in *":$A11Y:"*) :;; *) settings put secure enabled_accessibility_services "${ENABLED:+$ENABLED:}$A11Y";; esac
+    settings put secure accessibility_enabled 1
+    echo "tvlauncher: home override and stock RAM suppression configured"
+fi
 # Плитки TV Launcher. U+001E сохраняется как &#30; (AppManager.ORDER_DELIMITER проекта wiiguy/lightweight_androidtv_launcher).
 # Сверить плитки один раз после чистой установки; дальнейшие изменения пользователя сохранять.
 L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
 if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initialized" ]; then
     # Атомарно записать настройки до остановки HOME; особенности запуска описаны в HANDOFF.md.
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
-    ALLOWED="org.tvbox.iptv ru.yourok.torrserve com.droidlogic.FileBrower org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
+    ALLOWED="org.tvbox.iptv ru.yourok.torrserve org.tvbox.files org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
     T=""; EXTRA=""; N=0
     # Сохранить установленные функции и их порядок; удалить дубли и устаревшие плитки.
     for p in $(printf '%s' "$OLD" | sed 's/\&\#30;/ /g'); do
@@ -296,20 +315,20 @@ if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-flicky-removed"
     fi
     touch "$D/launcher-flicky-removed"
 fi
-# Плитка FileExploresky заменяет на своём месте прежний сторонний ФМ или «Файлы (root)»;
-# если их не было — после TorrServe. Один раз, порядок пользователя сохраняется.
-FM=com.droidlogic.FileBrower
+# Плитка «Файлы (root)» заменяет на своём месте FileExploresky или прежний сторонний ФМ;
+# если их не было — добавляется после TorrServe. Новый marker мигрирует уже настроенные приставки.
+FM=org.tvbox.files
 if pm path com.tvlauncher >/dev/null 2>&1 && pm path $FM >/dev/null 2>&1 \
-        && [ ! -e "$D/launcher-filemanager-tile" ] && [ -f "$L" ]; then
+        && [ ! -e "$D/launcher-root-filemanager-tile" ] && [ -f "$L" ]; then
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
     T=""; N=" "; C=0
     case " $(printf '%s' "$OLD" | sed 's/\&#30;/ /g') " in *" $FM "*) PLACED=1;; *) PLACED=0;; esac
     for p in $(printf '%s' "$OLD" | sed 's/\&#30;/ /g'); do
-        case "$p" in com.ghisler.*|org.tvbox.files) [ "$PLACED" = 1 ] && continue; p=$FM; PLACED=1;; esac
+        case "$p" in com.ghisler.*|com.droidlogic.FileBrower) [ "$PLACED" = 1 ] && continue; p=$FM; PLACED=1;; esac
         case "$N" in *" $p "*) continue;; esac
         T="${T:+$T&#30;}$p"; N="$N$p "; C=$((C+1))
         if [ "$p" = ru.yourok.torrserve ] && [ "$PLACED" = 0 ] \
-                && ! printf '%s' "$OLD" | grep -q -e 'com\.ghisler\.' -e 'org\.tvbox\.files'; then
+                && ! printf '%s' "$OLD" | grep -q -e 'com\.ghisler\.' -e 'com\.droidlogic\.FileBrower'; then
             T="$T&#30;$FM"; N="$N$FM "; C=$((C+1)); PLACED=1
         fi
     done
@@ -321,9 +340,9 @@ if pm path com.tvlauncher >/dev/null 2>&1 && pm path $FM >/dev/null 2>&1 \
         chown "$u:$u" "$L.new"; chmod 660 "$L.new"; mv "$L.new" "$L"; restorecon "$L"
         am force-stop com.tvlauncher
         am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
-        echo "tvlauncher: stock file manager tile"
+        echo "tvlauncher: root-backed file manager tile"
     fi
-    touch "$D/launcher-filemanager-tile"
+    touch "$D/launcher-root-filemanager-tile"
 fi
 pm disable com.mbx.settingsmbox/.OobeActivity >/dev/null 2>&1
 # Показать поверх экрана запуска краткую сводку ресурсов с временными метками; TV Launcher остаётся HOME-приложением.

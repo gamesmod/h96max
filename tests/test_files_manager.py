@@ -1,4 +1,4 @@
-"""Файловый менеджер по умолчанию — штатный FileExploresky (com.droidlogic.FileBrower); запасные «Файлы (root)»."""
+"""Плитка файлов открывает root-backed org.tvbox.files; stock FileExploresky остаётся резервным."""
 import hashlib
 import pathlib
 import re
@@ -45,12 +45,13 @@ class FilesManagerTests(unittest.TestCase):
                 self.assertNotRegex(line, r"appops set|pm grant|pm install|ALLOWED=|^g ")
         self.assertIn('pm uninstall --user 0 "$p"', FIRSTBOOT)
 
-    def test_stock_file_manager_tile_is_default_on_home_screen(self):
+    def test_root_backed_file_manager_tile_is_default_on_home_screen(self):
         allowed = re.search(r'ALLOWED="([^"]+)"', FIRSTBOOT).group(1).split()
-        self.assertEqual(allowed[:3], ["org.tvbox.iptv", "ru.yourok.torrserve", STOCK_FM_PKG])
-        self.assertNotIn("org.tvbox.files", allowed)
-        self.assertIn("launcher-filemanager-tile", FIRSTBOOT)
-        self.assertIn("com.ghisler.*|org.tvbox.files) [ \"$PLACED\" = 1 ] && continue; p=$FM", FIRSTBOOT)
+        self.assertEqual(allowed[:3], ["org.tvbox.iptv", "ru.yourok.torrserve", "org.tvbox.files"])
+        self.assertNotIn(STOCK_FM_PKG, allowed)
+        self.assertIn("launcher-root-filemanager-tile", FIRSTBOOT)
+        self.assertIn("FM=org.tvbox.files", FIRSTBOOT)
+        self.assertIn("com.ghisler.*|com.droidlogic.FileBrower) [ \"$PLACED\" = 1 ] && continue; p=$FM", FIRSTBOOT)
         self.assertIn(f"appops set {STOCK_FM_PKG} MANAGE_EXTERNAL_STORAGE allow", FIRSTBOOT)
         self.assertIn(f"pm enable {STOCK_FM_PKG}", FIRSTBOOT)
 
@@ -75,7 +76,7 @@ class FilesManagerTests(unittest.TestCase):
         self.assertNotIn("Runtime.getRuntime", FILES_OPS)
         self.assertNotRegex((ROOT / "apps/files/src/org/tvbox/files/Root.java").read_text(), r'"su"|xbin/su')
 
-    def test_fallback_files_app_does_not_take_default_role(self):
+    def test_files_app_exposes_only_its_launcher_and_private_provider(self):
         self.assertIn("android.intent.action.MAIN", MANIFEST)
         for action in ("android.intent.action.VIEW", "android.intent.action.GET_CONTENT"):
             self.assertNotIn(action, MANIFEST)

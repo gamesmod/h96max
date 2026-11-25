@@ -278,24 +278,7 @@ public class MainActivity extends Activity {
     }
 
     static String groupIcon(String group) {
-        String s = canonicalGroup(group);
-        if (s.contains(" · ")) return "📍";
-        if (s.matches("^[\\p{So}]+ .*")) return "📺";
-        if (s.equals("Для взрослых")) return "🔞";
-        if (s.equals("Спорт")) return "⚽";
-        if (s.equals("Новости")) return "📰";
-        if (s.equals("Фильмы")) return "🎬";
-        if (s.equals("Детские")) return "🧸";
-        if (s.equals("Музыка")) return "🎵";
-        if (s.equals("Познавательные")) return "🔭";
-        if (s.equals("Радио")) return "📻";
-        if (s.equals("Региональные")) return "📍";
-        if (s.equals("Развлекательные")) return "🎭";
-        if (s.equals("Россия")) return "🇷🇺";
-        if (s.equals("Беларусь")) return "🇧🇾";
-        if (s.equals("Украина")) return "🇺🇦";
-        if (s.equals("Казахстан")) return "🇰🇿";
-        return "📺";
+        return CategoryIcons.icon(canonicalGroup(group));
     }
 
     static String canonicalGroup(String group) {

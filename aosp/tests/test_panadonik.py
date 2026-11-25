@@ -33,5 +33,16 @@ class TestPanadonik(unittest.TestCase):
             p.cpu_percent((1,1),(1,1))
     def test_memory(self):
         self.assertEqual(p.parse_meminfo("MemTotal: 100 kB\nMemAvailable: 45 kB\nSwapTotal: 0 kB"), {"MemTotal":100,"MemAvailable":45,"SwapTotal":0})
+    def test_extended_benchmark_parsers(self):
+        self.assertEqual(p.parse_loadavg("1.00 0.50 0.25 1/100 10")["load_5m"], 0.5)
+        self.assertEqual(p.parse_thermal("soc\t73500\ngpu\t61\n"), {"soc": 73.5, "gpu": 61.0})
+        self.assertEqual(p.parse_named_ints("cpu0\t1200000\nbad\tx\n"), {"cpu0": 1200000})
+        gfx = p.parse_gfxinfo("Total frames rendered: 1,000\nJanky frames: 25 (2.50%)\n95th percentile: 18ms\n")
+        self.assertEqual(gfx["total_frames"], 1000)
+        self.assertEqual(gfx["janky_percent"], 2.5)
+    def test_boot_timeline_has_stage_durations(self):
+        rows = p.parse_boot_events("I/boot_progress_start( 1): 1000\nI/boot_progress_pms_ready( 1): 4500\n")
+        self.assertEqual(rows[0], {"event": "boot_progress_start", "elapsed_ms": 1000, "stage_duration_ms": 1000})
+        self.assertEqual(rows[1]["stage_duration_ms"], 3500)
 if __name__ == "__main__":
     unittest.main()

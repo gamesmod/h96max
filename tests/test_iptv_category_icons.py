@@ -1,0 +1,46 @@
+"""Every category in the bundled IPTV playlist has a stable, distinct badge."""
+import pathlib
+import re
+import subprocess
+import tempfile
+import unittest
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+PLAYLIST = ROOT / "overlay/system/etc/tvbox/iptv.m3u"
+SOURCE = ROOT / "apps/iptv/src/org/tvbox/iptv/CategoryIcons.java"
+
+
+class IptvCategoryIconTests(unittest.TestCase):
+    def test_bundled_categories_have_unique_icons(self):
+        categories = list(dict.fromkeys(re.findall(
+            r'group-title="([^"]+)"', PLAYLIST.read_text(encoding="utf-8"))))
+        self.assertGreater(len(categories), 1)
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            package = root / "org/tvbox/iptv"
+            package.mkdir(parents=True)
+            harness = package / "CategoryIconsHarness.java"
+            harness.write_text(
+                "package org.tvbox.iptv; public final class CategoryIconsHarness { "
+                "public static void main(String[] args) { for (String s : args) "
+                "System.out.println(CategoryIcons.icon(s)); } }", encoding="utf-8")
+            subprocess.run(["javac", "-encoding", "UTF-8", "-d", str(root),
+                            str(SOURCE), str(harness)], check=True)
+            result = subprocess.run(["java", "-cp", str(root),
+                                     "org.tvbox.iptv.CategoryIconsHarness", *categories],
+                                    check=True, capture_output=True, text=True)
+        icons = result.stdout.splitlines()
+        self.assertEqual(len(icons), len(categories))
+        self.assertEqual(len(icons), len(set(icons)), dict(zip(categories, icons)))
+        for category, icon in zip(categories, icons):
+            if category.startswith("🇦") or category.startswith("🇧") or category.startswith("🇨") \
+                    or category.startswith("🇩") or category.startswith("🇪") or category.startswith("🇬") \
+                    or category.startswith("🇮") or category.startswith("🇰") or category.startswith("🇱") \
+                    or category.startswith("🇲") or category.startswith("🇳") or category.startswith("🇵") \
+                    or category.startswith("🇷") or category.startswith("🇸") or category.startswith("🇹") \
+                    or category.startswith("🇺"):
+                self.assertEqual(icon, category.split()[0])
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -34,9 +34,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * "Файлы (root)": a fallback file manager of Panadonik without a home-screen tile. The default file manager and tile
- * is the stock FileExploresky "Файловый менеджер" (com.droidlogic.FileBrower), which runs as the system uid and cannot reach root.
- * This app browses and changes files as root through tvboxd (Root.java) and opens files in other apps through
+ * "Файлы (root)": the home-screen file manager of Panadonik. It browses and changes files as root through
+ * tvboxd (Root.java), while the Android UI remains sandboxed, and opens files in other apps through
  * Provider. Remote: OK opens, MENU (or long OK) shows actions, BACK goes up a folder.
  */
 public class MainActivity extends Activity {

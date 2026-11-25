@@ -36,6 +36,13 @@ class ReleaseSecurityConfigTests(unittest.TestCase):
         self.assertIn("ru.yourok.torrserve", tiles)
         self.assertNotIn("org.smarttube.stable", tiles)
 
+    def test_launcher_is_preconfigured_without_ui_automation(self):
+        script = (ROOT / "overlay/vendor/bin/tvbox-firstboot.sh").read_text(encoding="utf-8")
+        self.assertIn('name="home_override_enabled" value="true"', script)
+        self.assertIn('name="suppress_stock_launcher" value="true"', script)
+        self.assertIn("com.tvlauncher/com.tvlauncher.TvHomeOverrideService", script)
+        self.assertIn("settings put secure enabled_accessibility_services", script)
+
     def test_build_rejects_missing_required_applications(self):
         with tempfile.TemporaryDirectory() as directory:
             result = subprocess.run(

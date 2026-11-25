@@ -230,7 +230,89 @@ def cpu_percent(a, b):
         raise ValueError("invalid CPU delta")
     return 100 * (total - idle) / total
 
-def benchmark(work, serial, repetitions=5, interval=2):
+def parse_loadavg(text):
+    fields = text.split()
+    if len(fields) < 3:
+        raise ValueError("unexpected /proc/loadavg")
+    return {"load_1m": float(fields[0]), "load_5m": float(fields[1]),
+            "load_15m": float(fields[2])}
+
+def parse_thermal(text):
+    """Parse `type<TAB>temp` rows and normalize millidegrees to Celsius."""
+    result = {}
+    for line in text.splitlines():
+        name, sep, raw = line.partition("\t")
+        if not sep:
+            continue
+        try:
+            value = float(raw.strip())
+        except ValueError:
+            continue
+        if abs(value) >= 1000:
+            value /= 1000.0
+        result[name.strip() or "unknown"] = value
+    return result
+
+def parse_named_ints(text):
+    result = {}
+    for line in text.splitlines():
+        name, sep, raw = line.partition("\t")
+        if not sep:
+            continue
+        try:
+            result[name.strip()] = int(raw.strip())
+        except ValueError:
+            continue
+    return result
+
+def parse_gfxinfo(text):
+    def number(pattern, cast=int):
+        match = re.search(pattern, text, re.I)
+        return cast(match.group(1).replace(",", "")) if match else None
+    return {
+        "total_frames": number(r"Total frames rendered:\s*([\d,]+)"),
+        "janky_frames": number(r"Janky frames:\s*([\d,]+)"),
+        "janky_percent": number(r"Janky frames:\s*[\d,]+\s*\(([\d.]+)%\)", float),
+        "p95_ms": number(r"95th percentile:\s*([\d.]+)ms", float),
+        "p99_ms": number(r"99th percentile:\s*([\d.]+)ms", float),
+    }
+
+def parse_boot_events(text):
+    events = []
+    for line in text.splitlines():
+        name = re.search(r"\b(boot_progress_[a-z0-9_]+)\b", line, re.I)
+        if not name:
+            continue
+        numbers = [int(value) for value in re.findall(r"(?<![.\d])(\d{3,})(?![.\d])", line)]
+        if not numbers:
+            continue
+        elapsed = numbers[-1]
+        events.append({"event": name.group(1).lower(), "elapsed_ms": elapsed})
+    # Event buffers can contain duplicates; keep the latest value for each named milestone.
+    latest = {row["event"]: row["elapsed_ms"] for row in events}
+    ordered = sorted(({"event": key, "elapsed_ms": value} for key, value in latest.items()),
+                     key=lambda row: row["elapsed_ms"])
+    previous = 0
+    for row in ordered:
+        row["stage_duration_ms"] = max(0, row["elapsed_ms"] - previous)
+        previous = row["elapsed_ms"]
+    return ordered
+
+def summarize_samples(samples):
+    numeric = ("cpu_busy_pct_all_cores", "mem_available_kib", "load_1m",
+               "thermal_max_c", "cpu_frequency_max_khz")
+    medians = {}
+    for key in numeric:
+        values = [sample[key] for sample in samples if sample.get(key) is not None]
+        if values:
+            medians[key] = statistics.median(values)
+    temperatures = [sample["thermal_max_c"] for sample in samples
+                    if sample.get("thermal_max_c") is not None]
+    if temperatures:
+        medians["thermal_peak_c"] = max(temperatures)
+    return medians
+
+def benchmark(work, serial, repetitions=5, interval=2, package="com.tvlauncher"):
     if not shutil.which("adb") or not serial:
         save(work / "benchmark.json", {"status": "BLOCKED", "reason": "ADB and explicit serial required"})
         return BLOCKED
@@ -239,30 +321,93 @@ def benchmark(work, serial, repetitions=5, interval=2):
         raise ValueError("ADB device not online")
     def shell(*args):
         return run(adb + ["shell", *args])
+    def optional(*args):
+        try:
+            return shell(*args)
+        except (OSError, subprocess.SubprocessError):
+            return ""
     props = {p: shell("getprop", p) for p in PROPS}
     if shell("getprop", "sys.boot_completed") != "1":
         raise ValueError("Android has not completed boot")
+    thermal_command = ('for z in /sys/class/thermal/thermal_zone*; do '
+                       '[ -r "$z/temp" ] || continue; '
+                       'printf "%s\\t%s\\n" "$(cat "$z/type" 2>/dev/null)" "$(cat "$z/temp")"; done')
+    frequency_command = ('for c in /sys/devices/system/cpu/cpu[0-9]*; do '
+                         '[ -r "$c/cpufreq/scaling_cur_freq" ] || continue; '
+                         'printf "%s\\t%s\\n" "${c##*/}" "$(cat "$c/cpufreq/scaling_cur_freq")"; done')
+    gpu_command = ('for d in /sys/class/devfreq/*; do '
+                   '[ -r "$d/cur_freq" ] || continue; '
+                   'printf "%s\\t%s\\n" "${d##*/}" "$(cat "$d/cur_freq")"; done')
+    static = {
+        "display_size": optional("wm", "size"),
+        "display_density": optional("wm", "density"),
+        "data_filesystem": optional("df", "-k", "/data"),
+        "cpu_possible": optional("cat", "/sys/devices/system/cpu/possible"),
+        "cpu_present": optional("cat", "/sys/devices/system/cpu/present"),
+        "cpu_online": optional("cat", "/sys/devices/system/cpu/online"),
+        "media_codecs_sha256": hashlib.sha256(optional("dumpsys", "media.codec").encode()).hexdigest(),
+    }
+    boot_event_text = optional("logcat", "-d", "-b", "events", "-v", "brief",
+                               "boot_progress_start:I", "boot_progress_preload_start:I",
+                               "boot_progress_preload_end:I", "boot_progress_system_run:I",
+                               "boot_progress_pms_start:I", "boot_progress_pms_system_scan_start:I",
+                               "boot_progress_pms_data_scan_start:I", "boot_progress_pms_scan_end:I",
+                               "boot_progress_pms_ready:I", "boot_progress_ams_ready:I",
+                               "boot_progress_enable_screen:I", "*:S")
+    boot_timeline = parse_boot_events(boot_event_text)
+    boot_properties = {key: value for key, value in
+                       (line.strip("[]").split("]: [", 1) for line in optional("getprop").splitlines()
+                        if line.startswith("[ro.boottime."))}
+    gfx_before = parse_gfxinfo(optional("dumpsys", "gfxinfo", package)) if package else {}
     samples = []
     for _ in range(repetitions):
         a = cpu_ticks(shell("cat", "/proc/stat"))
         time.sleep(interval)
         b = cpu_ticks(shell("cat", "/proc/stat"))
         m = parse_meminfo(shell("cat", "/proc/meminfo"))
+        loads = parse_loadavg(shell("cat", "/proc/loadavg"))
+        thermals = parse_thermal(optional("sh", "-c", thermal_command))
+        frequencies = parse_named_ints(optional("sh", "-c", frequency_command))
+        gpu_frequencies = parse_named_ints(optional("sh", "-c", gpu_command))
         samples.append({"cpu_busy_pct_all_cores": cpu_percent(a, b),
                         "mem_available_kib": m.get("MemAvailable"),
                         "mem_total_kib": m.get("MemTotal"),
-                        "swap_total_kib": m.get("SwapTotal")})
-    medians = {key: statistics.median(s[key] for s in samples)
-               for key in samples[0] if all(s[key] is not None for s in samples)}
-    result = {"status": "MEASURED_PARTIAL", "properties": props, "kernel": shell("uname", "-r"),
+                        "swap_total_kib": m.get("SwapTotal"),
+                        **loads,
+                        "uptime_seconds": float(shell("cat", "/proc/uptime").split()[0]),
+                        "thermal_max_c": max(thermals.values()) if thermals else None,
+                        "thermal_zones_c": thermals,
+                        "cpu_frequency_min_khz": min(frequencies.values()) if frequencies else None,
+                        "cpu_frequency_max_khz": max(frequencies.values()) if frequencies else None,
+                        "cpu_frequencies_khz": frequencies,
+                        "gpu_frequencies_hz": gpu_frequencies})
+    medians = summarize_samples(samples)
+    gfx_after = parse_gfxinfo(optional("dumpsys", "gfxinfo", package)) if package else {}
+    warnings = []
+    if samples[0].get("swap_total_kib"):
+        warnings.append("swap is configured")
+    if medians.get("thermal_peak_c", 0) >= 85:
+        warnings.append("thermal peak reached 85 C or higher")
+    if gfx_after.get("janky_percent") is not None and gfx_after["janky_percent"] > 5:
+        warnings.append("graphics jank exceeds 5 percent")
+    result = {"status": "MEASURED_EXTENDED", "properties": props, "kernel": shell("uname", "-r"),
               "selinux": shell("getenforce"), "interval_seconds": interval,
-              "samples": samples, "medians": medians,
+              "sample_count": repetitions, "samples": samples, "medians": medians,
+              "static": static, "graphics_package": package,
+              "graphics_before": gfx_before, "graphics_after": gfx_after,
+              "boot": {"boot_id": optional("cat", "/proc/sys/kernel/random/boot_id"),
+                       "timeline": boot_timeline, "boottime_properties": boot_properties,
+                       "scope": "current boot; compare multiple cold boots separately"},
+              "warnings": warnings,
               "idle_condition": "operator must confirm; not enforced",
-              "not_tested": ["cold boot", "launcher input", "PSS/RSS", "graphics", "video",
-                             "network", "storage", "thermal", "24h stability", "OTA", "recovery"]}
+              "not_tested": ["cold boot timing", "interactive input latency", "GPU/VPU stress",
+                             "video playback quality", "network throughput", "storage throughput",
+                             "24h stability", "OTA", "recovery"]}
     save(work / "benchmark.json", result)
     with (work / "benchmark.csv").open("w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(samples[0]))
+        scalar_fields = [key for key, value in samples[0].items()
+                         if not isinstance(value, (dict, list))]
+        w = csv.DictWriter(f, fieldnames=scalar_fields, extrasaction="ignore")
         w.writeheader()
         w.writerows(samples)
     return 0
@@ -277,6 +422,8 @@ def main():
     parser.add_argument("--serial")
     parser.add_argument("--repetitions", type=int, default=5)
     parser.add_argument("--interval", type=float, default=2)
+    parser.add_argument("--package", default="com.tvlauncher",
+                        help="package whose cumulative gfxinfo is recorded; empty disables it")
     a = parser.parse_args()
     os.umask(0o077)
     a.work.mkdir(parents=True, exist_ok=True)
@@ -290,7 +437,7 @@ def main():
         if a.command == "benchmark":
             if a.repetitions < 5 or a.interval < 1:
                 parser.error("at least five repetitions and one-second interval")
-            return benchmark(a.work, a.serial, a.repetitions, a.interval)
+            return benchmark(a.work, a.serial, a.repetitions, a.interval, a.package)
         if a.command == "test":
             return subprocess.call([sys.executable, "-B", "-m", "unittest", "discover",
                                     "-s", str(AOSP / "tests"), "-v"])

@@ -15,8 +15,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
             </intent-filter>
-            <!-- Запасной root-менеджер без плитки и без роли по умолчанию: папки и выбор файла для других
-                 приложений обслуживает штатный FileExploresky (com.droidlogic.FileBrower). -->
+            <!-- Главная плитка файлов: полный доступ выполняет root-служба tvboxd через ограниченные FS_* команды. -->
         </activity>
         <provider android:name=".Provider" android:authorities="org.tvbox.files.provider"
             android:exported="false" android:grantUriPermissions="true"/>
