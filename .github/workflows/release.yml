@@ -51,18 +51,29 @@ jobs:
           [[ -n "$TVBOX_CERT" ]] || missing+=(TVBOX_SIGNING_CERT)
           [[ -n "$OTA_KEY" ]] || missing+=(OTA_SIGNING_KEY)
           [[ -n "$OTA_CERT" ]] || missing+=(OTA_SIGNING_CERT)
-          if ((${#missing[@]})); then
+          if (( ${#missing[@]} )); then
             printf 'Required repository Actions secrets are missing: %s\n' "${missing[*]}" >&2
             exit 1
           fi
 
       - name: Install build dependencies
         run: |
+          set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y aapt attr curl e2fsprogs ffmpeg gcc-aarch64-linux-gnu gdisk git-lfs openssl python3 python3-pil unzip zip zstd
           if [ -n "${ANDROID_HOME:-}" ]; then sudo rm -rf "$ANDROID_HOME"; fi
           sudo apt-get clean
           df -h /
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;30.0.3 build-tools;35.0.0 ndk;21.0.6113669'
+          log-accepted-android-sdk-licenses: 'false'
 
       - name: Fetch Git LFS objects
         run: |
@@ -75,7 +86,7 @@ jobs:
           set -euo pipefail
           mkdir -p release/qa
           bash -n build-sd.sh tools/build-release.sh tools/release-ota.sh tools/package-clean-install.sh \
-            tools/extract-vendor-blobs.sh tools/prepare-build-inputs.sh apps/*/build.sh
+            tools/extract-vendor-blobs.sh tools/prepare-build-inputs.sh apps/*/build.sh apps/panadonik-tube/sign.sh
           python3 -m json.tool obtainium-apps.json >/dev/null
           python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log
           python3 tools/analyze-release-logs.py /tmp/panadonik-tests.log \
@@ -332,7 +343,7 @@ jobs:
         with:
           name: panadonik-candidate-${{ steps.candidate.outputs.source_sha }}
           run-id: ${{ steps.candidate.outputs.run_id }}
-          github-token: ${{ github.token }}
+          github-token: ${{ steps.candidate.outputs.github_token }}
           path: release
 
       - name: Verify candidate and target-device evidence
@@ -362,14 +373,14 @@ jobs:
             "release/updates/emmc/tvbox-update-$version-emmc.zip" \
             release/updates/emmc/latest-emmc.txt \
             release/updates/emmc/SHA256SUMS \
-            release/Panadonik-$version-emmc-clean-install.zip \
-            release/Panadonik-$version-emmc-clean-install.zip.sha256 \
-            release/Panadonik-$version-emmc-clean-install.zip.sig \
-            release/Panadonik-$version-ota-cert.pem \
-            release/obtainium/*.apk \
-            release/qa/automated-tests.md \
-            release/qa/test-log-analysis.md \
-            release/qa/build-log-analysis.md \
-            release/qa/device-evidence.json \
+            "release/Panadonik-$version-emmc-clean-install.zip" \
+            "release/Panadonik-$version-emmc-clean-install.zip.sha256" \
+            "release/Panadonik-$version-emmc-clean-install.zip.sig" \
+            "release/Panadonik-$version-ota-cert.pem" \
+            "release/obtainium/*.apk" \
+            "release/qa/automated-tests.md" \
+            "release/qa/test-log-analysis.md" \
+            "release/qa/build-log-analysis.md" \
+            "release/qa/device-evidence.json" \
             --title "$title" \
             --notes-file /tmp/promotion-release-notes.md --generate-notes "${release_args[@]}"

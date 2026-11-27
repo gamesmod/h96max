@@ -11,13 +11,13 @@
 - Не удалять MediaCodec, DASH, SABR, HLS, нативные декодеры, leanback/voice/субтитры до теста зависимостей. R8 и дальнейшее удаление библиотек — отдельная измеряемая оптимизация; не обещать размер или ускорение без теста.
 
 ## Сборка
-JDK 17, SDK API 34, Build Tools 30.0.3, NDK 21.0.6113669, Git, Python 3. 
+JDK 17, SDK API 34, Build Tools 30.0.3, NDK 21.0.6113669, Git, Python 3.
 `python3 -m unittest -v` затем `bash build.sh` (из этого каталога).
 Выход: out/PanadonikTube-*-unsigned.apk, SHA256SUMS, SUBMODULES.txt, PANADONIK.patch, LICENSE.smarttube, source.lock.json. Не устанавливать неподписанный кандидат. Подпись и полный комплект лицензий/source notices — отдельный этап выпуска. Ключи не передавать скачанному Gradle.
 
 ## Исследование форков
-SmartTube-CN: https://github.com/jinran3/SmartTube-CN/commit/f8d3c09659ecf66b7a3d52ba533bf5f2c00af2cc — идея выделенного OkHttp media route, не переносить чужой updater и Workers. 
-SuperTube: https://github.com/jgestal/SuperTube — лёгкие настройки UI. 
+SmartTube-CN: https://github.com/jinran3/SmartTube-CN/commit/f8d3c09659ecf66b7a3d52ba533bf5f2c00af2cc — идея выделенного OkHttp media route, не переносить чужой updater и Workers.
+SuperTube: https://github.com/jgestal/SuperTube — лёгкие настройки UI.
 Electric Eel: https://github.com/cygnusx-1-org/electriceel — исправления SABR требуют согласованных изменений MediaServiceCore; пока не переносим.
 SmarterTube: https://github.com/joaotapparo/smarter-tube/commit/f6f19352501227cde3edcae9b91865c8e81f91dd — recovery; upstream уже инвалидирует кеш форматов при long buffering, не копировать без регрессионных тестов.
 Yandex VOT: https://github.com/Adrena1ine-ai/SmartTube-Yandex-VOT — отдельная опциональная функция, не включена в минимальную сборку (внешний сервис, зависимости).
@@ -27,3 +27,11 @@ Yandex VOT: https://github.com/Adrena1ine-ai/SmartTube-Yandex-VOT — отдел
 
 ## Автоматический прокси (.2)
 Встроен в процесс Panadonik Tube, отдельный APK не нужен. При старте собираются девять настроенных источников (допускается кеш до 1 часа); при менее пяти непустых источниках новые маршруты не принимаются. IPv4 HTTP CONNECT/SOCKS5, без приватных адресов. До 16 параллельных TLS/HTTP проверок YouTube API и CDN; пул содержит только прошедшие проверку сетевой доступности маршруты, шесть целевых позиций, перепроверка с интервалом 20 секунд после окончания предыдущего цикла, исключение на 120 секунд при сбое. Проверка корневого URL CDN не доказывает воспроизведение медиаданных. При длительной буферизации переключается маршрут, закрываются старые туннели, инвалидируется кеш форматов, перезапускается видео. Источники загружаются напрямую, YouTube — через локальный шлюз, другие домены — напрямую. TLS сохраняется, при пустом пуле нет прямого fallback для разрешённых YouTube доменов. Публичные прокси ненадёжны, использовать без Google-аккаунта. APK и аппаратная приёмка обязательны перед публикацией. Независимость агрегаторов и фактическую доступность из РФ предстоит подтвердить.
+
+## Критерии приёмки
+- Сборка, ABI/package/manifest и подпись.
+- 1080p аппаратный декодер на H96 Max.
+- Управление пультом (D-pad, OK, Back, голос).
+- Локальный прокси для API/CDN, восстановление сети.
+- Анализ памяти и кадров.
+- Обновлять README при изменениях.

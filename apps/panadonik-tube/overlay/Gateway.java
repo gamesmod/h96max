@@ -13,7 +13,7 @@ public final class Gateway implements Closeable {
         public final String protocol, ip;
         public final int port;
         public Upstream(String protocol, String ip, int port) {
-            if (!(protocol.equals("http") || protocol.equals("socks5")) || !publicV4(ip) || port < 1 || port > 65535)
+            if (!(protocol.equals("http") || protocol.equals("https") || protocol.equals("socks4") || protocol.equals("socks5")) || !publicV4(ip) || port < 1 || port > 65535)
                 throw new IllegalArgumentException("Invalid upstream");
             this.protocol=protocol; this.ip=ip; this.port=port;
         }
@@ -63,11 +63,11 @@ public final class Gateway implements Closeable {
             socket.connect(new InetSocketAddress(upstream.ip,upstream.port),timeout);
             socket.setSoTimeout(timeout);
             InputStream in=socket.getInputStream();OutputStream out=socket.getOutputStream();
-            if(upstream.protocol.equals("http")){
+            if(upstream.protocol.equals("http")||upstream.protocol.equals("https")){
                 write(out,"CONNECT "+host+":443 HTTP/1.1\r\nHost: "+host+":443\r\n\r\n");
                 if(!line(in).matches("HTTP/1\\.[01] 200(?: .*)?"))throw new IOException("CONNECT rejected");
                 headers(in);
-            }else{
+            }else if(upstream.protocol.equals("socks5")){
                 out.write(new byte[]{5,1,0});out.flush();
                 if(byteOf(in)!=5||byteOf(in)!=0)throw new IOException("SOCKS authentication rejected");
                 byte[] name=host.getBytes(StandardCharsets.US_ASCII);
@@ -76,9 +76,21 @@ public final class Gateway implements Closeable {
                 int type=byteOf(in);
                 if(type==1)skip(in,4);else if(type==4)skip(in,16);else if(type==3)skip(in,byteOf(in));else throw new IOException("SOCKS address");
                 skip(in,2);
+            }else{
+                byte[] name=host.getBytes(StandardCharsets.US_ASCII);
+                out.write(new byte[]{4,1,1,(byte)187,0,0,0,1,0});
+                out.write(name);out.write(0);out.flush();
+                if(byteOf(in)!=0||byteOf(in)!=90)throw new IOException("SOCKS4 connect rejected");
+                skip(in,6);
             }
             return socket;
         }catch(IOException|RuntimeException e){try{socket.close();}catch(IOException ignored){}throw e;}
+    }
+    private static Socket connectDirect(String host,int timeout)throws IOException{
+        if(!permitted(host))throw new IOException("destination denied");
+        Socket socket=new Socket(Proxy.NO_PROXY);
+        try{socket.connect(new InetSocketAddress(host,443),timeout);return socket;}
+        catch(IOException|RuntimeException e){try{socket.close();}catch(IOException ignored){}throw e;}
     }
     private final AtomicReference<Upstream> active=new AtomicReference<>();
     private final ExecutorService workers=Executors.newFixedThreadPool(12);
@@ -127,16 +139,14 @@ public final class Gateway implements Closeable {
                 write(c.getOutputStream(),"HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n");return;
             }
             String host=request[1].substring(0,request[1].length()-4).toLowerCase(java.util.Locale.ROOT);
-            Upstream selected=awaitActive();
-            if(!permitted(host)||selected==null){
-                write(c.getOutputStream(),"HTTP/1.1 503 Service Unavailable\r\nConnection: close\r\n\r\n");return;
-            }
+            Upstream selected=active.get();
+            if(!permitted(host)){write(c.getOutputStream(),"HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n");return;}
             Socket remote;
-            try{remote=connect(selected,host,5000);}
+            try{remote=selected==null?connectDirect(host,5000):connect(selected,host,5000);}
             catch(IOException e){write(c.getOutputStream(),"HTTP/1.1 502 Bad Gateway\r\nConnection: close\r\n\r\n");return;}
             sockets.add(remote);
             try(Socket r=remote){
-                if(active.get()!=selected)return;
+                if(selected!=null&&active.get()!=selected)return;
                 c.setSoTimeout(120000);r.setSoTimeout(120000);
                 write(c.getOutputStream(),"HTTP/1.1 200 Connection established\r\n\r\n");
                 Future<?> f=returns.submit(()->copy(r,c));

@@ -7,7 +7,7 @@ class SourcePatchTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 replace_once(s, "old", "new")
     def test_media_client(self):
-        s = "int source = tweaksData.getPlayerDataSource();\n    /**\n     * Use OkHttp for networking\nOkHttpClient client = OkHttpManager.instance().getClient();"
+        s = "int source = tweaksData.getPlayerDataSource();\n    /**\n     * Use OkHttp for networking\nOkHttpDataSourceFactory dataSourceFactory = new OkHttpDataSourceFactory(OkHttpManager.instance().getMediaClient(), USER_AGENT,"
         result = transform(next(p for p in PATHS if p.endswith("/ExoMediaSourceFactory.java")), s)
         self.assertIn('PLAYER_DATA_SOURCE_OKHTTP', result)
         self.assertIn('proxySelector(java.net.ProxySelector.getDefault())', result)
@@ -18,7 +18,7 @@ class SourcePatchTests(unittest.TestCase):
 // The first letter of the flavor name must be in uppercase
 if (true) { apply plugin: 'com.google.gms.google-services' }
 android {
-    versionName "32.83"
+    versionName "32.63-cn-20261008-r101"
     def project = "SmartTube"
     applicationId "app.smarttube.fdroid"
     include 'armeabi-v7a', 'arm64-v8a', 'x86' // comment
@@ -37,15 +37,23 @@ android {
         self.assertNotIn("abiFilters", result)
     def test_failover_hook(self):
         path = next(p for p in PATHS if p.endswith("/ErrorFixerController.java"))
-        s = transform(path, "        Throwable error = getPlayer().getUnthrownError();\n")
+        s = transform(path, """        if (getPlayer() == null) {
+            return;
+        }
+
+        if (isStreamEnded()) {
+""")
         self.assertIn("rotateOnBuffering()", s)
-        self.assertIn("invalidateFormatCache()", s)
+        self.assertIn("invalidateCache()", s)
         self.assertIn("reloadVideo()", s)
     def test_sources(self):
         import json
         from pathlib import Path
         rows = json.loads((Path(__file__).parent.parent / "smarttube-proxy/sources.json").read_text())
         self.assertGreaterEqual(len({r["id"] for r in rows}), 5)
+        self.assertTrue(all(r.get("enabled") for r in rows))
+        self.assertTrue({"txt", "json", "csv", "html", "geonode"} <= {r["format"] for r in rows})
+        self.assertTrue(all(r.get("license") for r in rows))
     def test_autoupdate_disabled(self):
         s = "    public void start(boolean forceCheck) {\n        update();\n    }\n    @Override\n"
         self.assertNotIn("update();", transform(next(p for p in PATHS if p.endswith("/AppUpdatePresenter.java")), s))

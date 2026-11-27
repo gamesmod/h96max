@@ -44,7 +44,7 @@ jobs:
         run: |
           set -euo pipefail
           bash -n build-sd.sh tools/build-release.sh tools/release-ota.sh tools/package-clean-install.sh \
-            tools/extract-vendor-blobs.sh tools/prepare-build-inputs.sh apps/*/build.sh
+            tools/extract-vendor-blobs.sh tools/prepare-build-inputs.sh apps/*/build.sh apps/panadonik-tube/sign.sh
           python3 -m json.tool obtainium-apps.json >/dev/null
           mkdir -p release/qa
           python3 -m unittest discover -s tests -v 2>&1 | tee /tmp/panadonik-tests.log

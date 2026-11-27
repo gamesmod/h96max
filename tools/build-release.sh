@@ -25,11 +25,14 @@ for app in antivirus bootlog bootscreen clean files installer iptv links power t
     echo "-- apps/$app/build.sh"
     bash "apps/$app/build.sh"
 done
+bash apps/panadonik-tube/build.sh
+bash apps/panadonik-tube/sign.sh
 for a in antivirus/TvboxAntivirus bootlog/TvboxBootLog clean/TvboxClean files/TvboxFiles installer/TvboxInstaller iptv/TvboxIptv \
          links/TvboxLinks power/TvboxPower; do
     ls apps/${a%%/*}/out/*.apk >/dev/null 2>&1 || { echo "no apk from apps/${a%%/*}"; exit 1; }; done
 [ -f apps/tvboxd/out/tvboxd.jar ]
 [ -f apps/bootscreen/out/tvbox-bootscreen.jar ]
+[ -f apps/panadonik-tube/out/org.tvbox.panadoniktube.apk ]
 step "4/6 OTA helper"
 aarch64-linux-gnu-gcc -static -O2 -Wall -o ota/tvbox-flash ota/tvbox-flash.c && aarch64-linux-gnu-strip ota/tvbox-flash
 step "5/6 eMMC image"
