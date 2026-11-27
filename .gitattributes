@@ -4,6 +4,9 @@
 *.apk filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.bin filter=lfs diff=lfs merge=lfs -text
+bcm4334-research/fw/*.bin* filter=lfs diff=lfs merge=lfs -text
+bcm4334-research/fw/*.hcd filter=lfs diff=lfs merge=lfs -text
+bcm4334-research/fw/*.txt -filter -diff -merge -text
 
 # Stock CI inputs (cleaned A12 partitions, boot loaders, A9 Wi-Fi/BT fw, VFD)
 dl/a12/** filter=lfs diff=lfs merge=lfs -text
