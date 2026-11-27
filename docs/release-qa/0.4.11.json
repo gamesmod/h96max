@@ -97,5 +97,26 @@
     "usb_acceptance": "pending",
     "iptv": "Два канала выводили кадры; первый при повторной попытке после первоначального сбоя. Для второго: 837 кадров за 33,43 с, медиана 33,34 мс, максимум 69,06 мс.",
     "release_gate": "pending"
+  },
+  "inspection_2026_11_27": {
+    "mode": "read-only network ADB",
+    "installed_release": "0.4.11",
+    "boot_completed": true,
+    "launcher_home": "com.tvlauncher/.MainActivity",
+    "swap_entries": 0,
+    "zram_entries": 0,
+    "dicio_installed": false,
+    "voicebridge_installed": false,
+    "tv_launcher_accessibility": "fail: enabled_accessibility_services=null",
+    "iptv_boot_receiver": "present",
+    "iptv_index_on_boot_service": "not found in installed package",
+    "hypatia_version": "3.18",
+    "hypatia_database_freshness": "pending",
+    "limited_error_filter": "no matching fatal/ANR/Watchdog/project-package lines in last 1000 error-buffer lines",
+    "full_sanity": "pending",
+    "security_review": "pending",
+    "network_capture_review": "pending",
+    "device_mutated": false,
+    "firmware_install_policy": "GitHub artifact/Release only; verify commit and SHA-256"
   }
 }

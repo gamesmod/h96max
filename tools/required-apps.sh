@@ -4,7 +4,6 @@ TVBOX_REQUIRED_APKS=(
     com.tvlauncher.apk
     dev.imranr.obtainium.apk
     org.maintainteam.hypatia.apk
-    org.stypox.dicio.apk
     org.videolan.vlc.apk
     ru.yourok.torrserve.apk
 )

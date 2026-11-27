@@ -54,21 +54,6 @@
       "url": "https://github.com/YouROK/TorrServer/releases/download/MatriX.147.1/TorrServer-android-arm64",
       "sha256": "93250bb1850e69663c6758398be515c2c429595cb4692c6eccb367f2236868d5",
       "dest": "dl/torrserver/TorrServer-android-arm64"
-    },
-    {
-      "id": "org.stypox.dicio",
-      "version": "4.2",
-      "url": "https://f-droid.org/repo/org.stypox.dicio_19.apk",
-      "sha256": "f17270a0e8809a7c076a423e39cdbdd86dc487e881762eafca57e03f82258e80",
-      "dest": "dl/apk/org.stypox.dicio.apk",
-      "signer_certificate_sha256": "f18a3aa28b65a3b67f1fc9f061aa345471aaabf006e3fa51387397754b86d71f"
-    },
-    {
-      "id": "vosk-model-small-ru-0.22",
-      "version": "0.22",
-      "url": "https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip",
-      "sha256": "961d5ff98a17f4aa6de69864d0aa71fa5bac682301d2b5d17a3f24c5c99a46d4",
-      "dest": "dl/dicio/vosk-model-small-ru-0.22.zip"
     }
   ]
 }

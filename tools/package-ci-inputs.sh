@@ -6,7 +6,6 @@
 set -euo pipefail
 umask 077
 R=$(cd "$(dirname "$0")/.." && pwd); cd "$R"
-python3 -I tools/prepare-dicio-assets.py --check
 SOURCE=${1:-"$R/dl/a12/Image/lp"}
 DEST=${2:-}
 command -v zerofree >/dev/null || { echo "Требуется zerofree" >&2; exit 1; }

@@ -20,14 +20,13 @@ step "1/6 stock inputs"
 tools/prepare-build-inputs.sh
 step "2/6 toolchain"
 tools/setup-sdk.sh --check || tools/setup-sdk.sh
-python3 -I tools/prepare-dicio-assets.py --fetch
 step "3/6 own apps"
-for app in antivirus bootlog bootscreen clean files installer iptv links power tvboxd voicebridge; do
+for app in antivirus bootlog bootscreen clean files installer iptv links power tvboxd; do
     echo "-- apps/$app/build.sh"
     bash "apps/$app/build.sh"
 done
 for a in antivirus/TvboxAntivirus bootlog/TvboxBootLog clean/TvboxClean files/TvboxFiles installer/TvboxInstaller iptv/TvboxIptv \
-         links/TvboxLinks power/TvboxPower voicebridge/TvboxVoiceBridge; do
+         links/TvboxLinks power/TvboxPower; do
     ls apps/${a%%/*}/out/*.apk >/dev/null 2>&1 || { echo "no apk from apps/${a%%/*}"; exit 1; }; done
 [ -f apps/tvboxd/out/tvboxd.jar ]
 [ -f apps/bootscreen/out/tvbox-bootscreen.jar ]
