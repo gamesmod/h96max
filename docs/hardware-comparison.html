@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>H96 Max: Panadonik и заводская приставка</title>
+  <style>
+    :root{color-scheme:light dark;--bg:#f6f7f9;--fg:#18202b;--muted:#5c6675;--card:#fff;--line:#dfe3e8;--accent:#3267d6;--accent2:#d56b31;--good:#21835a;--warn:#a06500;--bad:#b4232d;--soft:#e9eef9;--shadow:0 8px 30px rgba(20,30,50,.08)}
+    @media(prefers-color-scheme:dark){:root{--bg:#11151b;--fg:#e9edf3;--muted:#aab3c0;--card:#191f28;--line:#303946;--accent:#7da7ff;--accent2:#f49a68;--good:#65c998;--warn:#e1ae4f;--bad:#ff7b85;--soft:#212d44;--shadow:0 8px 30px rgba(0,0,0,.28)}}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}button,select{font:inherit}main{max-width:1180px;margin:auto;padding:28px 20px 64px}h1{font-size:clamp(25px,4vw,38px);line-height:1.1;margin:0 0 8px}h2{font-size:20px;margin:0 0 14px}h3{font-size:16px;margin:0 0 8px}.lead{color:var(--muted);max-width:840px;margin:0}.meta{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--soft);color:var(--fg);font-size:13px}.dot{width:8px;height:8px;border-radius:50%;background:currentColor}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+    .tabs{display:flex;gap:6px;overflow:auto;padding:4px 0 14px;position:sticky;top:0;background:var(--bg);z-index:5}.tabs button{border:0;border-radius:9px;padding:9px 13px;background:transparent;color:var(--muted);white-space:nowrap}.tabs button[aria-selected=true]{background:var(--fg);color:var(--bg)}button{cursor:pointer}.panel[hidden]{display:none}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}.span-3{grid-column:span 3}.span-4{grid-column:span 4}.span-5{grid-column:span 5}.span-6{grid-column:span 6}.span-7{grid-column:span 7}.span-8{grid-column:span 8}.span-12{grid-column:span 12}.stat-label{color:var(--muted);font-size:13px}.stat-value{font-size:25px;font-weight:650;line-height:1.2;margin-top:3px}.sub{color:var(--muted);font-size:13px;margin-top:6px}.big-callout{border-left:5px solid var(--bad)}
+    .legend{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin-bottom:12px}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}.one{background:var(--accent)}.two{background:var(--accent2)}.bar-row{display:grid;grid-template-columns:minmax(110px,1fr) 3fr 72px;gap:10px;align-items:center;margin:10px 0}.track{height:18px;background:color-mix(in srgb,var(--muted) 14%,transparent);border-radius:5px;overflow:hidden}.bar{height:100%;border-radius:5px;transition:width .25s}.number{text-align:right;font-variant-numeric:tabular-nums}.stack{display:flex;height:38px;border-radius:7px;overflow:hidden;background:color-mix(in srgb,var(--muted) 14%,transparent)}.stack span{display:grid;place-items:center;min-width:2px;color:#fff;font-size:12px;overflow:hidden;white-space:nowrap}.stack .same{background:var(--good)}.stack .diff{background:var(--bad)}.stack .only1{background:var(--accent)}.stack .only2{background:var(--accent2)}
+    .controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.controls label{display:flex;align-items:center;gap:7px}.controls select{padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg)}table{width:100%;border-collapse:collapse}th,td{padding:10px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.03em}tbody tr:hover{background:color-mix(in srgb,var(--accent) 7%,transparent)}.status{font-size:12px;font-weight:650}.status.same{color:var(--good)}.status.diff{color:var(--bad)}.status.profile{color:var(--warn)}.table-wrap{overflow-x:auto}.risk{display:grid;grid-template-columns:150px 1fr;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}.risk:last-child{border:0}.risk strong{color:var(--bad)}
+    .timeline{display:grid;grid-template-columns:26px 1fr;gap:0 12px}.timeline .node{width:14px;height:14px;border-radius:50%;background:var(--accent);margin:5px 0;position:relative}.timeline .node:after{content:"";position:absolute;width:2px;background:var(--line);top:14px;bottom:-55px;left:6px}.timeline>div:nth-last-child(-n+2) .node:after{display:none}.timeline .step{padding:0 0 22px}.timeline .step p{margin:4px 0 0;color:var(--muted)}code{background:var(--soft);padding:2px 5px;border-radius:4px}.note{font-size:13px;color:var(--muted)}.source-list{columns:2;column-gap:30px}.source-list li{break-inside:avoid;margin-bottom:7px}.empty{display:none;color:var(--muted);padding:18px 0}
+    @media(max-width:820px){.span-3,.span-4,.span-5,.span-6,.span-7,.span-8{grid-column:span 12}.bar-row{grid-template-columns:100px 1fr 62px}.source-list{columns:1}.risk{grid-template-columns:1fr}.tabs{position:static}}
+    @media(max-width:480px){main{padding:20px 12px 48px}.card{padding:13px}.bar-row{grid-template-columns:1fr 58px}.bar-row .track{grid-column:1/-1;grid-row:2}.hide-small{display:none}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>H96 Max: Panadonik против заводской системы</h1>
+    <p class="lead">Интерактивное сравнение установленной Panadonik 0.4.11 на приставке №1 и заводского Android 11 на приставке №2. Данные сняты адресованными read-only ADB-командами 24 ноября 2026 года.</p>
+    <div class="meta">
+      <span class="pill good"><span class="dot"></span>Обе платы: BCM4334 и RK3318/RK3328</span>
+      <span class="pill bad"><span class="dot"></span>Текущий raw-образ несовместим</span>
+      <span class="pill warn"><span class="dot"></span>№2: отдельный профиль 64 GB</span>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Разделы отчёта">
+    <button role="tab" aria-selected="true" aria-controls="overview">Итог</button>
+    <button role="tab" aria-selected="false" aria-controls="hardware">Аппаратная часть</button>
+    <button role="tab" aria-selected="false" aria-controls="partitions">Разделы</button>
+    <button role="tab" aria-selected="false" aria-controls="vendor">Vendor</button>
+    <button role="tab" aria-selected="false" aria-controls="risks">Риски</button>
+    <button role="tab" aria-selected="false" aria-controls="plan">План поддержки</button>
+    <button role="tab" aria-selected="false" aria-controls="evidence">Доказательства</button>
+  </nav>
+
+  <section class="panel" id="overview" role="tabpanel">
+    <div class="grid">
+      <article class="card span-3"><div class="stat-label">ОЗУ №2</div><div class="stat-value">3.86 GiB</div><div class="sub">4,043,332 KiB, соответствует классу 4 GB</div></article>
+      <article class="card span-3"><div class="stat-label">eMMC №2</div><div class="stat-value">57.62 GiB</div><div class="sub">SLD64G, класс 64 GB</div></article>
+      <article class="card span-3"><div class="stat-label">Vendor paths</div><div class="stat-value">650</div><div class="sub">Только 233 имеют одинаковый SHA-256</div></article>
+      <article class="card span-3"><div class="stat-label">Пиковая температура №2</div><div class="stat-value bad">86.5 °C</div><div class="sub">До stress/flash проверить охлаждение</div></article>
+
+      <article class="card span-7">
+        <h2>Ёмкость накопителя</h2>
+        <div class="legend"><span><i class="one"></i>Panadonik №1</span><span><i class="two"></i>Stock №2</span></div>
+        <div class="bar-row"><span>Вся eMMC</span><div class="track"><div class="bar one" style="width:50.5%"></div></div><span class="number">29.12 GiB</span></div>
+        <div class="bar-row"><span>Вся eMMC</span><div class="track"><div class="bar two" style="width:100%"></div></div><span class="number">57.62 GiB</span></div>
+        <div class="bar-row"><span><code>super</code></span><div class="track"><div class="bar one" style="width:100%"></div></div><span class="number">4.00 GiB</span></div>
+        <div class="bar-row"><span><code>super</code></span><div class="track"><div class="bar two" style="width:84%"></div></div><span class="number">3.36 GiB</span></div>
+      </article>
+      <article class="card span-5 big-callout">
+        <h2>Решение</h2>
+        <p><strong>NO-GO для текущего clean-install.</strong> Несмотря на вдвое большую eMMC, раздел <code>super</code> у №2 на 656 MiB меньше. Четырёхгигабайтный образ №1 физически не помещается.</p>
+        <p class="note">Поддержка возможна через отдельный 64 GB hardware profile, уменьшенный <code>super</code> либо доказанную миграцию разметки после stock backup.</p>
+      </article>
+
+      <article class="card span-12">
+        <h2>Что совпало, а что требует профиля</h2>
+        <div class="controls">
+          <label><input id="onlyDiff" type="checkbox"> Показывать только различия</label>
+          <label>Контур <select id="domainFilter"><option value="all">Все</option><option>Аппаратный</option><option>ПО</option><option>Безопасность</option><option>Установка</option></select></label>
+        </div>
+        <div class="table-wrap">
+          <table id="matrix"><thead><tr><th>Контур</th><th>Panadonik №1</th><th>Stock №2</th><th>Вывод</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div class="empty" id="matrixEmpty">Нет строк для выбранного фильтра.</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="panel" id="hardware" role="tabpanel" hidden>
+    <div class="grid">
+      <article class="card span-6"><h2>Общая аппаратная основа</h2><table><tbody>
+        <tr><th>SoC/CPU</th><td>RK3328 BSP / RK3318 retail, 4 x Cortex-A53 r0p4</td></tr>
+        <tr><th>DT family</th><td><code>rk3328-box-liantong-avb</code>, <code>rk3318-evb</code></td></tr>
+        <tr><th>Wi-Fi</th><td>BCM4334 rev 3, SDIO 02D0:4334</td></tr>
+        <tr><th>GPU</th><td>Mali Utgard, 2 PP cores, 200/300/400 MHz</td></tr>
+        <tr><th>VPU</th><td>RKVDEC, 100/200/300 MHz</td></tr>
+        <tr><th>Ethernet</th><td>Rockchip GMAC</td></tr>
+      </tbody></table></article>
+      <article class="card span-6"><h2>Периферия №2</h2><table><tbody>
+        <tr><th>HDMI/CEC</th><td>HDMI-A-1, CEC, sink modes до 3840x2160</td></tr>
+        <tr><th>Audio</th><td>I2S analog, HDMI, SPDIF, USB mic</td></tr>
+        <tr><th>IR</th><td>PWM remotectl <code>ff1b0030.pwm</code></td></tr>
+        <tr><th>VFD</th><td>OEM VfdService + ChangeLed; поведение не проверено</td></tr>
+        <tr><th>Пульт</th><td>Keyboard, mouse, consumer/system control, microphone</td></tr>
+        <tr><th>Bluetooth</th><td>HIDL 1.0, UART <code>/dev/ttyS0</code>; exact HCD неизвестен</td></tr>
+      </tbody></table></article>
+      <article class="card span-7"><h2>Частотные контуры №2</h2>
+        <div class="bar-row"><span>CPU max</span><div class="track"><div class="bar one" style="width:100%"></div></div><span class="number">1104 MHz</span></div>
+        <div class="bar-row"><span>DMC max</span><div class="track"><div class="bar one" style="width:54.3%"></div></div><span class="number">600 MHz</span></div>
+        <div class="bar-row"><span>GPU max</span><div class="track"><div class="bar one" style="width:36.2%"></div></div><span class="number">400 MHz</span></div>
+        <div class="bar-row"><span>RKVDEC max</span><div class="track"><div class="bar one" style="width:27.2%"></div></div><span class="number">300 MHz</span></div>
+      </article>
+      <article class="card span-5"><h2>Codec declarations №2</h2><p>AVC, VP9 и HEVC: до 4096x2160. MPEG-2, VP8, H.263, MPEG-4, FLV, MJPEG и VC-1: до 1920x1088. AVC encode: до 1920x1088.</p><p class="note">Это XML-декларации. Требуются реальные замеры dropped frames, buffering, latency и температуры.</p></article>
+    </div>
+  </section>
+
+  <section class="panel" id="partitions" role="tabpanel" hidden>
+    <div class="grid">
+      <article class="card span-4"><div class="stat-label">Разделы №1</div><div class="stat-value">15</div><div class="sub">SEM32G, userdata 24.18 GiB</div></article>
+      <article class="card span-4"><div class="stat-label">Разделы №2</div><div class="stat-value">16</div><div class="sub">SLD64G, отдельный <code>frp</code></div></article>
+      <article class="card span-4"><div class="stat-label">Расхождение super</div><div class="stat-value bad">−656 MiB</div><div class="sub">№2 меньше, несмотря на большую eMMC</div></article>
+      <article class="card span-12"><h2>Карта №2 — секторы по 512 B</h2><div class="table-wrap"><table><thead><tr><th>№</th><th>Имя</th><th class="number">Start</th><th class="number">Size</th><th>Роль</th></tr></thead><tbody id="partitionRows"></tbody></table></div></article>
+    </div>
+  </section>
+
+  <section class="panel" id="vendor" role="tabpanel" hidden>
+    <div class="grid">
+      <article class="card span-12"><h2>Сравнение SHA-256 по 650 vendor paths</h2>
+        <div class="stack" aria-label="233 одинаковых, 226 различаются, 158 только на первой, 33 только на второй">
+          <span class="same" style="width:35.85%">233</span><span class="diff" style="width:34.77%">226</span><span class="only1" style="width:24.31%">158</span><span class="only2" style="width:5.08%">33</span>
+        </div>
+        <div class="legend" style="margin-top:12px"><span><i style="background:var(--good)"></i>Одинаковые 233</span><span><i style="background:var(--bad)"></i>Различаются 226</span><span><i class="one"></i>Только №1: 158</span><span><i class="two"></i>Только №2: 33</span></div>
+      </article>
+      <article class="card span-6"><h2>Совпали</h2><ul><li>32/64-bit <code>libGLES_mali.so</code></li><li>32/64-bit <code>librk_vpuapi.so</code></li><li>Часть BCM4334 AP/P2P firmware</li><li>Rockit VINTF declaration</li></ul></article>
+      <article class="card span-6"><h2>Отличаются или уникальны</h2><ul><li>Wi-Fi и Bluetooth services</li><li>gralloc и hwcomposer</li><li>MPP, RGA, VPU и Rockit libraries</li><li>OMX VPU decoder/encoder только на №2</li><li><code>bcmdhd.ko</code> отдельным модулем на №2</li></ul></article>
+      <article class="card span-12 big-callout"><h2>Архитектурный вывод</h2><p>Совпадение SoC и Mali blob не доказывает совместимость всего vendor. GPU, gralloc, HWC, MPP, RGA, VPU, kernel и VINTF нужно сохранять и проверять как связанный профиль.</p></article>
+    </div>
+  </section>
+
+  <section class="panel" id="risks" role="tabpanel" hidden>
+    <article class="card">
+      <h2>Заводская система №2</h2>
+      <div class="risk"><strong>Критично</strong><div><b>ADB без RSA</b><br><span class="note"><code>ro.adb.secure=0</code>, TCP ADB 5555. Не использовать stock в недоверенной сети.</span></div></div>
+      <div class="risk"><strong>Критично</strong><div><b>Setuid-root su и SuperSU 2.76</b><br><span class="note">Устаревший privileged root stack, shared UID 1000.</span></div></div>
+      <div class="risk"><strong>Высокий</strong><div><b>SELinux permissive и unlocked/orange boot</b><br><span class="note">Цепочка доверия и policy enforcement ослаблены.</span></div></div>
+      <div class="risk"><strong>Высокий</strong><div><b>Security patch 2021-06-05</b><br><span class="note">Заводская система критически устарела.</span></div></div>
+      <div class="risk"><strong>Критично</strong><div><b>85–87 °C во время пассивной диагностики</b><br><span class="note">До stress, raw backup и flash осмотреть радиатор и термопрокладку.</span></div></div>
+      <div class="risk"><strong>Политика</strong><div><b>Активен zRAM 2.07 GB</b><br><span class="note">В Panadonik на приставке zRAM должен быть отключён и проверен после загрузки.</span></div></div>
+      <div class="risk"><strong>Регуляторный</strong><div><b>Текущий domain 00, boot code XS</b><br><span class="note">Полный BCM4334/CLM country list не извлечён. Нельзя задавать ALL, XS или чужую страну.</span></div></div>
+    </article>
+  </section>
+
+  <section class="panel" id="plan" role="tabpanel" hidden>
+    <article class="card">
+      <h2>Безопасный маршрут поддержки №2</h2>
+      <div class="timeline">
+        <div class="node"></div><div class="step"><h3>1. Охлаждение и физическая ревизия</h3><p>Проверить heatsink/thermal pad, PCB, DRAM и PMIC. Не запускать stress или flash при текущих температурах.</p></div>
+        <div class="node"></div><div class="step"><h3>2. Stock backup после отдельного разрешения</h3><p>Loader read-only, двойное чтение и SHA-256; не собирать userdata, credentials и уникальные секреты.</p></div>
+        <div class="node"></div><div class="step"><h3>3. Отдельный hardware profile</h3><p>64 GB layout, 16 partitions, <code>super ≤ 3,607,101,440 B</code>, DT/boot/vendor tuple и BCM4334 regulatory evidence.</p></div>
+        <div class="node"></div><div class="step"><h3>4. GitHub candidate</h3><p>Собрать опубликованный проверенный artifact, сверить commit/SHA-256 и подписи; локальный hot install не считается приёмкой.</p></div>
+        <div class="node"></div><div class="step"><h3>5. Отдельное согласие на wipe/install</h3><p>Явно перечислить удаляемые данные. Подготовка кандидата не является согласием на очистку.</p></div>
+        <div class="node"></div><div class="step"><h3>6. Полная аппаратная приёмка</h3><p>Boot, launcher/remote, Wi-Fi/BT/Ethernet, HDMI/CEC/audio, IR/VFD, codecs, thermal, IPTV/torrent, logs/security/traffic и OTA.</p></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="panel" id="evidence" role="tabpanel" hidden>
+    <div class="grid">
+      <article class="card span-7"><h2>Источники доказательств</h2><ul class="source-list">
+        <li><code>hardware-profile.json</code></li><li><code>hardware-profile.md</code></li><li><code>compatibility-matrix.md</code></li><li><code>device-2-stock.txt</code></li><li><code>device-2-targeted.txt</code></li><li><code>device-2-vendor-sha256.txt</code></li><li><code>reference-device-1.txt</code></li><li><code>reference-device-1-targeted.txt</code></li><li><code>vendor-hash-comparison.txt</code></li><li><code>SHA256SUMS</code></li>
+      </ul></article>
+      <article class="card span-5"><h2>Границы доказательств</h2><ul><li>Не выполнялись root, reboot, Loader/MaskROM и raw reads.</li><li>Не собирались пользовательские данные и credentials.</li><li>Codec XML не заменяет playback test.</li><li>EDID modes не доказывают плавный 4K.</li><li>Wi-Fi country list и exact Bluetooth HCD остаются блокерами.</li></ul></article>
+    </div>
+  </section>
+</main>
+<script>
+const matrixData=[
+ {d:'Аппаратный',n:'SoC / CPU',a:'RK3328/RK3318, 4×A53',b:'RK3328/RK3318, 4×A53',s:'same',v:'Совпадает'},
+ {d:'Аппаратный',n:'RAM',a:'4,044,156 KiB',b:'4,043,332 KiB',s:'same',v:'Совместимо'},
+ {d:'Аппаратный',n:'eMMC',a:'SEM32G · 29.12 GiB',b:'SLD64G · 57.62 GiB',s:'profile',v:'Отдельный профиль'},
+ {d:'Установка',n:'Разметка',a:'15 разделов',b:'16 разделов, включая frp',s:'diff',v:'Raw несовместим'},
+ {d:'Установка',n:'super',a:'4.00 GiB',b:'3.359 GiB',s:'diff',v:'Образ не помещается'},
+ {d:'Аппаратный',n:'Wi‑Fi',a:'BCM4334 · 02D0:4334',b:'BCM4334 rev 3 · 02D0:4334',s:'same',v:'Хорошая база'},
+ {d:'ПО',n:'Android / VNDK',a:'12 / 32',b:'11 / 30',s:'diff',v:'Vendor не смешивать'},
+ {d:'ПО',n:'Kernel',a:'4.19.232',b:'4.19.193',s:'profile',v:'Профильный boot tuple'},
+ {d:'ПО',n:'GPU/VPU',a:'Mali Utgard / RKVDEC',b:'Mali Utgard / RKVDEC',s:'profile',v:'Hardware совпало, stack различается'},
+ {d:'Безопасность',n:'ADB',a:'RSA включён',b:'RSA выключен, TCP 5555',s:'diff',v:'Критический риск stock'},
+ {d:'Безопасность',n:'Root stack',a:'Проектный tvboxd backend',b:'setuid su + SuperSU 2.76',s:'diff',v:'Критический риск stock'},
+ {d:'ПО',n:'zRAM',a:'Отключён',b:'Активен 2.07 GB',s:'diff',v:'Отключить в профиле'},
+ {d:'Аппаратный',n:'HDMI / CEC / Audio',a:'RK topology',b:'Та же RK topology',s:'profile',v:'Нужна приёмка'},
+ {d:'Безопасность',n:'Температура',a:'Release benchmark обязателен',b:'До 86.5 °C',s:'diff',v:'Проверить охлаждение'}
+];
+const partitions=[['1','security','8 192','8 192','Security metadata'],['2','uboot','16 384','8 192','U-Boot'],['3','trust','24 576','8 192','Trust / firmware'],['4','misc','32 768','8 192','Recovery commands'],['5','dtbo','40 960','8 192','DT overlays'],['6','vbmeta','49 152','2 048','AVB metadata'],['7','boot','51 200','81 920','Kernel + ramdisk'],['8','recovery','133 120','196 608','Recovery 96 MiB'],['9','backup','329 728','786 432','OEM backup'],['10','cache','1 116 160','884 735','Cache'],['11','metadata','2 000 895','32 768','Encryption metadata'],['12','frp','2 033 663','1 024','Factory reset protection'],['13','baseparameter','2 034 687','2 048','Display/base parameters'],['14','logo','2 036 735','32 768','Boot logo'],['15','super','2 069 503','7 045 120','Dynamic partitions · 3.359 GiB'],['16','userdata','9 114 623','111 717 313','Userdata · 53.271 GiB']];
+const tabs=[...document.querySelectorAll('[role=tab]')];
+tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>{x.setAttribute('aria-selected','false');document.getElementById(x.getAttribute('aria-controls')).hidden=true});t.setAttribute('aria-selected','true');document.getElementById(t.getAttribute('aria-controls')).hidden=false}));
+function renderMatrix(){const diff=document.getElementById('onlyDiff').checked,domain=document.getElementById('domainFilter').value,body=document.querySelector('#matrix tbody');const rows=matrixData.filter(x=>(!diff||x.s!=='same')&&(domain==='all'||x.d===domain));body.innerHTML=rows.map(x=>`<tr><td><b>${x.n}</b><div class="note">${x.d}</div></td><td>${x.a}</td><td>${x.b}</td><td><span class="status ${x.s}">${x.v}</span></td></tr>`).join('');document.getElementById('matrixEmpty').style.display=rows.length?'none':'block'}
+document.getElementById('onlyDiff').addEventListener('change',renderMatrix);document.getElementById('domainFilter').addEventListener('change',renderMatrix);renderMatrix();
+document.getElementById('partitionRows').innerHTML=partitions.map(p=>`<tr><td>${p[0]}</td><td><code>${p[1]}</code></td><td class="number">${p[2]}</td><td class="number">${p[3]}</td><td>${p[4]}</td></tr>`).join('');
+</script>
+</body>
+</html>

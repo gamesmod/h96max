@@ -33,5 +33,12 @@
     "author": "MaintainTeam",
     "name": "Hypatia",
     "additionalSettings": "{}"
+  },
+  {
+    "id": "org.stypox.dicio",
+    "url": "https://f-droid.org/packages/org.stypox.dicio",
+    "author": "DicioTeam",
+    "name": "Dicio",
+    "additionalSettings": "{}"
   }
 ]

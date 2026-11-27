@@ -117,6 +117,7 @@ jobs:
             fi
           done
           bash tools/fetch-third-party.sh
+          python3 -I tools/prepare-dicio-assets.py --fetch
           test -f dl/apk/com.tvlauncher.apk
           test -f dl/webview/webview-arm64.apk
           test -f dl/torrserver/TorrServer-android-arm64

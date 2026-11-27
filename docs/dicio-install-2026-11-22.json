@@ -1,0 +1,83 @@
+{
+  "recorded_at_utc": "2026-11-22T23:35:03.628767+00:00",
+  "source_commit": "9ee870d54a94a91993ec96ce767020bce5905962",
+  "device_release": "0.4.5",
+  "package": "org.stypox.dicio",
+  "version_name": "4.2",
+  "version_code": 19,
+  "source": "https://f-droid.org/en/packages/org.stypox.dicio/",
+  "download_url": "https://f-droid.org/repo/org.stypox.dicio_19.apk",
+  "apk_path": "dl/apk/org.stypox.dicio.apk",
+  "apk_size_bytes": 38037561,
+  "apk_sha256": "f17270a0e8809a7c076a423e39cdbdd86dc487e881762eafca57e03f82258e80",
+  "signer_certificate_sha256": "f18a3aa28b65a3b67f1fc9f061aa345471aaabf006e3fa51387397754b86d71f",
+  "signature_verified_schemes": [
+    "v1",
+    "v2",
+    "v3"
+  ],
+  "provenance_limit": "HTTPS official download and APK cryptographic verification; signer not independently matched to a signed repository index",
+  "language": "Russian",
+  "wake_word_enabled": false,
+  "record_audio": "granted; appops foreground; observed active USB audio input during assist; recording inactive after Back",
+  "assistant": "org.stypox.dicio/.MainActivity",
+  "speech_model": {
+    "url": "https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip",
+    "local_path": "dl/dicio/vosk-model-small-ru-0.22.zip",
+    "sha256": "961d5ff98a17f4aa6de69864d0aa71fa5bac682301d2b5d17a3f24c5c99a46d4",
+    "installation": "Built-in download timed out twice. Official zip downloaded on host, transferred into Dicio private files with URL marker, correct app ownership and SELinux labels. Extraction performed by Dicio; model loaded and Russian words appeared.",
+    "source_reference": "https://github.com/DicioTeam/dicio-android/blob/v4.2/app/src/main/kotlin/org/stypox/dicio/io/input/vosk/VoskInputDevice.kt"
+  },
+  "launches_ms": [
+    2096,
+    1892
+  ],
+  "remote_bridge": {
+    "package": "org.tvbox.voicebridge",
+    "version": "0.1",
+    "source_path": "apps/voicebridge",
+    "apk_sha256": "c7711542b63a3e94ab61c55d25d7a3eb87818867e16ad36799e46c789fe781a9",
+    "signer_certificate_sha256": "f52a109a77d33ff95bc97760c4b85358b678384f805035ebe0ef9d692e26f388",
+    "signature_verified": true,
+    "key_preserved": "Existing project signing key used",
+    "function": "Handles VOICE_ASSIST and android.speech.action.WEB_SEARCH; launches ACTION_ASSIST explicitly for org.stypox.dicio; no permissions, no background service",
+    "rationale": "Android 12 VOICE_ASSIST key dispatches RecognizerIntent.ACTION_WEB_SEARCH while unlocked. Dicio supports ACTION_ASSIST, not that search action.",
+    "test": "Injected KEYCODE_VOICE_ASSIST after Home opened Dicio and active microphone; Russian recognition observed",
+    "physical_remote_button": "pending user test"
+  },
+  "graphics_observation": {
+    "total_frames": 155,
+    "janky_frames": 155,
+    "legacy_janky_frames": 139,
+    "median_ms": 65,
+    "p90_ms": 250,
+    "p95_ms": 350,
+    "assessment": "Less severe than prior Alice observations; still not smooth, not a matched benchmark"
+  },
+  "tts": "No Android TTS_SERVICE installed; voice answers not configured",
+  "commands_execution": "Opening apps/media control by spoken commands not yet confirmed",
+  "obtainium": {
+    "source": "https://f-droid.org/packages/org.stypox.dicio",
+    "project_config": "obtainium-apps.json",
+    "device_record": "/sdcard/Android/data/dev.imranr.obtainium/files/app_data/org.stypox.dicio.json",
+    "seed_applied": true,
+    "existing_records_preserved": true,
+    "ui_load_and_update_check": "pending; file placement is not proof of successful update check",
+    "own_bridge_excluded": true
+  },
+  "validation": {
+    "bridge_build": "pass",
+    "bridge_shell_syntax": "pass",
+    "obtainium_tests": {
+      "passed": 3
+    },
+    "git_diff_check": "pass"
+  },
+  "limitations": [
+    "Physical remote activation and successful spoken command execution pending",
+    "No complete security/traffic audit performed for this app trial",
+    "No new firmware built or installed; not a release acceptance",
+    "Dicio and bridge not added to mandatory firmware APK list; bridge not wired into release build",
+    "APK and model stored locally and ignored by Git; no publication or commit performed"
+  ]
+}

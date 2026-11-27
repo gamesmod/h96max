@@ -405,5 +405,95 @@
     "usb_target_detected": false,
     "installed_artifact_currently_verified": false,
     "release_acceptance": "pending"
+  },
+  "github_dev_update_2026_11_22": {
+    "updated_at": "2026-11-22T23:51:45.884242+00:00",
+    "source": "GitHub dev-v0.4.6; direct device download",
+    "ota_sha256": "521ba9bf33490bf94896dcfd82fd0745e237350b283dbce3119daa1d8c96a1e0",
+    "source_commit": "083cefbe19a1e7a01568b846d41165f88c80662f",
+    "from_release": "0.4.5",
+    "to_release": "0.4.6",
+    "user_confirmed_userdata_wipe": true,
+    "connectivity_handoff": "prepared, private cache checksums validated; Wi-Fi and ADB keys; authenticated TCP ADB restricted to original host",
+    "installed_android_signature_verification": "pass",
+    "uncrypt": "pass: 100%, 1 range",
+    "installer_result": "DONE ok; reboot to recovery requested",
+    "device_postboot": "pass: boot completed; TV Launcher resumed; Wi-Fi and authenticated ADB reconnected automatically",
+    "sanity": {
+      "scope": "basic post-update checks only",
+      "apps": {
+        "org.tvbox.installer": {
+          "exit_code": 0,
+          "status_ok": true,
+          "launch_error": false
+        },
+        "org.tvbox.iptv": {
+          "exit_code": 0,
+          "status_ok": true,
+          "launch_error": false
+        },
+        "org.tvbox.links": {
+          "exit_code": 0,
+          "status_ok": true,
+          "launch_error": false
+        },
+        "org.tvbox.clean": {
+          "exit_code": 0,
+          "status_ok": true,
+          "launch_error": false
+        }
+      },
+      "torrserver_http_echo": 200,
+      "swap_active_entries": 0,
+      "obtainium_third_party_records": 9,
+      "obtainium_own_app_records": 0,
+      "restored_adb_keys": "identical to private pre-wipe backup",
+      "restored_adb_policy": "IPv4 limited to original host; IPv6 blocked; authentication required",
+      "boot_panics_oops_anr_fatal_exceptions_detected": 0,
+      "startup_error_triage": "pending; vendor system components report errors/warnings",
+      "physical_remote_media_bluetooth_security_traffic_acceptance": "not performed"
+    },
+    "recovery_reboot_requested_at": "2026-11-22T23:37:22Z",
+    "screen_observation": "user currently cannot inspect screen",
+    "router_diagnostics": "read-only authentication unsuccessful; no router settings changed",
+    "forced_reboots_after_install_request": 0,
+    "installed": true,
+    "installed_release": "0.4.6",
+    "boot_completed": true,
+    "recovery_result": "success (last_install=1); time_total=378 seconds",
+    "partition_readback": {
+      "result": "pass",
+      "partitions": [
+        "super",
+        "boot",
+        "dtbo",
+        "vbmeta",
+        "recovery"
+      ],
+      "chunk_bytes": 67108864,
+      "chunks": 68,
+      "method": "read-only block readback; SHA-256 each <=64 MiB versus signed candidate regions"
+    },
+    "private_connectivity_handoff": "retained root-private in cache until full sanity/acceptance; no credentials in report"
+  },
+  "ui_update_check_2026_11_23": {
+    "checked_at": "2026-11-23T00:20:50.084421+00:00",
+    "installed_release": "0.4.6",
+    "installed_artifact_source_commit": "083cefbe19a1e7a01568b846d41165f88c80662f",
+    "working_head_at_test_start": "9ee870d54a94a91993ec96ce767020bce5905962",
+    "ui_action": "Installer: Проверить обновления",
+    "configured_default_source": "https://github.com/gamesmod/h96max/releases/latest/download/",
+    "observed_result": "Обновлений не найдено; HTTP 404",
+    "reason": "GitHub releases/latest excludes prereleases; only dev-v0.4.6 is published",
+    "planned_source_for_test": "https://github.com/gamesmod/h96max/releases/download/dev-v0.4.6/",
+    "new_source_added": true,
+    "source_selection_ui": "pass: menu -> add source -> typed direct dev tag URL -> persisted in sources list",
+    "full_interface_update": "pending: download/signature/recovery cycle through UI not yet run",
+    "installation_requested": false,
+    "wipe_requested": false,
+    "ui_search_with_direct_source": "pass: 0.4.6, not newer than installed 0.4.6, expected GitHub OTA URL, 1271 MiB",
+    "package_description_dialog": "pass: release notes, source and warning about data deletion; both action buttons visible",
+    "final_confirmation_dialog": "pass: deletion list and separate Да, обновить / Нет buttons",
+    "final_confirmation_response": "Нет: test stopped safely while awaiting separate repeated-wipe consent"
   }
 }

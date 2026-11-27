@@ -18,6 +18,7 @@ release/notes/*
 !release/notes/0.4.9.txt
 !release/notes/0.4.10.txt
 !release/notes/0.4.11.txt
+!release/notes/0.4.12.txt
 
 # Сторонние и исследовательские входы — не в git (скачивает tools/fetch-third-party.sh)
 /dl/apk/
