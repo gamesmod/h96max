@@ -1,0 +1,48 @@
+{
+  "version": "0.4.12",
+  "reviewed_at_utc": "2026-11-27T15:38:00Z",
+  "build_start_commit": "c84eb05c42035a218fdccb3ed595de3d72841510",
+  "integrated_master_commit": "90edc8638f1b077b41b30946ac12bbfc1299afe1",
+  "source_state": "local candidate; a test-only file changed concurrently; no device installation or publication",
+  "candidate": {
+    "ota_path": "release/updates/emmc/tvbox-update-0.4.12-emmc.zip",
+    "ota_size_bytes": 984254454,
+    "ota_sha256": "67989a56ee8567751e47b36ba12850c39f3c851fcc60541d217df6b8af9405b1",
+    "clean_install_path": "release/Panadonik-0.4.12-emmc-clean-install.zip",
+    "clean_install_size_bytes": 987494981,
+    "clean_install_sha256": "a9b6259d7b37027db285478bbae69d9bb1c66907c9ff3ef32923e76843f5f2d4",
+    "installed": false,
+    "published": false
+  },
+  "host_checks": {
+    "unit_tests": {"status": "pass", "count": 186},
+    "ota_cms_signature": "pass",
+    "sha256sums": "pass",
+    "wifi_credentials_final_ext4": "pass",
+    "iptv_static_urls_checked": 68,
+    "iptv_credentials": "not_found",
+    "dicio_inputs": "pass"
+  },
+  "size_comparison": {
+    "format": "sum of release/<version>/emmc/regions/*.gz",
+    "baseline_0_4_11_bytes": 903146457,
+    "candidate_0_4_12_bytes": 987478331,
+    "delta_bytes": 84331874,
+    "reduce_200mb_goal": "fail"
+  },
+  "checks": {
+    "published_artifact_identity": "pending",
+    "cold_boot_ready": "pending",
+    "first_run_configuration": "pending",
+    "hypatia_database_freshness": "pending",
+    "iptv_boot_index_and_playback": "pending",
+    "torrent_vlc_playback": "pending",
+    "usb_remote_and_page_keys": "pending",
+    "wifi_bluetooth_regulatory": "pending",
+    "root_file_manager": "pending",
+    "logs_and_performance": "pending",
+    "network_capture_review": "pending",
+    "security_review": "pending"
+  },
+  "release_gate": "blocked_pending_hardware_security_size_and_reproducible_rebuild"
+}
