@@ -55,6 +55,7 @@ def transform(path, text):
             """OkHttpClient client = OkHttpManager.instance().getClient();
         if (isPanadonikProxy()) {
             client = client.newBuilder()
+                    .proxy(null)
                     .proxySelector(java.net.ProxySelector.getDefault())
                     .build();
         }""")

@@ -1,10 +1,10 @@
 name: Panadonik Tube source candidate
 on:
   pull_request:
-    paths: ['apps/panadonik-tube/**', '.github/workflows/panadonik-tube.yml']
+    paths: ['apps/panadonik-tube/**', 'apps/smarttube-proxy/sources.json', '.github/workflows/panadonik-tube.yml']
   push:
     branches: ['master']
-    paths: ['apps/panadonik-tube/**', '.github/workflows/panadonik-tube.yml']
+    paths: ['apps/panadonik-tube/**', 'apps/smarttube-proxy/sources.json', '.github/workflows/panadonik-tube.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,6 +27,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Java proxy pool tests
+        working-directory: apps/panadonik-tube
+        run: |
+          mkdir -p /tmp/panadonik-test
+          javac --release 8 -d /tmp/panadonik-test overlay/Gateway.java overlay/ProxyPool.java tests/ProxyPoolTest.java
+          java -cp /tmp/panadonik-test org.tvbox.panadonikproxy.ProxyPoolTest
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools platforms;android-34 build-tools;30.0.3 ndk;21.0.6113669'

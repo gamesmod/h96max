@@ -6,7 +6,6 @@ import android.util.Log;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.regex.Pattern;
 
 /** Process-local automatic proxy selection. No credentials or media URLs are collected. */
 public final class AutoProxy {
@@ -51,7 +50,7 @@ public final class AutoProxy {
         if(!enabled)return false;
         long time=now();
         Gateway.Upstream old=pool.current();
-        if(old==null||time-lastRotate<15000)return false;
+        if(old==null||(lastRotate!=0&&time-lastRotate<15000))return false;
         lastRotate=time;
         Gateway.Upstream next=pool.fail(old,time);
         gateway.select(next);
@@ -81,7 +80,7 @@ public final class AutoProxy {
             // Revalidate active and reserves periodically. No untested endpoint enters the pool.
             List<Gateway.Upstream> recheck=pool.candidates(now());
             if(!recheck.isEmpty())checkBatch(recheck,true);
-            int budget=128;
+            int budget=32;
             while(cursor<pending.size()&&pool.size(now())<6&&budget>0){
                 int end=Math.min(cursor+16,pending.size());
                 checkBatch(new ArrayList<>(pending.subList(cursor,end)),false);
