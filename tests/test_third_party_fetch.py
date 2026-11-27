@@ -34,6 +34,8 @@ class ThirdPartyFetchTests(unittest.TestCase):
     def test_required_apps_covered_by_manifest(self):
         required = re.findall(r'^\s+([a-z0-9_.]+\.apk)\s*$', REQUIRED, re.M)
         dests = {item["dest"] for item in json.loads(MANIFEST.read_text())["items"]}
+        dicio = json.loads((ROOT / "tools/dicio-inputs.json").read_text())["apk"]
+        dests.add(dicio["path"])
         for name in required:
             self.assertIn("dl/apk/" + name, dests)
 
