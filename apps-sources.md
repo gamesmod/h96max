@@ -17,7 +17,7 @@
 | `org.maintainteam.hypatia` | [Hypatia v3.18](https://github.com/MaintainTeam/Hypatia/releases/tag/v3.18) | `d0e31c8dbb338e61220373be61ee524c8476f39aa2d59517984fe45c5e7576c3` | `1b008d64bb95ab4774d68b87f22b8be9a272f4924df52029d7e6183835d918cc` |
 | `org.videolan.vlc` | [VLC 3.7.2](https://f-droid.org/packages/org.videolan.vlc/), arm64, сборка F-Droid | `e748c3e0bb9ec447f3e49f71d5c73e0b48c2c0309faa7fb79806d3afb5601b66` | `80535be61eedb9a03b0476a6f493d496c3498770404339ea7a8000f5e61d22c0` |
 | `ru.yourok.torrserve` | [TorrServe MatriX.143.FOSS](https://f-droid.org/packages/ru.yourok.torrserve/), сборка F-Droid | `c1021faf83e99bd9cdb7359581ec9c7dabf306ca37edaf286685b30d73e772a6` | `ce166643e2c6aad3f7433a9e2c8e67a34f88dcd0edea74fd244f9737f01a0287` |
-| `com.tvlauncher` | TV Launcher 1.6.2 · [F-Droid APK](https://f-droid.org/repo/com.tvlauncher_10602.apk); [исходники](https://github.com/wiiguy/lightweight_androidtv_launcher) | `7afde83f96ccf30d1bc69ca06692d385800d2d9a14dd5f7d85fb4ad4f3c5c210` | `9e9f185a5b3cfb6ff65ac2907d3180c150483705ba129787c60667088647a767` |
+| `com.tvlauncher` | TV Launcher 1.6.2 · [исходники](https://github.com/wiiguy/lightweight_androidtv_launcher) | `7afde83f96ccf30d1bc69ca06692d385800d2d9a14dd5f7d85fb4ad4f3c5c210` | `9e9f185a5b3cfb6ff65ac2907d3180c150483705ba129787c60667088647a767` |
 
 GitHub APK сверены с SHA-256 релиза и проверены `apksigner`. Для APK F-Droid проверены подпись индекса и отпечаток сертификата репозитория, дайджест индекса, SHA-256 APK и подписант из индекса. Установка APK не требует установки магазина F-Droid.
 
