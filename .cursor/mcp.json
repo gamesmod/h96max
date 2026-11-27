@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "manus": {
+      "command": "node",
+      "args": ["${workspaceFolder}/tools/manus-mcp/server.mjs"],
+      "env": { "MANUS_API_KEY": "${env:MANUS_API_KEY}" }
+    }
+  }
+}

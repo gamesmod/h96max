@@ -1,0 +1,8 @@
+# Проектная конфигурация Codex. Применяется, когда проект помечен как доверенный.
+# Ключ в репозиторий не кладётся: задайте MANUS_API_KEY в окружении, из которого запускается Codex.
+[mcp_servers.manus]
+command = "node"
+args = ["tools/manus-mcp/server.mjs"]
+env_vars = ["MANUS_API_KEY"]
+startup_timeout_sec = 15
+tool_timeout_sec = 90
