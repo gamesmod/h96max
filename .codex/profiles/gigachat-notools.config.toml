@@ -1,0 +1,31 @@
+# Источник именованного профиля Codex "gigachat-notools".
+# Установка: $CODEX_HOME/gigachat-notools.config.toml, режим 0600.
+# Секретов нет.
+
+model = "GigaChat-2-Max"
+model_provider = "gigachat"
+model_reasoning_effort = "none"
+web_search = "disabled"
+model_context_window = 128000
+model_auto_compact_token_limit = 96000
+
+# Read-only и без интерактивных подтверждений.
+sandbox_mode = "read-only"
+approval_policy = "never"
+
+[features]
+shell_tool = false
+goals = false
+apps = false
+plugins = false
+
+[agents]
+enabled = false
+
+[model_providers.gigachat]
+name = "gpt2giga GigaChat"
+base_url = "http://127.0.0.1:8090/v2"
+env_key = "GPT2GIGA_API_KEY"
+wire_api = "responses"
+supports_websockets = false
+requires_openai_auth = false
