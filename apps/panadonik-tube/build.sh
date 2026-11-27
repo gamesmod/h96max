@@ -17,6 +17,7 @@ git -C "$W" checkout --detach FETCH_HEAD
 test "$(git -C "$W" rev-parse HEAD)" = "$SHA"
 git -C "$W" -c protocol.file.allow=never submodule update --init --recursive
 python3 "$ROOT/patch_source.py" "$W"
+git -C "$W" add -N common/src/main/java/org/tvbox/panadonikproxy smarttubetv/src/main/assets/sources.json
 git -C "$W" -c core.whitespace=cr-at-eol diff --check
 mkdir -p out
 git -C "$W" submodule status --recursive > out/SUBMODULES.txt

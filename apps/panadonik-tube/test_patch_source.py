@@ -10,7 +10,7 @@ class SourcePatchTests(unittest.TestCase):
         s = "int source = tweaksData.getPlayerDataSource();\n    /**\n     * Use OkHttp for networking\nOkHttpClient client = OkHttpManager.instance().getClient();"
         result = transform(next(p for p in PATHS if p.endswith("/ExoMediaSourceFactory.java")), s)
         self.assertIn('PLAYER_DATA_SOURCE_OKHTTP', result)
-        self.assertIn('new java.net.InetSocketAddress("127.0.0.1", 18765)', result)
+        self.assertIn('proxySelector(java.net.ProxySelector.getDefault())', result)
         self.assertIn('isPanadonikProxy() ?', result)
     def test_id_and_abis(self):
         s = """        classpath 'com.google.gms:google-services:4.3.15'

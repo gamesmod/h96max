@@ -17,9 +17,11 @@ def transform(path, text):
         text = replace_once(text, 'applicationId "app.smarttube.fdroid"', 'applicationId "org.tvbox.panadoniktube"\n            resConfigs "ru", "en"')
         text = replace_once(text, "include 'armeabi-v7a', 'arm64-v8a', 'x86' //", "include 'armeabi-v7a', 'arm64-v8a' //")
         text = replace_once(text, "universalApk true", "universalApk false")
-        text = replace_once(text, "abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'", "abiFilters 'armeabi-v7a', 'arm64-v8a'")
+        text = replace_once(text, "abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'", "// ARM ABI selected by splits")
+        # AGP rejects ndk.abiFilters and splits.abi together.
+        text = text.replace("abiFilters 'armeabi-v7a', 'arm64-v8a'", "// ARM ABI selected by splits")
         text = replace_once(text, 'def project = "SmartTube"', 'def project = "PanadonikTube"')
-        text = replace_once(text, 'versionName "32.83"', 'versionName "32.83-panadonik.1"')
+        text = replace_once(text, 'versionName "32.83"', 'versionName "32.83-panadonik.2"')
         # F-Droid build does not use these plugins. Keep other flavors declared for Gradle variant matching.
         text = replace_once(text, "        classpath 'com.google.gms:google-services:4.3.15'", "")
         text = replace_once(text, "        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.7.1'", "")
@@ -44,8 +46,7 @@ def transform(path, text):
             "int source = isPanadonikProxy() ? PlayerTweaksData.PLAYER_DATA_SOURCE_OKHTTP : tweaksData.getPlayerDataSource();")
         text = replace_once(text, "    /**\n     * Use OkHttp for networking",
             """    private static boolean isPanadonikProxy() {
-        return "127.0.0.1".equals(System.getProperty("https.proxyHost"))
-                && "18765".equals(System.getProperty("https.proxyPort"));
+        return org.tvbox.panadonikproxy.AutoProxy.enabled();
     }
 
     /**
@@ -54,8 +55,7 @@ def transform(path, text):
             """OkHttpClient client = OkHttpManager.instance().getClient();
         if (isPanadonikProxy()) {
             client = client.newBuilder()
-                    .proxy(new java.net.Proxy(java.net.Proxy.Type.HTTP,
-                            new java.net.InetSocketAddress("127.0.0.1", 18765)))
+                    .proxySelector(java.net.ProxySelector.getDefault())
                     .build();
         }""")
         return text
@@ -70,6 +70,23 @@ def transform(path, text):
         }
     }
 """ + text[end:]
+    if path.endswith("/MainApplication.java"):
+        return replace_once(text, "        setupGlobalExceptionHandler();",
+            "        org.tvbox.panadonikproxy.AutoProxy.start(this);\n        setupGlobalExceptionHandler();")
+    if path.endswith("/SplashPresenter.java"):
+        # The managed selector is installed before network clients initialize.
+        return replace_once(text, "if (GeneralData.instance(getContext()).isProxyEnabled()) {",
+            "if (!org.tvbox.panadonikproxy.AutoProxy.enabled() && GeneralData.instance(getContext()).isProxyEnabled()) {")
+    if path.endswith("/ErrorFixerController.java"):
+        return replace_once(text, "        Throwable error = getPlayer().getUnthrownError();\n",
+            """        if (!isStreamEnded() && !isVideoNearEnd()
+                && org.tvbox.panadonikproxy.AutoProxy.rotateOnBuffering()) {
+            YouTubeServiceManager.instance().invalidateFormatCache();
+            mVideoLoaderController.reloadVideo();
+            return;
+        }
+        Throwable error = getPlayer().getUnthrownError();
+""")
     raise ValueError("Unknown patch path")
 
 PATHS = [
@@ -80,6 +97,9 @@ PATHS = [
     BASE + "prefs/MainUIData.java",
     BASE + "exoplayer/ExoMediaSourceFactory.java",
     BASE + "app/presenters/dialogs/AppUpdatePresenter.java",
+    "smarttubetv/src/main/java/com/liskovsoft/smartyoutubetv2/tv/ui/main/MainApplication.java",
+    BASE + "app/presenters/SplashPresenter.java",
+    BASE + "app/models/playback/controllers/ErrorFixerController.java",
 ]
 
 def apply(root):
@@ -98,6 +118,15 @@ def apply(root):
         changes[file] = transform(name, data).replace("\n", sep).encode("utf-8")
     for file, data in changes.items():
         file.write_bytes(data)
+    # Build overlay belongs to the common module; assets are embedded in the final APK.
+    overlay = Path(__file__).with_name("overlay")
+    dest = root / "common/src/main/java/org/tvbox/panadonikproxy"
+    dest.mkdir(parents=True, exist_ok=True)
+    for java in overlay.glob("*.java"):
+        (dest / java.name).write_bytes(java.read_bytes())
+    assets = root / "smarttubetv/src/main/assets"
+    assets.mkdir(parents=True, exist_ok=True)
+    (assets / "sources.json").write_bytes((Path(__file__).parent.parent / "smarttube-proxy/sources.json").read_bytes())
     print("Патчи применены:", len(changes))
 
 if __name__ == "__main__":
