@@ -57,7 +57,8 @@ public class IndexOnBootService extends Service {
             return START_NOT_STICKY;
         }
 
-        prefs.edit().putBoolean("running", true).putBoolean("shown", false).putInt("done", 0).apply();
+        prefs.edit().putBoolean("running", true).putBoolean("shown", false).putBoolean("complete", false)
+                .remove("error").putInt("done", 0).putInt("total", 1).putInt("left_seconds", 0).apply();
         worker = new Thread(new Runnable() {
             public void run() { index(playlist, size, modified, prefs); }
         }, "iptv-index");

@@ -1,0 +1,115 @@
+{
+  "date_utc": "2026-11-23T00:02:04.460556+00:00",
+  "source_commit": "9ee870d54a94a91993ec96ce767020bce5905962",
+  "working_tree_sha256": {
+    "apps/voicebridge/AndroidManifest.xml": "0c457c792287195322c69d74e7f21c3702710a6bdf0ff2bbb55c096b31ac04c7",
+    "apps/voicebridge/build.sh": "7417e67c5f7d38b5a40cc99096d071fa738253dba3e38cbc874abd2fcb6d60e8",
+    "apps/voicebridge/src/org/tvbox/voicebridge/CommandExecutor.java": "6c2f69fe59c1c5bfa2a7915f55da827183f77e688555043e04e021990120ce74",
+    "apps/voicebridge/src/org/tvbox/voicebridge/ListeningService.java": "d88510739dcf1e37393c38af53e17397c24dc8c234a387dcc2f9288b5c55756f",
+    "apps/voicebridge/src/org/tvbox/voicebridge/MainActivity.java": "0554f8eadda62bf7f3eb25818473ae3dd2f7ad2a2d42a3adbba685b18343fa47",
+    "apps/voicebridge/src/org/tvbox/voicebridge/VoiceCommand.java": "6f277f866115008a12cf05b3735f14d94e0c0a4d6731259bd511e0a842963ca2",
+    "obtainium-apps.json": "fd02d8b0eb003993691847e0c129c88d46b329ed40518758a03898d7624f0c16",
+    "tests/test_voicebridge_commands.py": "9a892c172395ea10b7558b3c08118cbe4720fe8a0f736b3d389f6cef0724cb92"
+  },
+  "installed_device_release": "0.4.6",
+  "base_firmware_sha256": "not established in this app-only test; no firmware installation performed by this task",
+  "previous_observation": "Device initially unavailable; returned running 0.4.6 without Dicio or bridge. Both apps installed and configured afresh; no data wipe or reboot performed.",
+  "bridge": {
+    "package": "org.tvbox.voicebridge",
+    "version_name": "0.2",
+    "version_code": 2,
+    "apk_path": "apps/voicebridge/out/TvboxVoiceBridge.apk",
+    "sha256": "f540fff15bd2c30b157079958595438b88a830e50adf7f17562f900c877d90c9",
+    "installed_sha256_matches": true,
+    "signature_verified": true,
+    "signer_certificate_sha256": "f52a109a77d33ff95bc97760c4b85358b678384f805035ebe0ef9d692e26f388",
+    "source": "apps/voicebridge",
+    "entry": "NoDisplay activity starts a bounded microphone foreground service, then immediately finishes; Dicio MainActivity is never launched for recognition",
+    "recognition_service": "org.stypox.dicio/.io.input.stt_service.SttService",
+    "ui": "Nonfocusable, nontouchable overlay at top right; preparing/listening status; silent foreground notification",
+    "audio_focus": "Not requested; no automatic duck or media pause",
+    "limits": "30 seconds for cold preparation, 15 seconds once capture is ready; second press cancels; stale callbacks ignored; microphone released before executing command; refuses start if another recording is already active",
+    "input_and_output": "Russian local recognition via Dicio; fixed command vocabulary implemented by bridge, not all Dicio skills; no audio/text storage or transcript logging in bridge"
+  },
+  "dicio": {
+    "version": "4.2",
+    "apk_sha256": "f17270a0e8809a7c076a423e39cdbdd86dc487e881762eafca57e03f82258e80",
+    "language": "RU",
+    "vosk_model_sha256": "961d5ff98a17f4aa6de69864d0aa71fa5bac682301d2b5d17a3f24c5c99a46d4",
+    "settings_schema": "https://github.com/DicioTeam/dicio-android/blob/v4.2/app/src/main/proto/user_settings.proto",
+    "initial_settings_pb_hex": "180920022801300140014804",
+    "settings": "Explicit Russian, Vosk, wake word disabled, speech output disabled, STT sound disabled; only initialized because settings/model absent",
+    "wake_word_enabled": false,
+    "obtainium_record_seeded_on_046": true,
+    "obtainium_ui_update_check": "pending"
+  },
+  "device_configuration": {
+    "RECORD_AUDIO": "Granted to bridge and Dicio",
+    "SYSTEM_ALERT_WINDOW": "Allowed for bridge",
+    "assistant": "org.tvbox.voicebridge/.MainActivity",
+    "log.tag.VoskListener": "WARN",
+    "persist.log.tag.VoskListener": "WARN",
+    "logging_note": "Upstream Dicio logs transcripts at DEBUG; suppressing this tag produced zero new debug lines during final test. Previous system log buffer was not cleared."
+  },
+  "supported_commands": [
+    "пауза",
+    "продолжи",
+    "следующий трек",
+    "предыдущий трек",
+    "громче",
+    "тише",
+    "выключи звук",
+    "включи звук",
+    "домой",
+    "который час",
+    "открой <точное имя приложения>",
+    "запусти <точное имя приложения>"
+  ],
+  "unimplemented_commands": [
+    "переключение IPTV-каналов",
+    "назад",
+    "произвольные навыки Dicio"
+  ],
+  "live_test": {
+    "date_utc": "2026-11-23T00:00:27.308842+00:00",
+    "before": "org.tvbox.iptv/.MainActivity",
+    "during": "org.tvbox.iptv/.MainActivity",
+    "cold_microphone_active": true,
+    "cold_microphone_ready_seconds": 6.93,
+    "foreground_retained_cold": true,
+    "cancel_input_released": true,
+    "cancel_service_stopped": true,
+    "warm_microphone_active": true,
+    "warm_foreground_retained": true,
+    "timeout_input_released": true,
+    "timeout_service_stopped": true,
+    "after_timeout": "org.tvbox.iptv/.MainActivity",
+    "new_vosk_debug_log_lines": 0
+  },
+  "focus_verification": "During cold/warm listening and after DPAD_DOWN, window focus remained with org.tvbox.iptv/.MainActivity; visual check showed only the small listening indicator over IPTV",
+  "validation": {
+    "unit_tests": 107,
+    "unit_tests_result": "pass",
+    "build": "pass",
+    "signature": "pass; original project key retained",
+    "shell_json_whitespace": "pass"
+  },
+  "playback_test": {
+    "status": "not accepted",
+    "fixture": "Locally generated 40-second H264 1280x720/30fps + silent AAC MP4",
+    "fixture_sha256": "990d844cd38e7d41ae1ff2e1e5463c65504a4df7511b41905af92a20ce125b1b",
+    "result": "VLC showed a black video surface and stopped/none media state before any voice invocation. No successful playback continuity or dropped-frame measurement; unrelated root cause not established. Only this synthetic VLC test was stopped.",
+    "restored_foreground": "org.tvbox.iptv/.MainActivity"
+  },
+  "limitations": [
+    "Physical USB key and successful spoken-command execution still need user confirmation; injected KEYCODE_VOICE_ASSIST tested",
+    "No successful playing-movie continuity acceptance yet",
+    "No full network capture/security review; app trial is not firmware release acceptance",
+    "Dicio and bridge not wired into mandatory firmware build/firstboot yet",
+    "Own bridge excluded from Obtainium; no automatic commit, push, tag or publication performed"
+  ],
+  "history": [
+    "docs/dicio-install-2026-11-22.json",
+    "docs/alice-ai-install-2026-11-14.json"
+  ]
+}

@@ -8,7 +8,9 @@ import android.os.Build;
 /** Запускает лёгкую однократную индексацию плейлиста после старта Android. */
 public class BootReceiver extends BroadcastReceiver {
     @Override public void onReceive(Context context, Intent intent) {
-        if (!Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) return;
+        String action = intent.getAction();
+        if (!Intent.ACTION_BOOT_COMPLETED.equals(action) &&
+                !Intent.ACTION_MY_PACKAGE_REPLACED.equals(action)) return;
         Intent service = new Intent(context, IndexOnBootService.class);
         if (Build.VERSION.SDK_INT >= 26) {
             try { Context.class.getMethod("startForegroundService", Intent.class).invoke(context, service); }

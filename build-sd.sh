@@ -6,6 +6,7 @@ set -euo pipefail
 R=$(cd "$(dirname "$0")" && pwd)
 source "$R/tools/required-apps.sh"
 tvbox_require_apks || { echo "Сборка остановлена: комплект приложений неполный" >&2; exit 1; }
+if [ -z "${VANILLA:-}" ]; then python3 -I "$R/tools/prepare-dicio-assets.py" --check; fi
 # Проверка вендорских разделов (аналог Finishing из LineageOS extract-blobs wiki).
 bash "$R/tools/prepare-build-inputs.sh" --check-only
 T=$R/tools

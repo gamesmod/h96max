@@ -119,6 +119,12 @@ fi
 appops set org.tvbox.files MANAGE_EXTERNAL_STORAGE allow
 pm grant org.tvbox.files android.permission.READ_EXTERNAL_STORAGE 2>/dev/null
 pm grant org.tvbox.files android.permission.WRITE_EXTERNAL_STORAGE 2>/dev/null
+# Первый boot: только что установленный APK может пропустить BOOT_COMPLETED
+# или оставаться stopped до первого явного запуска. Готовим кэш без открытия Activity.
+# Служба сама пропускает работу, если плейлист и схема индекса не изменились.
+if pm path org.tvbox.iptv >/dev/null 2>&1; then
+    am start-foreground-service --user 0 -n org.tvbox.iptv/.IndexOnBootService
+fi
 # Один раз выключить субтитры VLC по умолчанию; последующие настройки пользователя сохраняются.
 V=/data/data/org.videolan.vlc/shared_prefs/org.videolan.vlc_preferences.xml
 if pm path org.videolan.vlc >/dev/null 2>&1 && ! grep -q subtitle_preferred_language $V 2>/dev/null; then
