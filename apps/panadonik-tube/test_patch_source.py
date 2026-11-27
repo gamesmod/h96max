@@ -22,6 +22,7 @@ android {
     def project = "SmartTube"
     applicationId "app.smarttube.fdroid"
     include 'armeabi-v7a', 'arm64-v8a', 'x86' // comment
+    abiFilters 'armeabi-v7a', 'arm64-v8a'
     abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'
     universalApk true
 }
@@ -33,6 +34,18 @@ android {
         self.assertNotIn("com.google.gms", result)
         self.assertNotIn("firebase-crashlytics-gradle", result)
         self.assertIn("universalApk false", result)
+        self.assertNotIn("abiFilters", result)
+    def test_failover_hook(self):
+        path = next(p for p in PATHS if p.endswith("/ErrorFixerController.java"))
+        s = transform(path, "        Throwable error = getPlayer().getUnthrownError();\n")
+        self.assertIn("rotateOnBuffering()", s)
+        self.assertIn("invalidateFormatCache()", s)
+        self.assertIn("reloadVideo()", s)
+    def test_sources(self):
+        import json
+        from pathlib import Path
+        rows = json.loads((Path(__file__).parent.parent / "smarttube-proxy/sources.json").read_text())
+        self.assertGreaterEqual(len({r["id"] for r in rows}), 5)
     def test_autoupdate_disabled(self):
         s = "    public void start(boolean forceCheck) {\n        update();\n    }\n    @Override\n"
         self.assertNotIn("update();", transform(next(p for p in PATHS if p.endswith("/AppUpdatePresenter.java")), s))

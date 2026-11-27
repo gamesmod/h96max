@@ -1,10 +1,10 @@
 name: Panadonik Tube source candidate
 on:
   pull_request:
-    paths: ['apps/panadonik-tube/**', '.github/workflows/panadonik-tube.yml']
+    paths: ['apps/panadonik-tube/**', 'apps/smarttube-proxy/sources.json', '.github/workflows/panadonik-tube.yml']
   push:
     branches: ['master']
-    paths: ['apps/panadonik-tube/**', '.github/workflows/panadonik-tube.yml']
+    paths: ['apps/panadonik-tube/**', 'apps/smarttube-proxy/sources.json', '.github/workflows/panadonik-tube.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,6 +27,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Java proxy pool tests
+        working-directory: apps/panadonik-tube
+        run: |
+          mkdir -p /tmp/panadonik-test
+          javac --release 8 -d /tmp/panadonik-test overlay/Gateway.java overlay/ProxyPool.java tests/ProxyPoolTest.java
+          java -cp /tmp/panadonik-test org.tvbox.panadonikproxy.ProxyPoolTest
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools platforms;android-34 build-tools;30.0.3 ndk;21.0.6113669'
@@ -38,5 +44,58 @@ jobs:
         with:
           name: panadonik-tube-unsigned-unaccepted
           path: apps/panadonik-tube/out/
+          if-no-files-found: error
+          retention-days: 3
+  signed-candidate:
+    needs: source-build
+    if: github.ref == 'refs/heads/master' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: panadonik-tube-unsigned-unaccepted
+          path: unsigned
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;35.0.0'
+          log-accepted-android-sdk-licenses: 'false'
+      - name: Sign isolated APK candidate
+        env:
+          TVBOX_KEY: ${{ secrets.TVBOX_SIGNING_KEY }}
+          TVBOX_CERT: ${{ secrets.TVBOX_SIGNING_CERT }}
+        run: |
+          set -euo pipefail
+          umask 077
+          w=$(mktemp -d)
+          trap 'rm -rf "$w"' EXIT
+          test -n "$TVBOX_KEY" && test -n "$TVBOX_CERT"
+          printf '%s\n' "$TVBOX_KEY" > "$w/key.pem"
+          printf '%s\n' "$TVBOX_CERT" > "$w/cert.pem"
+          unset TVBOX_KEY TVBOX_CERT
+          openssl pkcs8 -topk8 -nocrypt -in "$w/key.pem" -outform DER -out "$w/key.der"
+          bt="$ANDROID_HOME/build-tools/35.0.0"
+          expected=$(openssl x509 -in "$w/cert.pem" -outform DER | sha256sum | cut -d' ' -f1)
+          mkdir -p signed
+          (cd unsigned && sha256sum -c SHA256SUMS)
+          for abi in armeabi-v7a arm64-v8a; do
+            input="unsigned/PanadonikTube-$abi-unsigned.apk"
+            output="signed/PanadonikTube-$abi.apk"
+            "$bt/zipalign" -f -p 4 "$input" "$w/aligned.apk"
+            "$bt/apksigner" sign --key "$w/key.der" --cert "$w/cert.pem" --v1-signing-enabled true --v2-signing-enabled true --out "$output" "$w/aligned.apk"
+            "$bt/apksigner" verify --verbose --print-certs "$output" | tee "$w/verify.txt"
+            grep -Fx "Signer #1 certificate SHA-256 digest: $expected" "$w/verify.txt"
+            "$bt/zipalign" -c -p 4 "$output"
+          done
+          (cd signed && sha256sum *.apk > SHA256SUMS)
+          cp unsigned/source.lock.json unsigned/SUBMODULES.txt unsigned/PANADONIK.patch unsigned/LICENSE.smarttube signed/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: panadonik-tube-signed-unaccepted
+          path: signed/
           if-no-files-found: error
           retention-days: 3
