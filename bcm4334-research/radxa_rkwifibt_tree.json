@@ -1,0 +1,2401 @@
+{
+  "sha": "bf5f91cb0e641962630979a8b73f668ae8bd8ed9",
+  "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/bf5f91cb0e641962630979a8b73f668ae8bd8ed9",
+  "tree": [
+    {
+      "path": "NOTICE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c5b1efa7aac764ae6d8da63476a2d5cec02a6a5d",
+      "size": 10695,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/c5b1efa7aac764ae6d8da63476a2d5cec02a6a5d"
+    },
+    {
+      "path": "S36load_ampakall_wifi_modules",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "2767f6699625835a90e3ef7020a870df02214dc4",
+      "size": 735,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/2767f6699625835a90e3ef7020a870df02214dc4"
+    },
+    {
+      "path": "S36load_rv1109_wifi_modules",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "057fef1ce9cdf2893f462d4c2ac73bfba7097d28",
+      "size": 760,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/057fef1ce9cdf2893f462d4c2ac73bfba7097d28"
+    },
+    {
+      "path": "S36load_wifi_modules",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "862c23dafcc9baaaf43b2dc89ede1ac119a3946a",
+      "size": 688,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/862c23dafcc9baaaf43b2dc89ede1ac119a3946a"
+    },
+    {
+      "path": "S36load_wifi_rk912_modules",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "46f158940985dec46619c928f3943e3d4d0e27c9",
+      "size": 766,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/46f158940985dec46619c928f3943e3d4d0e27c9"
+    },
+    {
+      "path": "S67wifi",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "8e2cccf9edf4c94f78470dd81d03e2b3b095f5b1",
+      "size": 1268,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/8e2cccf9edf4c94f78470dd81d03e2b3b095f5b1"
+    },
+    {
+      "path": "bin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "08550c0d79999b7547c665b0f3cf2d323de7b5a0",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/08550c0d79999b7547c665b0f3cf2d323de7b5a0"
+    },
+    {
+      "path": "bin/arm",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fa58a4685f38f62ef5822a76327cfa7e97efbe3d",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/fa58a4685f38f62ef5822a76327cfa7e97efbe3d"
+    },
+    {
+      "path": "bin/arm/dhd",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "edca78c19ef070a93fd9e79a46d049dd377c1588",
+      "size": 193384,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/edca78c19ef070a93fd9e79a46d049dd377c1588"
+    },
+    {
+      "path": "bin/arm/rtlbtmp",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "735a99de306f62c782326e8005ccc8ede026a87e",
+      "size": 174004,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/735a99de306f62c782326e8005ccc8ede026a87e"
+    },
+    {
+      "path": "bin/arm/rtwpriv",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "44e479019e81663d725e199012588de8002f5792",
+      "size": 1672528,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/44e479019e81663d725e199012588de8002f5792"
+    },
+    {
+      "path": "bin/arm/wl",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "5cc710d8a6e308f82d061fbdb1abd9fadfbfbe9a",
+      "size": 739140,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/5cc710d8a6e308f82d061fbdb1abd9fadfbfbe9a"
+    },
+    {
+      "path": "bin/arm64",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "78eecb5153421bd31d4cf3136d548b500693ec8d",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/78eecb5153421bd31d4cf3136d548b500693ec8d"
+    },
+    {
+      "path": "bin/arm64/dhd",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "bc645f021c0995c69f237862c98a4cf69cafaa50",
+      "size": 232352,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/bc645f021c0995c69f237862c98a4cf69cafaa50"
+    },
+    {
+      "path": "bin/arm64/rtlbtmp",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "9b688711df050a26deb0e1d57f0e75c77426de84",
+      "size": 228952,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/9b688711df050a26deb0e1d57f0e75c77426de84"
+    },
+    {
+      "path": "bin/arm64/rtwpriv",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "a01eb42aff688b13c73edb434b11fb95123dad8e",
+      "size": 2622568,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/a01eb42aff688b13c73edb434b11fb95123dad8e"
+    },
+    {
+      "path": "bin/arm64/wl",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "c2fc7f67252b5c651af8055ff344476d9a09a805",
+      "size": 1554880,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/c2fc7f67252b5c651af8055ff344476d9a09a805"
+    },
+    {
+      "path": "brcm_tools",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "91aaef69eedd099b482d77781ba3139d666b9536",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/91aaef69eedd099b482d77781ba3139d666b9536"
+    },
+    {
+      "path": "brcm_tools/brcm_patchram_plus1.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0879fa2ba0157a040a89a724ed4c57adae011c35",
+      "size": 22544,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/0879fa2ba0157a040a89a724ed4c57adae011c35"
+    },
+    {
+      "path": "brcm_tools/dhd_priv.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a05665800b65bc80755a52089058640a6bba2290",
+      "size": 1876,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/a05665800b65bc80755a52089058640a6bba2290"
+    },
+    {
+      "path": "bt_load_broadcom_firmware",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "1c7a128497a80b6f2f7238075beae95798beb41b",
+      "size": 323,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/1c7a128497a80b6f2f7238075beae95798beb41b"
+    },
+    {
+      "path": "bt_load_rtk_firmware",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "66c553ca6b116288870b17e625c3be852d3f6b6c",
+      "size": 234,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/66c553ca6b116288870b17e625c3be852d3f6b6c"
+    },
+    {
+      "path": "bt_realtek_hfp_accept",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "43faf34c62b79a6dc5b793850eac7924bb450b40",
+      "size": 118,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/43faf34c62b79a6dc5b793850eac7924bb450b40"
+    },
+    {
+      "path": "bt_realtek_hfp_hanup",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "9c9878f2b3cd9ceb1252d13b5c853e9e9ff1501d",
+      "size": 122,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/9c9878f2b3cd9ceb1252d13b5c853e9e9ff1501d"
+    },
+    {
+      "path": "bt_realtek_hfp_start",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "e6d9d8cc749a078cbb581de6d7c1fcaa804d0ee0",
+      "size": 293,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e6d9d8cc749a078cbb581de6d7c1fcaa804d0ee0"
+    },
+    {
+      "path": "bt_realtek_start",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "5fce8ad5cf0d3609623401dc0d0b271525e35ff2",
+      "size": 579,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/5fce8ad5cf0d3609623401dc0d0b271525e35ff2"
+    },
+    {
+      "path": "dnsmasq.conf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d9b2f6fd85532dc7d30054532569a13a70771fc",
+      "size": 101,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/7d9b2f6fd85532dc7d30054532569a13a70771fc"
+    },
+    {
+      "path": "firmware",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "82255081866502007f863e381b07598c89913629",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/82255081866502007f863e381b07598c89913629"
+    },
+    {
+      "path": "firmware/broadcom",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "01395b4e69f0f9c4cacce21e2c865adfe46cc632",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/01395b4e69f0f9c4cacce21e2c865adfe46cc632"
+    },
+    {
+      "path": "firmware/broadcom/AP6181",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "262f17b8e3bf69059b2f11f4b902596c6a8efae7",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/262f17b8e3bf69059b2f11f4b902596c6a8efae7"
+    },
+    {
+      "path": "firmware/broadcom/AP6181/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "90df899d717e45e946cb260b0f47fd76d2ac3e94",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/90df899d717e45e946cb260b0f47fd76d2ac3e94"
+    },
+    {
+      "path": "firmware/broadcom/AP6181/wifi/fw_bcm40181a2.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e0f277b6998015aaa3b7f7b97a3cc011053e8d04",
+      "size": 212894,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e0f277b6998015aaa3b7f7b97a3cc011053e8d04"
+    },
+    {
+      "path": "firmware/broadcom/AP6181/wifi/fw_bcm40181a2_mfg.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6d52546b72cd50b10b9db318254b2d1082f62bea",
+      "size": 214902,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/6d52546b72cd50b10b9db318254b2d1082f62bea"
+    },
+    {
+      "path": "firmware/broadcom/AP6181/wifi/nvram_ap6181.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2869608bd9990230b4ea852dd411fc4b969e1ea7",
+      "size": 1235,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/2869608bd9990230b4ea852dd411fc4b969e1ea7"
+    },
+    {
+      "path": "firmware/broadcom/AP6203BM",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8ef31b49d69dbfebcec45050e72412da2821ac31",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/8ef31b49d69dbfebcec45050e72412da2821ac31"
+    },
+    {
+      "path": "firmware/broadcom/AP6203BM/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "46484d04e42a9630f2026d0411144ae4548619db",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/46484d04e42a9630f2026d0411144ae4548619db"
+    },
+    {
+      "path": "firmware/broadcom/AP6203BM/bt/null.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "firmware/broadcom/AP6203BM/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f95157abbd4c18313e0c64d019b0f296c5c6f285",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/f95157abbd4c18313e0c64d019b0f296c5c6f285"
+    },
+    {
+      "path": "firmware/broadcom/AP6203BM/wifi/clm_bcm43013c1_ag.blob",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8991d31ba05b16b260cce4f715605e1c32708e06",
+      "size": 5144,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/8991d31ba05b16b260cce4f715605e1c32708e06"
+    },
+    {
+      "path": "firmware/broadcom/AP6203BM/wifi/config.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "63ef0d2e8f2208a6c83460cf826bce86354ac6f6",
+      "size": 209,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/63ef0d2e8f2208a6c83460cf826bce86354ac6f6"
+    },
+    {
+      "path": "firmware/broadcom/AP6203BM/wifi/fw_bcm43013c1_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "12f33ceb66615d49f91eee5194a06846b527f8f1",
+      "size": 503491,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/12f33ceb66615d49f91eee5194a06846b527f8f1"
+    },
+    {
+      "path": "firmware/broadcom/AP6203BM/wifi/fw_bcm43013c1_ag_mfg.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "00c3f13c4b0aa5206c08ab68931eade917ec1a3d",
+      "size": 489441,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/00c3f13c4b0aa5206c08ab68931eade917ec1a3d"
+    },
+    {
+      "path": "firmware/broadcom/AP6203BM/wifi/nvram_ap6201bm.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9f946c57222aa51394c7bcab0163829f400d7d2c",
+      "size": 2688,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/9f946c57222aa51394c7bcab0163829f400d7d2c"
+    },
+    {
+      "path": "firmware/broadcom/AP6203BM/wifi/nvram_ap6203bm.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f2b40922859cb9d576766a24a972a5cee120c0c5",
+      "size": 3102,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/f2b40922859cb9d576766a24a972a5cee120c0c5"
+    },
+    {
+      "path": "firmware/broadcom/AP6212A1",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1e9524c1d3e98685f648e43efeb5547f94a378b9",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/1e9524c1d3e98685f648e43efeb5547f94a378b9"
+    },
+    {
+      "path": "firmware/broadcom/AP6212A1/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cfd8941ad1a21ae80dd27a24578c9482405021b2",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/cfd8941ad1a21ae80dd27a24578c9482405021b2"
+    },
+    {
+      "path": "firmware/broadcom/AP6212A1/bt/bcm43438a1.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "956a932a12a73e79d05e605a6d3d8e4544a1507b",
+      "size": 36755,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/956a932a12a73e79d05e605a6d3d8e4544a1507b"
+    },
+    {
+      "path": "firmware/broadcom/AP6212A1/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "05640240ec54280ee9976e27b2414dd032bdfd9f",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/05640240ec54280ee9976e27b2414dd032bdfd9f"
+    },
+    {
+      "path": "firmware/broadcom/AP6212A1/wifi/fw_bcm43438a1.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8fb60836ccf69bd564e1d6144ac56499e3fddbfd",
+      "size": 414579,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/8fb60836ccf69bd564e1d6144ac56499e3fddbfd"
+    },
+    {
+      "path": "firmware/broadcom/AP6212A1/wifi/fw_bcm43438a1_mfg.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2a3d73704685a10c89e7297e1ecdcb32dfa4b47",
+      "size": 331377,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/d2a3d73704685a10c89e7297e1ecdcb32dfa4b47"
+    },
+    {
+      "path": "firmware/broadcom/AP6212A1/wifi/nvram_ap6212a.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9a913daf2a13d8465201f84956d22af4621512ff",
+      "size": 1003,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/9a913daf2a13d8465201f84956d22af4621512ff"
+    },
+    {
+      "path": "firmware/broadcom/AP6236",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f01b443eda872ccf01600a9b8cc42982807907cd",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/f01b443eda872ccf01600a9b8cc42982807907cd"
+    },
+    {
+      "path": "firmware/broadcom/AP6236/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3024d82206e737ff9f7e096c1a48386117372107",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/3024d82206e737ff9f7e096c1a48386117372107"
+    },
+    {
+      "path": "firmware/broadcom/AP6236/bt/BCM4343B0.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a4832eab53f61c001a69cdad9a8500554d282c4",
+      "size": 46538,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/5a4832eab53f61c001a69cdad9a8500554d282c4"
+    },
+    {
+      "path": "firmware/broadcom/AP6236/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c2b539b23b3cfb0c537364b898a4cf7227a82511",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/c2b539b23b3cfb0c537364b898a4cf7227a82511"
+    },
+    {
+      "path": "firmware/broadcom/AP6236/wifi/fw_bcm43436b0.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a0341a72686a26dcfdf1a9c84f54da1fd2b3fa0d",
+      "size": 428559,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/a0341a72686a26dcfdf1a9c84f54da1fd2b3fa0d"
+    },
+    {
+      "path": "firmware/broadcom/AP6236/wifi/fw_bcm43436b0_mfg.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1735332833f02f87190851f5e8f08c12b0ac785",
+      "size": 402846,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/b1735332833f02f87190851f5e8f08c12b0ac785"
+    },
+    {
+      "path": "firmware/broadcom/AP6236/wifi/nvram_ap6236.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "94859d90313d77941ea9649b0b951614485dcd45",
+      "size": 1212,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/94859d90313d77941ea9649b0b951614485dcd45"
+    },
+    {
+      "path": "firmware/broadcom/AP6254",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ea57e0d8b653752e6b52884676d1d874186122cc",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/ea57e0d8b653752e6b52884676d1d874186122cc"
+    },
+    {
+      "path": "firmware/broadcom/AP6254/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b94ef00bb7f0dd2df305530eef12ba4b8b256f15",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/b94ef00bb7f0dd2df305530eef12ba4b8b256f15"
+    },
+    {
+      "path": "firmware/broadcom/AP6254/wifi/fw_bcm43455c0_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6cb278da3d7ed86cfc9d388fb521eb36419da72",
+      "size": 624166,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/d6cb278da3d7ed86cfc9d388fb521eb36419da72"
+    },
+    {
+      "path": "firmware/broadcom/AP6254/wifi/fw_bcm43455c0_ag_apsta.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6cb278da3d7ed86cfc9d388fb521eb36419da72",
+      "size": 624166,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/d6cb278da3d7ed86cfc9d388fb521eb36419da72"
+    },
+    {
+      "path": "firmware/broadcom/AP6254/wifi/nvram_ap6254.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc4f7c100c04cc52d9b1c41586d5b6e3695068cd",
+      "size": 1768,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/dc4f7c100c04cc52d9b1c41586d5b6e3695068cd"
+    },
+    {
+      "path": "firmware/broadcom/AP6255",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6c8951b3cd4d6812de1b5e1a94eac39935e21def",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/6c8951b3cd4d6812de1b5e1a94eac39935e21def"
+    },
+    {
+      "path": "firmware/broadcom/AP6255/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6e1f4400a923afbb65e0ea9b0bf77e158b374892",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/6e1f4400a923afbb65e0ea9b0bf77e158b374892"
+    },
+    {
+      "path": "firmware/broadcom/AP6255/bt/BCM4345C0.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8693f68a4a74e0ad51704082c76099c9f6e4ceb1",
+      "size": 71609,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/8693f68a4a74e0ad51704082c76099c9f6e4ceb1"
+    },
+    {
+      "path": "firmware/broadcom/AP6255/bt/BCM4345C0_ap.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67fb8f53b063e6a5bfeb5afcdc3399f77773e6d4",
+      "size": 65570,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/67fb8f53b063e6a5bfeb5afcdc3399f77773e6d4"
+    },
+    {
+      "path": "firmware/broadcom/AP6255/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1c20f5b8eb3c250c07cc5c3901f7ae5de73ec7c8",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/1c20f5b8eb3c250c07cc5c3901f7ae5de73ec7c8"
+    },
+    {
+      "path": "firmware/broadcom/AP6255/wifi/fw_bcm43455c0_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1427903d68a13020f8e570b2908db033405aae96",
+      "size": 624560,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/1427903d68a13020f8e570b2908db033405aae96"
+    },
+    {
+      "path": "firmware/broadcom/AP6255/wifi/fw_bcm43455c0_ag_mfg.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fa001fb27e8cb22146cf13b179c024d81134cff8",
+      "size": 525888,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/fa001fb27e8cb22146cf13b179c024d81134cff8"
+    },
+    {
+      "path": "firmware/broadcom/AP6255/wifi/nvram_ap6255.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a2ae81bab8e8e7d0bf87e9a36350a53966a27e1c",
+      "size": 2200,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/a2ae81bab8e8e7d0bf87e9a36350a53966a27e1c"
+    },
+    {
+      "path": "firmware/broadcom/AP6256",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3af81cc5019b52c1c35daa9d326640703ada0bd3",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/3af81cc5019b52c1c35daa9d326640703ada0bd3"
+    },
+    {
+      "path": "firmware/broadcom/AP6256/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "746a3ef300ed4e4e79018f823e800ed65d9a8358",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/746a3ef300ed4e4e79018f823e800ed65d9a8358"
+    },
+    {
+      "path": "firmware/broadcom/AP6256/bt/BCM4345C5.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f92310c94842ecd14dcc9ee416e4b5bdbf86ab99",
+      "size": 45667,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/f92310c94842ecd14dcc9ee416e4b5bdbf86ab99"
+    },
+    {
+      "path": "firmware/broadcom/AP6256/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "80710ad68b31b222a75ebf50bb1bfba71880c2c5",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/80710ad68b31b222a75ebf50bb1bfba71880c2c5"
+    },
+    {
+      "path": "firmware/broadcom/AP6256/wifi/fw_bcm43456c5_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61fd45797c77ba82900fff936f0daee76d1d28af",
+      "size": 585884,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/61fd45797c77ba82900fff936f0daee76d1d28af"
+    },
+    {
+      "path": "firmware/broadcom/AP6256/wifi/fw_bcm43456c5_ag_apsta.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd91afc315aa1dfea70e0f9c21a2efc11b9d638e",
+      "size": 482927,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/cd91afc315aa1dfea70e0f9c21a2efc11b9d638e"
+    },
+    {
+      "path": "firmware/broadcom/AP6256/wifi/fw_bcm43456c5_ag_mfg.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "63dfd90609e3bf2e7ad33be0f5dfc9d217b60a8e",
+      "size": 463874,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/63dfd90609e3bf2e7ad33be0f5dfc9d217b60a8e"
+    },
+    {
+      "path": "firmware/broadcom/AP6256/wifi/fw_bcm43456c5_ag_p2p.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd91afc315aa1dfea70e0f9c21a2efc11b9d638e",
+      "size": 482927,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/cd91afc315aa1dfea70e0f9c21a2efc11b9d638e"
+    },
+    {
+      "path": "firmware/broadcom/AP6256/wifi/nvram_ap6256.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0916af537640a3f21ccd622c8e6ef72623a0a4fd",
+      "size": 2099,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/0916af537640a3f21ccd622c8e6ef72623a0a4fd"
+    },
+    {
+      "path": "firmware/broadcom/AP6275S",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "44d68318bb8d90b60257515e7d8e581d92730384",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/44d68318bb8d90b60257515e7d8e581d92730384"
+    },
+    {
+      "path": "firmware/broadcom/AP6275S/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1051178f54e284c890e31685e5eace6df690ff90",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/1051178f54e284c890e31685e5eace6df690ff90"
+    },
+    {
+      "path": "firmware/broadcom/AP6275S/bt/BCM4362A2.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "abed4e3c1c788d910322d786d44e89d64516156b",
+      "size": 72658,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/abed4e3c1c788d910322d786d44e89d64516156b"
+    },
+    {
+      "path": "firmware/broadcom/AP6275S/bt/BCM4362A2_001.003.006.1004.1008.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "abed4e3c1c788d910322d786d44e89d64516156b",
+      "size": 72658,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/abed4e3c1c788d910322d786d44e89d64516156b"
+    },
+    {
+      "path": "firmware/broadcom/AP6275S/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "88d35c89b22e373a1b9b1afff6d720c93670f68f",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/88d35c89b22e373a1b9b1afff6d720c93670f68f"
+    },
+    {
+      "path": "firmware/broadcom/AP6275S/wifi/clm_bcm43752a2_ag.blob",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e8c8d7f0d258130b585c5c9030a8141127cad368",
+      "size": 29217,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e8c8d7f0d258130b585c5c9030a8141127cad368"
+    },
+    {
+      "path": "firmware/broadcom/AP6275S/wifi/fw_bcm43752a2_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd5e06056d47a7d65c9ab97880adaa8bd103de8d",
+      "size": 768943,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/bd5e06056d47a7d65c9ab97880adaa8bd103de8d"
+    },
+    {
+      "path": "firmware/broadcom/AP6275S/wifi/fw_bcm43752a2_ag_apsta.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd5e06056d47a7d65c9ab97880adaa8bd103de8d",
+      "size": 768943,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/bd5e06056d47a7d65c9ab97880adaa8bd103de8d"
+    },
+    {
+      "path": "firmware/broadcom/AP6275S/wifi/nvram_ap6275s.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "757b436bda59f2f2f797d16d0079d8a2df6be3d4",
+      "size": 8354,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/757b436bda59f2f2f797d16d0079d8a2df6be3d4"
+    },
+    {
+      "path": "firmware/broadcom/AP6335",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0f8784d49c6a5d9b365d6e3fed17fe014d657fcf",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/0f8784d49c6a5d9b365d6e3fed17fe014d657fcf"
+    },
+    {
+      "path": "firmware/broadcom/AP6335/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3a9eebbcfef4db35fb4cc69ba23071fc75c345d8",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/3a9eebbcfef4db35fb4cc69ba23071fc75c345d8"
+    },
+    {
+      "path": "firmware/broadcom/AP6335/bt/bcm4339a0.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9832507a8ae6f276df16a278d84c3f2dde023946",
+      "size": 57291,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/9832507a8ae6f276df16a278d84c3f2dde023946"
+    },
+    {
+      "path": "firmware/broadcom/AP6335/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1571b24938d27f92b4f56e5e113708b847d552f6",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/1571b24938d27f92b4f56e5e113708b847d552f6"
+    },
+    {
+      "path": "firmware/broadcom/AP6335/wifi/fw_bcm4339a0_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cbf8aa0f4d84c3efd5216f0d29f7136582cb6721",
+      "size": 569309,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/cbf8aa0f4d84c3efd5216f0d29f7136582cb6721"
+    },
+    {
+      "path": "firmware/broadcom/AP6335/wifi/fw_bcm4339a0_ag_mfg.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "234070754bb00e0c7ebf8a3d964234078e7e2643",
+      "size": 529461,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/234070754bb00e0c7ebf8a3d964234078e7e2643"
+    },
+    {
+      "path": "firmware/broadcom/AP6335/wifi/nvram_ap6335.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d32f36d6e28095908a8c373a0f02dfc72e9bbf69",
+      "size": 2361,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/d32f36d6e28095908a8c373a0f02dfc72e9bbf69"
+    },
+    {
+      "path": "firmware/broadcom/AP6354",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "630602b76bed108dfc30b99abfcf6c0e5a3ce138",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/630602b76bed108dfc30b99abfcf6c0e5a3ce138"
+    },
+    {
+      "path": "firmware/broadcom/AP6354/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "be2e415c9911a35d83aa8e28b6db3bbf6d7b9b91",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/be2e415c9911a35d83aa8e28b6db3bbf6d7b9b91"
+    },
+    {
+      "path": "firmware/broadcom/AP6354/bt/bcm4354a1.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b25b06426e5b05be95b5bf395adf6827062ec12",
+      "size": 66879,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/7b25b06426e5b05be95b5bf395adf6827062ec12"
+    },
+    {
+      "path": "firmware/broadcom/AP6354/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "24d8f0ad941924a04e7008b4de005538ca5bbcad",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/24d8f0ad941924a04e7008b4de005538ca5bbcad"
+    },
+    {
+      "path": "firmware/broadcom/AP6354/wifi/fw_bcm4354a1_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2cdfc50df6316ed5b6ec129a89a668dc7a98b127",
+      "size": 654993,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/2cdfc50df6316ed5b6ec129a89a668dc7a98b127"
+    },
+    {
+      "path": "firmware/broadcom/AP6354/wifi/fw_bcm4354a1_ag_mfg.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8e15d867b1f1aac0ace806018cbcf017a308876d",
+      "size": 549036,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/8e15d867b1f1aac0ace806018cbcf017a308876d"
+    },
+    {
+      "path": "firmware/broadcom/AP6354/wifi/nvram_ap6354.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5bce9a0e3f45275ff830856682e5452607326456",
+      "size": 3341,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/5bce9a0e3f45275ff830856682e5452607326456"
+    },
+    {
+      "path": "firmware/broadcom/AP6356",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d4333403cff522775ac658521008393ee5d96cdb",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/d4333403cff522775ac658521008393ee5d96cdb"
+    },
+    {
+      "path": "firmware/broadcom/AP6356/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "dfff565bcffe025605cdc502c48cf78916676bc1",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/dfff565bcffe025605cdc502c48cf78916676bc1"
+    },
+    {
+      "path": "firmware/broadcom/AP6356/bt/BCM4356A2.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1dfb790544d1a80feb937aeff89689ce23d0d49d",
+      "size": 65850,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/1dfb790544d1a80feb937aeff89689ce23d0d49d"
+    },
+    {
+      "path": "firmware/broadcom/AP6356/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "45494c7e68fd9c434898fac4070af730b70a710b",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/45494c7e68fd9c434898fac4070af730b70a710b"
+    },
+    {
+      "path": "firmware/broadcom/AP6356/wifi/fw_bcm4356a2_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "455d3801a619bc5444894cf491415adcc1bb8622",
+      "size": 578797,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/455d3801a619bc5444894cf491415adcc1bb8622"
+    },
+    {
+      "path": "firmware/broadcom/AP6356/wifi/fw_bcm4356a2_ag_apsta.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "455d3801a619bc5444894cf491415adcc1bb8622",
+      "size": 578797,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/455d3801a619bc5444894cf491415adcc1bb8622"
+    },
+    {
+      "path": "firmware/broadcom/AP6356/wifi/fw_bcm4356a2_ag_mfg.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e6f870e557a629d5be8bae10e6e28f6ebbbfdca6",
+      "size": 488239,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e6f870e557a629d5be8bae10e6e28f6ebbbfdca6"
+    },
+    {
+      "path": "firmware/broadcom/AP6356/wifi/nvram_ap6356.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "72dc6cd4d4b5fa9836975e0bbee3a7e5193c4c22",
+      "size": 2858,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/72dc6cd4d4b5fa9836975e0bbee3a7e5193c4c22"
+    },
+    {
+      "path": "firmware/broadcom/AP6356/wifi/nvram_ap6356s.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a80438a3083828e56dc794afd626f798426b10c",
+      "size": 2584,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/6a80438a3083828e56dc794afd626f798426b10c"
+    },
+    {
+      "path": "firmware/broadcom/AP6398S",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "50d5007f24ba0dd334ee6715d952abdab0cfa09e",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/50d5007f24ba0dd334ee6715d952abdab0cfa09e"
+    },
+    {
+      "path": "firmware/broadcom/AP6398S/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8c959750c24df5287eb91957cff3c2957538fbc1",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/8c959750c24df5287eb91957cff3c2957538fbc1"
+    },
+    {
+      "path": "firmware/broadcom/AP6398S/bt/BCM4359C0.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "95c16546fadc51e006083c84d0b2e95508b269dc",
+      "size": 67687,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/95c16546fadc51e006083c84d0b2e95508b269dc"
+    },
+    {
+      "path": "firmware/broadcom/AP6398S/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9dc692b817f42e3a314472d74abc66d641f37a5b",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/9dc692b817f42e3a314472d74abc66d641f37a5b"
+    },
+    {
+      "path": "firmware/broadcom/AP6398S/wifi/fw_bcm4359c0_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "70c8c7ba7c1f78f38ada982281d7a7060c16e410",
+      "size": 604169,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/70c8c7ba7c1f78f38ada982281d7a7060c16e410"
+    },
+    {
+      "path": "firmware/broadcom/AP6398S/wifi/fw_bcm4359c0_ag_mfg.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "40f19d8e2598ce5cc1aa1ecce7aa714c4fa25e7f",
+      "size": 555556,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/40f19d8e2598ce5cc1aa1ecce7aa714c4fa25e7f"
+    },
+    {
+      "path": "firmware/broadcom/AP6398S/wifi/nvram_ap6398s.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b69fe56db7d7b559c7e2c794ae08f623ec4e123a",
+      "size": 5861,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/b69fe56db7d7b559c7e2c794ae08f623ec4e123a"
+    },
+    {
+      "path": "firmware/broadcom/AW-CM256",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a385562c02f44500c2a86051b72fab2a2ab4aefc",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/a385562c02f44500c2a86051b72fab2a2ab4aefc"
+    },
+    {
+      "path": "firmware/broadcom/AW-CM256/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e1bc41ba88220520ab2e03020f88a250de066fb9",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/e1bc41ba88220520ab2e03020f88a250de066fb9"
+    },
+    {
+      "path": "firmware/broadcom/AW-CM256/bt/BCM4345C0.hcd",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "719f5f9e57f6b23c0aa90a8486612a4159d8c4fc",
+      "size": 79,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/719f5f9e57f6b23c0aa90a8486612a4159d8c4fc"
+    },
+    {
+      "path": "firmware/broadcom/AW-CM256/bt/BCM4345C0_003.001.025.0162.0000_Generic_UART_37_4MHz_wlbga_ref_iLNA_iTR_eLG.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ccdbca165fd40107af6994ec77b16516c7bf4971",
+      "size": 56757,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/ccdbca165fd40107af6994ec77b16516c7bf4971"
+    },
+    {
+      "path": "firmware/broadcom/AW-CM256/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "79a4c8158c3bb52ae4924bf209d97afcc5afcd07",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/79a4c8158c3bb52ae4924bf209d97afcc5afcd07"
+    },
+    {
+      "path": "firmware/broadcom/AW-CM256/wifi/fw_cyw43455.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "392c59a995d2fea30150a8281f7e950bf8c6e9c1",
+      "size": 605200,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/392c59a995d2fea30150a8281f7e950bf8c6e9c1"
+    },
+    {
+      "path": "firmware/broadcom/AW-CM256/wifi/nvram_azw256.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6068ba1d5bec608a3dd5a561745176ce76f9ca1c",
+      "size": 2070,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/6068ba1d5bec608a3dd5a561745176ce76f9ca1c"
+    },
+    {
+      "path": "firmware/broadcom/AW-NB197",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f1b350373701d05ac736d7d7bee49f7d0d0ea444",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/f1b350373701d05ac736d7d7bee49f7d0d0ea444"
+    },
+    {
+      "path": "firmware/broadcom/AW-NB197/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c0cd054147e8e09c01514592f6c4a81ad042f4b0",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/c0cd054147e8e09c01514592f6c4a81ad042f4b0"
+    },
+    {
+      "path": "firmware/broadcom/AW-NB197/bt/BCM4343A1.hcd",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "5698eefed59a0d701ec1228d8b3a60a21fb452c1",
+      "size": 35,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/5698eefed59a0d701ec1228d8b3a60a21fb452c1"
+    },
+    {
+      "path": "firmware/broadcom/AW-NB197/bt/BCM4343A1_001.002.009.1008.1024.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4fff0c82cee310d05f41aef8080d20765a526180",
+      "size": 46236,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/4fff0c82cee310d05f41aef8080d20765a526180"
+    },
+    {
+      "path": "firmware/broadcom/AW-NB197/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ae6d370480eb606f5e632e760738c9192cb6f3dc",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/ae6d370480eb606f5e632e760738c9192cb6f3dc"
+    },
+    {
+      "path": "firmware/broadcom/AW-NB197/wifi/fw_cyw43438.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac8f21bae304ee4f938df3b444c7e7519dc26510",
+      "size": 409852,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/ac8f21bae304ee4f938df3b444c7e7519dc26510"
+    },
+    {
+      "path": "firmware/broadcom/AW-NB197/wifi/nvram_azw372.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9d9b06bc9d7a5d1e86f0fa839eea73dac8aea7a8",
+      "size": 1017,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/9d9b06bc9d7a5d1e86f0fa839eea73dac8aea7a8"
+    },
+    {
+      "path": "firmware/broadcom/all",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e47a4a410de93f55f0eb34f7959b38ed2071c345",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/e47a4a410de93f55f0eb34f7959b38ed2071c345"
+    },
+    {
+      "path": "firmware/broadcom/all/bt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "acc3a21ec7213101bf3a5020b903a902239da0fe",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/acc3a21ec7213101bf3a5020b903a902239da0fe"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/4343A0.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af48952e3f61b58522fd2e209e1c90d6128608e1",
+      "size": 29773,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/af48952e3f61b58522fd2e209e1c90d6128608e1"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/BCM4330B1.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "463ac80276e91b340394e26caa0ef27238e26637",
+      "size": 54593,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/463ac80276e91b340394e26caa0ef27238e26637"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/BCM4343A1.hcd",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "8707333fc2f87d15e3eb12ab2d99f83abcd4a9ef",
+      "size": 31,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/8707333fc2f87d15e3eb12ab2d99f83abcd4a9ef"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/BCM4343B0.hcd",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "86964173e2470d2e39593f772f33b1a8654c5c13",
+      "size": 29,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/86964173e2470d2e39593f772f33b1a8654c5c13"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/BCM4345C0.hcd",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "0a871e2c997d14ea2276ae14300dc322d4a3153f",
+      "size": 29,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/0a871e2c997d14ea2276ae14300dc322d4a3153f"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/BCM4345C0_ap.hcd",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "a6fb9075ead85234a74cfede046507d7e08e18dd",
+      "size": 32,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/a6fb9075ead85234a74cfede046507d7e08e18dd"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/BCM4345C5.hcd",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "3710b2a9b2e8663b708ea4150fc7f03e720195e9",
+      "size": 29,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/3710b2a9b2e8663b708ea4150fc7f03e720195e9"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/BCM4354A2.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dcefb61fae9978864f3e26d274065c13c319834d",
+      "size": 60602,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/dcefb61fae9978864f3e26d274065c13c319834d"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/BCM4356A2.hcd",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "453c142e87ffc3a1a2b9bca1b812b21906deb4d5",
+      "size": 29,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/453c142e87ffc3a1a2b9bca1b812b21906deb4d5"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/BCM4359C0.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "95c16546fadc51e006083c84d0b2e95508b269dc",
+      "size": 67687,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/95c16546fadc51e006083c84d0b2e95508b269dc"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/awnb108.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cb387ef24e00a13e1ac1e4e53330c7b02d166694",
+      "size": 37955,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/cb387ef24e00a13e1ac1e4e53330c7b02d166694"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm20710a1.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ebfedd9f2d5455ab6d2da7fd42db0bd5464b424e",
+      "size": 26621,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/ebfedd9f2d5455ab6d2da7fd42db0bd5464b424e"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm20710a1_24M.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "63a797466d72564b2b6909cec039fbac3591f1e2",
+      "size": 26634,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/63a797466d72564b2b6909cec039fbac3591f1e2"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm20710a1_26M.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ebfedd9f2d5455ab6d2da7fd42db0bd5464b424e",
+      "size": 26621,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/ebfedd9f2d5455ab6d2da7fd42db0bd5464b424e"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm2076b1.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a5d8a06753b5d7ba85049e2c8bbee4d784ec4686",
+      "size": 32802,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/a5d8a06753b5d7ba85049e2c8bbee4d784ec4686"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm40183b2.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "463ac80276e91b340394e26caa0ef27238e26637",
+      "size": 54593,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/463ac80276e91b340394e26caa0ef27238e26637"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm43241b4.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f6e0d7f97d8c16c71c6d479e86c6c1e11904cca",
+      "size": 14344,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/7f6e0d7f97d8c16c71c6d479e86c6c1e11904cca"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm4329.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80054bb9b6ffb92398fa59ac1bc9b2501818fc10",
+      "size": 16608,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/80054bb9b6ffb92398fa59ac1bc9b2501818fc10"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm43341b0.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5888bacb670c0cfcfd5d6a04cf40a8b59d89af08",
+      "size": 41413,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/5888bacb670c0cfcfd5d6a04cf40a8b59d89af08"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm4339a0.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9832507a8ae6f276df16a278d84c3f2dde023946",
+      "size": 57291,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/9832507a8ae6f276df16a278d84c3f2dde023946"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm43438a0.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9205ae61517fb0752f5d480e5cbb231bb31802fd",
+      "size": 40568,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/9205ae61517fb0752f5d480e5cbb231bb31802fd"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm43438a1.hcd",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "27af3e55893dfbc4668c68ef0699a243c45400c6",
+      "size": 32,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/27af3e55893dfbc4668c68ef0699a243c45400c6"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/bcm4354a1.hcd",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "3537c09661d02ba650d5182ca82cdb6a979ced46",
+      "size": 29,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/3537c09661d02ba650d5182ca82cdb6a979ced46"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/nh660.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2e13fa23dc15b75b986fab457bd186bb3ff074e",
+      "size": 37949,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e2e13fa23dc15b75b986fab457bd186bb3ff074e"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/rk903.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8dca5cdf10e405f18de5d79bcc7529478a3cb96c",
+      "size": 36156,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/8dca5cdf10e405f18de5d79bcc7529478a3cb96c"
+    },
+    {
+      "path": "firmware/broadcom/all/bt/rk903_26M.hcd",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "463ac80276e91b340394e26caa0ef27238e26637",
+      "size": 54593,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/463ac80276e91b340394e26caa0ef27238e26637"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fbde74ea5e12bec5e1787684a10010bb2e0b05a1",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/fbde74ea5e12bec5e1787684a10010bb2e0b05a1"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_awnb108.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d8338d0eb3696c351b9b224a4379999dc05eea8e",
+      "size": 206231,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/d8338d0eb3696c351b9b224a4379999dc05eea8e"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_awnb108_ap.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "454c80310338d656486fc250e9ff855de0f68fe0",
+      "size": 191709,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/454c80310338d656486fc250e9ff855de0f68fe0"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm40181a2.bin",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "846d90875a837d41b37c75c4d572e6f1f921b722",
+      "size": 35,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/846d90875a837d41b37c75c4d572e6f1f921b722"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm40183b2.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5a5fd6a9461b70eeea28ba389d944c048be1f72",
+      "size": 226606,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e5a5fd6a9461b70eeea28ba389d944c048be1f72"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm40183b2_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6309e8692255151e72a6f5e15ca6cc6a756430f3",
+      "size": 239507,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/6309e8692255151e72a6f5e15ca6cc6a756430f3"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm43241b4_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3ad1b251335d7c4e74020660f06decda9b906bdb",
+      "size": 392320,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/3ad1b251335d7c4e74020660f06decda9b906bdb"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm4330.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "052b4e639a355257e98078efa3965ff8e4b943f4",
+      "size": 218460,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/052b4e639a355257e98078efa3965ff8e4b943f4"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm43341b0_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dac653bbfb834ff6a5bb44a0732ab590c2a1a099",
+      "size": 399488,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/dac653bbfb834ff6a5bb44a0732ab590c2a1a099"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm4334b1_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f89c5997636df113e774cf614a9ca85f2218c1f6",
+      "size": 457249,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/f89c5997636df113e774cf614a9ca85f2218c1f6"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm4339a0_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "41d5929abd273bb4f57abdbc3ab92568e0362324",
+      "size": 541314,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/41d5929abd273bb4f57abdbc3ab92568e0362324"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm43436b0.bin",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "20c5597886c9d825e7a7da47b6a7930516a6d7df",
+      "size": 35,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/20c5597886c9d825e7a7da47b6a7930516a6d7df"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm43438a0.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f8210a41bb332ece6a175cab40bb3d52823bfcd",
+      "size": 405428,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/7f8210a41bb332ece6a175cab40bb3d52823bfcd"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm43438a1.bin",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "471ab6cc61946d7b57357229539a9e352054fe60",
+      "size": 37,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/471ab6cc61946d7b57357229539a9e352054fe60"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm43455c0_ag.bin",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "e33d8ec9d372ee9a54d3c7bdc25de81adca0120d",
+      "size": 38,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e33d8ec9d372ee9a54d3c7bdc25de81adca0120d"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm43456c5_ag.bin",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "375f89d1ff5aa6cc4a11bd71c4e7f862887fcedb",
+      "size": 38,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/375f89d1ff5aa6cc4a11bd71c4e7f862887fcedb"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm4354a1_ag.bin",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "83474d4cd0382e2007f34a9d634c4966f67cb152",
+      "size": 37,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/83474d4cd0382e2007f34a9d634c4966f67cb152"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm4356a2_ag.bin",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "360559c5d063904cc8186608d9680fa451eaf877",
+      "size": 37,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/360559c5d063904cc8186608d9680fa451eaf877"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_bcm4359c0_ag.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "70c8c7ba7c1f78f38ada982281d7a7060c16e410",
+      "size": 604169,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/70c8c7ba7c1f78f38ada982281d7a7060c16e410"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_cyw43438.bin",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "33375178f4dc99677b122c038e6deade17dba89a",
+      "size": 35,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/33375178f4dc99677b122c038e6deade17dba89a"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/fw_cyw43455.bin",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "50e360ea6a0d1aebc7db6191479b86109044521c",
+      "size": 35,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/50e360ea6a0d1aebc7db6191479b86109044521c"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_4330.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6489f212daf8a6070446ff81b3e69c57348f847f",
+      "size": 741,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/6489f212daf8a6070446ff81b3e69c57348f847f"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_4330_oob.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d3e4e3221164322509154658d6c2814fdef7766d",
+      "size": 753,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/d3e4e3221164322509154658d6c2814fdef7766d"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_AP6210.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4aa428706fc6dcb14edfe33d27fdde08e7922507",
+      "size": 1178,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/4aa428706fc6dcb14edfe33d27fdde08e7922507"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_AP6210_24M.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4236e10db820ad49df3dc57d3e8774567ad2a404",
+      "size": 1178,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/4236e10db820ad49df3dc57d3e8774567ad2a404"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_AP6234.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "25bad9cbd58eb8fc4b7ee90bcb196f85d07231c1",
+      "size": 2613,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/25bad9cbd58eb8fc4b7ee90bcb196f85d07231c1"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_AP6330.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc8cb182595c298ccbc52043e90f006ef472a303",
+      "size": 1522,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/cc8cb182595c298ccbc52043e90f006ef472a303"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_AP6335.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "38d68df13cc3ce6f21ea3937aebff962664650af",
+      "size": 2366,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/38d68df13cc3ce6f21ea3937aebff962664650af"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_AP6441.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a09fa521705c8c86506da4971b64ea5578ab5829",
+      "size": 2628,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/a09fa521705c8c86506da4971b64ea5578ab5829"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_AP6476.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f43a1acb739738346b46ebd4c80e9bbbb5d82176",
+      "size": 712,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/f43a1acb739738346b46ebd4c80e9bbbb5d82176"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_AP6493.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c588bbedd0ad7388ecc1b75d6bc4e657f6c6d650",
+      "size": 1035,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/c588bbedd0ad7388ecc1b75d6bc4e657f6c6d650"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_B23.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "50b57fabaa6f6bba89b08163847a4e9cfc93fcb0",
+      "size": 1187,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/50b57fabaa6f6bba89b08163847a4e9cfc93fcb0"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_RK901.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b2d82ef4744d605bdd4c29e9e49e3b35b5ff8f7c",
+      "size": 698,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/b2d82ef4744d605bdd4c29e9e49e3b35b5ff8f7c"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_RK903.cal",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "41793c72e3b09908ccc35f0928320333245c003d",
+      "size": 1647,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/41793c72e3b09908ccc35f0928320333245c003d"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_RK903.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "786cfe71eb0cf360369bf8daaeba22ec1214e153",
+      "size": 1003,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/786cfe71eb0cf360369bf8daaeba22ec1214e153"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_RK903_26M.cal",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "330bac8ecca2f3aec01a6ecde0eae0a1af0fdbb8",
+      "size": 1663,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/330bac8ecca2f3aec01a6ecde0eae0a1af0fdbb8"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6181.txt",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "6f2b55c73bb19bff71ec60c255934c1b20c72bf0",
+      "size": 34,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/6f2b55c73bb19bff71ec60c255934c1b20c72bf0"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6212.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "03b49a3f5d15e2545a23e2c4226259ab760db478",
+      "size": 979,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/03b49a3f5d15e2545a23e2c4226259ab760db478"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6212a.txt",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "163aaea56f9e9f0e64c0658b9d23a1dee7a1de8e",
+      "size": 37,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/163aaea56f9e9f0e64c0658b9d23a1dee7a1de8e"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6212a_ap.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e6eaa092652e9ee272b13f1e92644727888bc442",
+      "size": 948,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e6eaa092652e9ee272b13f1e92644727888bc442"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6212a_cy.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c6f19dc2153ff624af082eb4c2c1aba844a24d1c",
+      "size": 1007,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/c6f19dc2153ff624af082eb4c2c1aba844a24d1c"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6233f.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4bb2e4ab27460db4074594d2c1b4877a7c2baa25",
+      "size": 2659,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/4bb2e4ab27460db4074594d2c1b4877a7c2baa25"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6236.txt",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "e1043be83c7edcde47080d8ef5c3afcdc11eeec9",
+      "size": 34,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e1043be83c7edcde47080d8ef5c3afcdc11eeec9"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6255.txt",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "87d9e66a66727cf29d6953a9ec1f3d547dd1091c",
+      "size": 34,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/87d9e66a66727cf29d6953a9ec1f3d547dd1091c"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6256.txt",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "1480fb56ed02d5d612a5106b5e9b9afc083db39f",
+      "size": 34,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/1480fb56ed02d5d612a5106b5e9b9afc083db39f"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap62x2.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0d03189728e586619e7dda97242523072755053d",
+      "size": 2669,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/0d03189728e586619e7dda97242523072755053d"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6354.txt",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "3b657374e5bb14aba57c17f0e9bab40d0bd5190f",
+      "size": 34,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/3b657374e5bb14aba57c17f0e9bab40d0bd5190f"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6356.txt",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "03025f3083490cb395e78c4db3bd957aee665bb9",
+      "size": 34,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/03025f3083490cb395e78c4db3bd957aee665bb9"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6356s.txt",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "7acf713cd6926888326be937edb96f7aacc61742",
+      "size": 35,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/7acf713cd6926888326be937edb96f7aacc61742"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6398s.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b69fe56db7d7b559c7e2c794ae08f623ec4e123a",
+      "size": 5861,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/b69fe56db7d7b559c7e2c794ae08f623ec4e123a"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_ap6452.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb2c622a4b1a8148c7e702300b95e09ec4cb0c94",
+      "size": 1002,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/eb2c622a4b1a8148c7e702300b95e09ec4cb0c94"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_awnb108.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ec19291804e5a217c7032c0f8e38520e008a8619",
+      "size": 861,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/ec19291804e5a217c7032c0f8e38520e008a8619"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_azw256.txt",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "219d300cc85e7a6f3916ade1ad59f086adae00ff",
+      "size": 36,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/219d300cc85e7a6f3916ade1ad59f086adae00ff"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_azw372.txt",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "55dcd61fd0c8e55c8986ccee79750d1c1b66c27c",
+      "size": 36,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/55dcd61fd0c8e55c8986ccee79750d1c1b66c27c"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_cyw43438.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e6eaa092652e9ee272b13f1e92644727888bc442",
+      "size": 948,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e6eaa092652e9ee272b13f1e92644727888bc442"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/nvram_cyw43455.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a708e299e73bf4007f82669acb2d76f6de6bf6fa",
+      "size": 1924,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/a708e299e73bf4007f82669acb2d76f6de6bf6fa"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/wifi_efuse_8189e.map",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "09bb3fb1076d8be202608d6ec07262f65c246309",
+      "size": 1566,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/09bb3fb1076d8be202608d6ec07262f65c246309"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/wifi_efuse_8723bs-vq0.map",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ebfb3b3f974ee136a858d1bbbb8c7f88a6bca114",
+      "size": 1421,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/ebfb3b3f974ee136a858d1bbbb8c7f88a6bca114"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/wifi_efuse_8723cs.map",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "45ea116cdd88fa48f2816ca589795fa758df5218",
+      "size": 1568,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/45ea116cdd88fa48f2816ca589795fa758df5218"
+    },
+    {
+      "path": "firmware/broadcom/all/wifi/wifi_efuse_8723ds.map",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5813cfafd211244d19c009350b8ce3b657186f81",
+      "size": 1567,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/5813cfafd211244d19c009350b8ce3b657186f81"
+    },
+    {
+      "path": "firmware/cypress",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "27e3be02d69326a742f82a476ee87396c74ad482",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/27e3be02d69326a742f82a476ee87396c74ad482"
+    },
+    {
+      "path": "firmware/cypress/wifi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7c6d2b79bb54abb8732a459c319f88a89452a974",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/7c6d2b79bb54abb8732a459c319f88a89452a974"
+    },
+    {
+      "path": "firmware/cypress/wifi/cyfmac43430-sdio.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f3043f859a249b4369ff1605bd03bca472cda81d",
+      "size": 419798,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/f3043f859a249b4369ff1605bd03bca472cda81d"
+    },
+    {
+      "path": "firmware/cypress/wifi/cyfmac43430-sdio.clm_blob",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d93449f28fa7301187a122078a15afb9e8bec897",
+      "size": 4733,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/d93449f28fa7301187a122078a15afb9e8bec897"
+    },
+    {
+      "path": "firmware/cypress/wifi/cyfmac43430-sdio.txt",
+      "mode": "120000",
+      "type": "blob",
+      "sha": "adfd5bbf3513b2dee39541f38cb9e6354ea4ad9b",
+      "size": 46,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/adfd5bbf3513b2dee39541f38cb9e6354ea4ad9b"
+    },
+    {
+      "path": "firmware/cypress/wifi/cyfmac43455-sdio.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4e11a60f3d7b2781c86a6d6a87a29dd2a8f1964f",
+      "size": 612256,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/4e11a60f3d7b2781c86a6d6a87a29dd2a8f1964f"
+    },
+    {
+      "path": "firmware/cypress/wifi/cyfmac43455-sdio.clm_blob",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eaa9d37ed9be5725ce9e5d29faa83fd95f78b003",
+      "size": 4733,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/eaa9d37ed9be5725ce9e5d29faa83fd95f78b003"
+    },
+    {
+      "path": "firmware/cypress/wifi/cyfmac43455-sdio.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5d4fb7e365417a0a9643615e10d51a5409996238",
+      "size": 2023,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/5d4fb7e365417a0a9643615e10d51a5409996238"
+    },
+    {
+      "path": "firmware/rockchip",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7a9ae957907ab27c266f594ee3dece2310e8a844",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/7a9ae957907ab27c266f594ee3dece2310e8a844"
+    },
+    {
+      "path": "firmware/rockchip/WIFI_FIRMWARE",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "265afc13f514a31e673ee63faac50aa7d463237b",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/265afc13f514a31e673ee63faac50aa7d463237b"
+    },
+    {
+      "path": "firmware/rockchip/WIFI_FIRMWARE/rk912_fw.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f69b28b51403223667b36e839187123cb23adb0a",
+      "size": 24600,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/f69b28b51403223667b36e839187123cb23adb0a"
+    },
+    {
+      "path": "firmware/rockchip/WIFI_FIRMWARE/rk912_patch.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "99ffc4f5593311b31cf5cd6c893911975a558023",
+      "size": 30460,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/99ffc4f5593311b31cf5cd6c893911975a558023"
+    },
+    {
+      "path": "firmware/rockchip/WIFI_FIRMWARE/rk912_patch_cal.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3658ea491e10d36447439f743b199c318903eb89",
+      "size": 30460,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/3658ea491e10d36447439f743b199c318903eb89"
+    },
+    {
+      "path": "realtek",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "35a685c521cea99a72491a72461947526bb5d501",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/35a685c521cea99a72491a72461947526bb5d501"
+    },
+    {
+      "path": "realtek/RTL8723BE",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a1643c25c80dfeccf6a1e5432d40e95367a1c9c8",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/a1643c25c80dfeccf6a1e5432d40e95367a1c9c8"
+    },
+    {
+      "path": "realtek/RTL8723BE/rtl8723b_config.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05f5901a67eb8a79fafb489446f5876bfd6743b3",
+      "size": 55,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/05f5901a67eb8a79fafb489446f5876bfd6743b3"
+    },
+    {
+      "path": "realtek/RTL8723BE/rtl8723b_fw.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e694a524b27e859cf58393d5449be8686b87788",
+      "size": 46324,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/1e694a524b27e859cf58393d5449be8686b87788"
+    },
+    {
+      "path": "realtek/RTL8723BE/rtl8723befw.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3cd979d90bf0cd719031719890c9ccf3c9ba1308",
+      "size": 207182,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/3cd979d90bf0cd719031719890c9ccf3c9ba1308"
+    },
+    {
+      "path": "realtek/RTL8723BE/rtl8723befw_36.bin",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "25e183cb15a3f2bc05418d3fac4be7bd8e62a779",
+      "size": 30746,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/25e183cb15a3f2bc05418d3fac4be7bd8e62a779"
+    },
+    {
+      "path": "realtek/RTL8723BE/rtl8723befw_36.bin.v1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e02a3ece2013120fa708045cc1d721ef8757ac47",
+      "size": 213707,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e02a3ece2013120fa708045cc1d721ef8757ac47"
+    },
+    {
+      "path": "realtek/RTL8723DS",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ed5fba143cd1c6e4f9d9f7551366c9972de786b3",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/ed5fba143cd1c6e4f9d9f7551366c9972de786b3"
+    },
+    {
+      "path": "realtek/RTL8723DS/mp_rtl8723d_config",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "99475ee3bad9502dca3dd92c38b47a229aecd36b",
+      "size": 25,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/99475ee3bad9502dca3dd92c38b47a229aecd36b"
+    },
+    {
+      "path": "realtek/RTL8723DS/mp_rtl8723d_fw",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1801c6c9ffcd2e4f0b8fea386a6e025a6e435aee",
+      "size": 55736,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/1801c6c9ffcd2e4f0b8fea386a6e025a6e435aee"
+    },
+    {
+      "path": "realtek/RTL8723DS/rtl8723d_config",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "60abee4d0db9e315967ec84972ac37ddde27486f",
+      "size": 33,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/60abee4d0db9e315967ec84972ac37ddde27486f"
+    },
+    {
+      "path": "realtek/RTL8723DS/rtl8723d_fw",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a3a78e7a8a424db8002e5d75c5f15176b8f3c76",
+      "size": 55156,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/5a3a78e7a8a424db8002e5d75c5f15176b8f3c76"
+    },
+    {
+      "path": "realtek/RTL8723DU",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "11aa43297562696192ec97a62881a2cf55c9f98f",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/11aa43297562696192ec97a62881a2cf55c9f98f"
+    },
+    {
+      "path": "realtek/RTL8723DU/rtl8723du_config",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b00270edca74c0bcd0234ceb8fe313a61ee28416",
+      "size": 14,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/b00270edca74c0bcd0234ceb8fe313a61ee28416"
+    },
+    {
+      "path": "realtek/RTL8723DU/rtl8723du_fw",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6cb1fd675f9915cc2473c5c99c60780bf6fbf197",
+      "size": 48328,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/6cb1fd675f9915cc2473c5c99c60780bf6fbf197"
+    },
+    {
+      "path": "realtek/RTL8821CS",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "42e5844a4f4f8cdc0056dac35046c29f89626a2c",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/42e5844a4f4f8cdc0056dac35046c29f89626a2c"
+    },
+    {
+      "path": "realtek/RTL8821CS/rtl8821c_config",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "60abee4d0db9e315967ec84972ac37ddde27486f",
+      "size": 33,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/60abee4d0db9e315967ec84972ac37ddde27486f"
+    },
+    {
+      "path": "realtek/RTL8821CS/rtl8821c_fw",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1035c11ea56adb0cd9cd0d3ca8d0e36c7f71b1cf",
+      "size": 49956,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/1035c11ea56adb0cd9cd0d3ca8d0e36c7f71b1cf"
+    },
+    {
+      "path": "realtek/RTL8821CU",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5e03957027d6b360d4643431bcc69f23083964e7",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/5e03957027d6b360d4643431bcc69f23083964e7"
+    },
+    {
+      "path": "realtek/RTL8821CU/rtl8821cu_config",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bb15fcd4312379eb7d2ebc26ad2240dc87031faf",
+      "size": 10,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/bb15fcd4312379eb7d2ebc26ad2240dc87031faf"
+    },
+    {
+      "path": "realtek/RTL8821CU/rtl8821cu_fw",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "201205fe2caebfdb8b88774f42fd4ad485b8b9ba",
+      "size": 44840,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/201205fe2caebfdb8b88774f42fd4ad485b8b9ba"
+    },
+    {
+      "path": "realtek/bluetooth_uart_driver.7z",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "60e1913f0940720a5512318398de0092e9b735aa",
+      "size": 30632,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/60e1913f0940720a5512318398de0092e9b735aa"
+    },
+    {
+      "path": "realtek/bluetooth_uart_driver",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cb8b587f333d000046537edbb548136bb6b58f50",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/cb8b587f333d000046537edbb548136bb6b58f50"
+    },
+    {
+      "path": "realtek/bluetooth_uart_driver/Kconfig",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "03576faf3d6432a03f7f7cb23d9ffbe9e3ce8756",
+      "size": 6732,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/03576faf3d6432a03f7f7cb23d9ffbe9e3ce8756"
+    },
+    {
+      "path": "realtek/bluetooth_uart_driver/Makefile",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a45ee44031bab0dc0cde5f748f4c9f56ee670bd7",
+      "size": 337,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/a45ee44031bab0dc0cde5f748f4c9f56ee670bd7"
+    },
+    {
+      "path": "realtek/bluetooth_uart_driver/hci_h4.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "580bdad53234f3f270600dd0f013399565d33d37",
+      "size": 7105,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/580bdad53234f3f270600dd0f013399565d33d37"
+    },
+    {
+      "path": "realtek/bluetooth_uart_driver/hci_ldisc.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1dfc8770f7a10143a73f0996fa60664a62cc1dad",
+      "size": 26161,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/1dfc8770f7a10143a73f0996fa60664a62cc1dad"
+    },
+    {
+      "path": "realtek/bluetooth_uart_driver/hci_rtk_h5.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7fbce668962d2bf9087993e7636bb50fdc46a3de",
+      "size": 22434,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/7fbce668962d2bf9087993e7636bb50fdc46a3de"
+    },
+    {
+      "path": "realtek/bluetooth_uart_driver/hci_uart.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a38197cac5e4c062dbcd5d66d24aab57c7970827",
+      "size": 3779,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/a38197cac5e4c062dbcd5d66d24aab57c7970827"
+    },
+    {
+      "path": "realtek/bluetooth_uart_driver/rtk_coex.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6c6d38e01ba1e695abdc23754efe478c4bbde72e",
+      "size": 78228,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/6c6d38e01ba1e695abdc23754efe478c4bbde72e"
+    },
+    {
+      "path": "realtek/bluetooth_uart_driver/rtk_coex.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "31c97aea645d384920bd1129265d061931523f52",
+      "size": 11023,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/31c97aea645d384920bd1129265d061931523f52"
+    },
+    {
+      "path": "realtek/bluetooth_usb_driver",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f88b3d9c1d9c323e9346f5adb83b629b4174eab4",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/f88b3d9c1d9c323e9346f5adb83b629b4174eab4"
+    },
+    {
+      "path": "realtek/bluetooth_usb_driver/Makefile",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "16316d61d0a2365d93b77575508604671b14723a",
+      "size": 311,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/16316d61d0a2365d93b77575508604671b14723a"
+    },
+    {
+      "path": "realtek/bluetooth_usb_driver/rtk_bt.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb4a415961490c2197eea86c710f4a95962c177a",
+      "size": 39359,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/eb4a415961490c2197eea86c710f4a95962c177a"
+    },
+    {
+      "path": "realtek/bluetooth_usb_driver/rtk_bt.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4aec3154f21194f402c6dafae17f71e2a248a177",
+      "size": 3947,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/4aec3154f21194f402c6dafae17f71e2a248a177"
+    },
+    {
+      "path": "realtek/bluetooth_usb_driver/rtk_coex.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6c6d38e01ba1e695abdc23754efe478c4bbde72e",
+      "size": 78228,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/6c6d38e01ba1e695abdc23754efe478c4bbde72e"
+    },
+    {
+      "path": "realtek/bluetooth_usb_driver/rtk_coex.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b0ec85f0c60e77935aad3f64325162691675a6a",
+      "size": 11022,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/5b0ec85f0c60e77935aad3f64325162691675a6a"
+    },
+    {
+      "path": "realtek/bluetooth_usb_driver/rtk_misc.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f9befa6a86f5c92243f7c881ebce1b8311f02958",
+      "size": 49726,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/f9befa6a86f5c92243f7c881ebce1b8311f02958"
+    },
+    {
+      "path": "realtek/bluetooth_usb_driver/rtk_misc.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0db42d8f7531c3c85672ed105a440e311b50fa18",
+      "size": 2705,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/0db42d8f7531c3c85672ed105a440e311b50fa18"
+    },
+    {
+      "path": "realtek/demo",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8ef8dc5910def209e16e2e1f1bbb5771d0e4f19f",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/8ef8dc5910def209e16e2e1f1bbb5771d0e4f19f"
+    },
+    {
+      "path": "realtek/demo/avrcp",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "843efcce660af41fcefda2520775a6cbbeafaa23",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/843efcce660af41fcefda2520775a6cbbeafaa23"
+    },
+    {
+      "path": "realtek/demo/avrcp/README.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9cb2f6823a39c796b7183c946323568004eeb9b7",
+      "size": 457,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/9cb2f6823a39c796b7183c946323568004eeb9b7"
+    },
+    {
+      "path": "realtek/demo/avrcp/arm",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cb471cad5aedab37dae58fb6767cd0efa8689005",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/cb471cad5aedab37dae58fb6767cd0efa8689005"
+    },
+    {
+      "path": "realtek/demo/avrcp/arm/libgdbus-internal.a",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "27a0acaf46ed7fe31ce393d62484ef50003eafd1",
+      "size": 49780,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/27a0acaf46ed7fe31ce393d62484ef50003eafd1"
+    },
+    {
+      "path": "realtek/demo/avrcp/arm64",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "194853af2865cfcd288498154a83209e277c36e4",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/194853af2865cfcd288498154a83209e277c36e4"
+    },
+    {
+      "path": "realtek/demo/avrcp/arm64/libgdbus-internal.a",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e80623d51dab08bafc3fd6c0c53ac0f9ccbd197d",
+      "size": 80180,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e80623d51dab08bafc3fd6c0c53ac0f9ccbd197d"
+    },
+    {
+      "path": "realtek/demo/avrcp/avrcpctrl.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c86188db2da0590c7c83dc2dc1f2928d209add58",
+      "size": 15501,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/c86188db2da0590c7c83dc2dc1f2928d209add58"
+    },
+    {
+      "path": "realtek/demo/avrcp/avrcpctrl.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6dc1a8f286c95c5c93b0be575d551ed5779a24e",
+      "size": 1061,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/d6dc1a8f286c95c5c93b0be575d551ed5779a24e"
+    },
+    {
+      "path": "realtek/demo/avrcp/bin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2a6fb22406db5b7885904e55e458fe4aac094516",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/2a6fb22406db5b7885904e55e458fe4aac094516"
+    },
+    {
+      "path": "realtek/demo/avrcp/bin/arm64",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8bc09faf5b262a0e4ff49744c63f02cafc8c7ad5",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/8bc09faf5b262a0e4ff49744c63f02cafc8c7ad5"
+    },
+    {
+      "path": "realtek/demo/avrcp/bin/arm64/bluetooth-player",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "5fa28994a8353aa3fd4fe506b13670942e163a7b",
+      "size": 89120,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/5fa28994a8353aa3fd4fe506b13670942e163a7b"
+    },
+    {
+      "path": "realtek/demo/avrcp/gdbus.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "69fbc107c3cce8cf9ddbf5249031fd16ec452910",
+      "size": 13592,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/69fbc107c3cce8cf9ddbf5249031fd16ec452910"
+    },
+    {
+      "path": "realtek/demo/hfp",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d0a3aec5f5886608e891b42fbae83af3b73131f7",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/d0a3aec5f5886608e891b42fbae83af3b73131f7"
+    },
+    {
+      "path": "realtek/demo/hfp/REDME.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "520207e1642c164dd3b476e6df08a4a36b22a42f",
+      "size": 805,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/520207e1642c164dd3b476e6df08a4a36b22a42f"
+    },
+    {
+      "path": "realtek/demo/hfp/bluetooth.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "852a6b23a2aa7426486ed962cfd5ed2383a862a9",
+      "size": 9388,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/852a6b23a2aa7426486ed962cfd5ed2383a862a9"
+    },
+    {
+      "path": "realtek/demo/hfp/ctl-client.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f52e0923a7fcc608fc27407f28fb5ce112b31c4d",
+      "size": 13494,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/f52e0923a7fcc608fc27407f28fb5ce112b31c4d"
+    },
+    {
+      "path": "realtek/demo/hfp/ctl-client.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8055af4a621d66fa5b0f2c76adb80809f6ee491b",
+      "size": 1343,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/8055af4a621d66fa5b0f2c76adb80809f6ee491b"
+    },
+    {
+      "path": "realtek/demo/hfp/ctl-proto.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e020839dd8cf679422c5ba175f8d8ef5c6f0d52b",
+      "size": 3484,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/e020839dd8cf679422c5ba175f8d8ef5c6f0d52b"
+    },
+    {
+      "path": "realtek/rtk_hciattach",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cd61f17c98222ee383891d5475df419b0233e013",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/cd61f17c98222ee383891d5475df419b0233e013"
+    },
+    {
+      "path": "realtek/rtk_hciattach/Makefile",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80505fd3224d810d980d0555855cbb64f79cce28",
+      "size": 416,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/80505fd3224d810d980d0555855cbb64f79cce28"
+    },
+    {
+      "path": "realtek/rtk_hciattach/fix_mac.patch",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9871a742bafb01c129e805258e314467513bfdb4",
+      "size": 6566,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/9871a742bafb01c129e805258e314467513bfdb4"
+    },
+    {
+      "path": "realtek/rtk_hciattach/hciattach.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0a4ca71da3c71ea423e3d7b66e19d579110df3fa",
+      "size": 12271,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/0a4ca71da3c71ea423e3d7b66e19d579110df3fa"
+    },
+    {
+      "path": "realtek/rtk_hciattach/hciattach.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "68d112f3279540a853a5b5d44c457956b349dcd3",
+      "size": 4793,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/68d112f3279540a853a5b5d44c457956b349dcd3"
+    },
+    {
+      "path": "realtek/rtk_hciattach/hciattach_h4.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ae923953d5076bed89635674a9e64bb9c708b3d8",
+      "size": 6275,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/ae923953d5076bed89635674a9e64bb9c708b3d8"
+    },
+    {
+      "path": "realtek/rtk_hciattach/hciattach_h4.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8549da7a54c509ae2b5d636a33eeaae04f6a4ce7",
+      "size": 270,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/8549da7a54c509ae2b5d636a33eeaae04f6a4ce7"
+    },
+    {
+      "path": "realtek/rtk_hciattach/hciattach_rtk.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ce0b1330e9e15952bfa89975dbcded41ff20e79e",
+      "size": 48066,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/ce0b1330e9e15952bfa89975dbcded41ff20e79e"
+    },
+    {
+      "path": "realtek/rtk_hciattach/rtb_fwc.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "670363782dc383e8887b162dc37a6fa21d1a16f4",
+      "size": 34610,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/670363782dc383e8887b162dc37a6fa21d1a16f4"
+    },
+    {
+      "path": "realtek/rtk_hciattach/rtb_fwc.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3665ce1851fcf29b677172323832e854f8299712",
+      "size": 2337,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/3665ce1851fcf29b677172323832e854f8299712"
+    },
+    {
+      "path": "src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9b7073b4b6338eb08ee463ec38932664e96fc507",
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/trees/9b7073b4b6338eb08ee463ec38932664e96fc507"
+    },
+    {
+      "path": "src/rk_wifi_init.c",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "17afe0a0f60746c01e683c351e5a0fa98a0d217a",
+      "size": 15370,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/17afe0a0f60746c01e683c351e5a0fa98a0d217a"
+    },
+    {
+      "path": "tb_start_wifi.sh",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "4dafe0032215b32b80c9b3c06c280be5697ff51c",
+      "size": 3730,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/4dafe0032215b32b80c9b3c06c280be5697ff51c"
+    },
+    {
+      "path": "wifi_ap6xxx_rftest.sh",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "00a380e8d0d73fd2f3f3d5ef78c47a72e8f2963a",
+      "size": 402,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/00a380e8d0d73fd2f3f3d5ef78c47a72e8f2963a"
+    },
+    {
+      "path": "wifi_start.sh",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "ff171785cb7ec09ae03e7bfe02c5944f262fda55",
+      "size": 293,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/ff171785cb7ec09ae03e7bfe02c5944f262fda55"
+    },
+    {
+      "path": "wpa_supplicant.conf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9c71c67391c7039fb6431c6a28d2d8eabc838f33",
+      "size": 125,
+      "url": "https://api.github.com/repos/radxa/rkwifibt/git/blobs/9c71c67391c7039fb6431c6a28d2d8eabc838f33"
+    }
+  ],
+  "truncated": false
+}

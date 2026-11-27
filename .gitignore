@@ -92,6 +92,7 @@ __pycache__/
 !/a9fw/bcm4334.hcd
 !/a9fw/fw_bcm4334b1_ag.bin
 !/a9fw/fw_bcm4334b1_ag_apsta.bin
+!/bcm4334-research/fw/*.bin
 !/stock/vfd/vfdsrv
 !/overlay-wifi/TvboxWifiOverlay.apk
 !/prebuilt/stock-filemanager/FileExploresky.apk
