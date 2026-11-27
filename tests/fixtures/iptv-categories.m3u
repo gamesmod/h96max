@@ -1,0 +1,99 @@
+#EXTM3U
+#EXTINF:-1 group-title="Для взрослых",Fixture 1
+https://example.invalid/1.m3u8
+#EXTINF:-1 group-title="Спорт · Футбол",Fixture 2
+https://example.invalid/2.m3u8
+#EXTINF:-1 group-title="Спорт · Хоккей",Fixture 3
+https://example.invalid/3.m3u8
+#EXTINF:-1 group-title="Спорт · Теннис",Fixture 4
+https://example.invalid/4.m3u8
+#EXTINF:-1 group-title="Спорт · Баскетбол",Fixture 5
+https://example.invalid/5.m3u8
+#EXTINF:-1 group-title="Спорт · Автоспорт",Fixture 6
+https://example.invalid/6.m3u8
+#EXTINF:-1 group-title="Спорт",Fixture 7
+https://example.invalid/7.m3u8
+#EXTINF:-1 group-title="Фильмы · Сериалы",Fixture 8
+https://example.invalid/8.m3u8
+#EXTINF:-1 group-title="Фильмы",Fixture 9
+https://example.invalid/9.m3u8
+#EXTINF:-1 group-title="Новости · Мир",Fixture 10
+https://example.invalid/10.m3u8
+#EXTINF:-1 group-title="Новости · Экономика",Fixture 11
+https://example.invalid/11.m3u8
+#EXTINF:-1 group-title="Новости",Fixture 12
+https://example.invalid/12.m3u8
+#EXTINF:-1 group-title="Музыка",Fixture 13
+https://example.invalid/13.m3u8
+#EXTINF:-1 group-title="Познавательные · Наука",Fixture 14
+https://example.invalid/14.m3u8
+#EXTINF:-1 group-title="Познавательные · Природа",Fixture 15
+https://example.invalid/15.m3u8
+#EXTINF:-1 group-title="Познавательные · История",Fixture 16
+https://example.invalid/16.m3u8
+#EXTINF:-1 group-title="Познавательные",Fixture 17
+https://example.invalid/17.m3u8
+#EXTINF:-1 group-title="Религиозные",Fixture 18
+https://example.invalid/18.m3u8
+#EXTINF:-1 group-title="Авто",Fixture 19
+https://example.invalid/19.m3u8
+#EXTINF:-1 group-title="Кулинария",Fixture 20
+https://example.invalid/20.m3u8
+#EXTINF:-1 group-title="Отдых · Природа",Fixture 21
+https://example.invalid/21.m3u8
+#EXTINF:-1 group-title="Путешествия",Fixture 22
+https://example.invalid/22.m3u8
+#EXTINF:-1 group-title="Государственные",Fixture 23
+https://example.invalid/23.m3u8
+#EXTINF:-1 group-title="Культура",Fixture 24
+https://example.invalid/24.m3u8
+#EXTINF:-1 group-title="Юмор",Fixture 25
+https://example.invalid/25.m3u8
+#EXTINF:-1 group-title="Радио",Fixture 26
+https://example.invalid/26.m3u8
+#EXTINF:-1 group-title="Развлекательные",Fixture 27
+https://example.invalid/27.m3u8
+#EXTINF:-1 group-title="Общие",Fixture 28
+https://example.invalid/28.m3u8
+#EXTINF:-1 group-title="Региональные",Fixture 29
+https://example.invalid/29.m3u8
+#EXTINF:-1 group-title="🇷🇺 Россия",Fixture 30
+https://example.invalid/30.m3u8
+#EXTINF:-1 group-title="🇺🇸 США",Fixture 31
+https://example.invalid/31.m3u8
+#EXTINF:-1 group-title="🇨🇦 Канада",Fixture 32
+https://example.invalid/32.m3u8
+#EXTINF:-1 group-title="🇬🇧 Великобритания",Fixture 33
+https://example.invalid/33.m3u8
+#EXTINF:-1 group-title="🇩🇪 Германия",Fixture 34
+https://example.invalid/34.m3u8
+#EXTINF:-1 group-title="🇫🇷 Франция",Fixture 35
+https://example.invalid/35.m3u8
+#EXTINF:-1 group-title="🇹🇷 Турция",Fixture 36
+https://example.invalid/36.m3u8
+#EXTINF:-1 group-title="🇰🇿 Казахстан",Fixture 37
+https://example.invalid/37.m3u8
+#EXTINF:-1 group-title="🇧🇾 Беларусь",Fixture 38
+https://example.invalid/38.m3u8
+#EXTINF:-1 group-title="🇺🇦 Украина",Fixture 39
+https://example.invalid/39.m3u8
+#EXTINF:-1 group-title="🇮🇱 Израиль",Fixture 40
+https://example.invalid/40.m3u8
+#EXTINF:-1 group-title="🇮🇳 Индия",Fixture 41
+https://example.invalid/41.m3u8
+#EXTINF:-1 group-title="🇵🇱 Польша",Fixture 42
+https://example.invalid/42.m3u8
+#EXTINF:-1 group-title="🇸🇪 Швеция",Fixture 43
+https://example.invalid/43.m3u8
+#EXTINF:-1 group-title="🇮🇹 Италия",Fixture 44
+https://example.invalid/44.m3u8
+#EXTINF:-1 group-title="🇦🇪 ОАЭ",Fixture 45
+https://example.invalid/45.m3u8
+#EXTINF:-1 group-title="🇧🇷 Бразилия",Fixture 46
+https://example.invalid/46.m3u8
+#EXTINF:-1 group-title="🇵🇹 Португалия",Fixture 47
+https://example.invalid/47.m3u8
+#EXTINF:-1 group-title="🇨🇿 Чехия",Fixture 48
+https://example.invalid/48.m3u8
+#EXTINF:-1 group-title="🇦🇺 Австралия",Fixture 49
+https://example.invalid/49.m3u8
