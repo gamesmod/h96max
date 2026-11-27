@@ -6,7 +6,6 @@ set -euo pipefail
 R=$(cd "$(dirname "$0")" && pwd)
 source "$R/tools/required-apps.sh"
 tvbox_require_apks || { echo "Сборка остановлена: комплект приложений неполный" >&2; exit 1; }
-if [ -z "${VANILLA:-}" ]; then python3 -I "$R/tools/prepare-dicio-assets.py" --check; fi
 # Проверка вендорских разделов (аналог Finishing из LineageOS extract-blobs wiki).
 bash "$R/tools/prepare-build-inputs.sh" --check-only
 T=$R/tools
@@ -110,10 +109,6 @@ sudo install -m 0644 $R/obtainium-apps.json $MNT/tvbox/obtainium-apps.json
 python3 "$R/tools/prepare-obtainium.py" "$R/obtainium-apps.json" "$W/obtainium-seed"
 sudo mkdir -p "$MNT/tvbox/obtainium-seed"
 sudo install -m 0644 "$W/obtainium-seed/"*.json "$MNT/tvbox/obtainium-seed/"
-python3 -I "$R/tools/prepare-dicio-assets.py" --output "$W/dicio-assets"
-sudo cp -a "$W/dicio-assets" "$MNT/tvbox/dicio"
-sudo find "$MNT/tvbox/dicio" -exec setfattr -h -n security.selinux -v u:object_r:system_file:s0 {} +
-sudo install -m 0644 "$R/apps/voicebridge/out/TvboxVoiceBridge.apk" "$MNT/tvbox/apk/org.tvbox.voicebridge.apk"
 # Устанавливать только согласованный состав, а не все APK из локального кеша.
 for name in "${TVBOX_REQUIRED_APKS[@]}"; do
     [[ "$name" == com.tvlauncher.apk ]] && continue
@@ -284,10 +279,8 @@ debugfs -R "dump /system/usr/keylayout/Generic.kl $W/usb-remote.kl" $LP/system.i
 grep -qE '^key[[:space:]]+582[[:space:]]+VOICE_ASSIST' $W/usb-remote.kl || { echo "В раскладке AOSP нет привязки клавиши 582 к VOICE_ASSIST"; exit 1; }
 mnt vendor
 sudo install -m 0644 $R/overlay/vendor/etc/init/tvbox.rc $MNT/etc/init/tvbox.rc
-sudo install -m 0644 "$R/overlay/vendor/etc/init/tvbox-voice.rc" "$MNT/etc/init/tvbox-voice.rc"
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-emmc-ro.sh $MNT/bin/tvbox-emmc-ro.sh
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-firstboot.sh $MNT/bin/tvbox-firstboot.sh
-sudo install -m 0755 "$R/overlay/vendor/bin/tvbox-voice-setup.sh" "$MNT/bin/tvbox-voice-setup.sh"
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-restore-wifi.sh $MNT/bin/tvbox-restore-wifi.sh
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-startup-summary.sh $MNT/bin/tvbox-startup-summary.sh
 sudo install -m 0755 $R/overlay/vendor/bin/tvbox-clock.sh $MNT/bin/tvbox-clock.sh
@@ -341,8 +334,6 @@ lbl u:object_r:vendor_configs_file:s0 $MNT/etc/vintf/manifest.xml
 # fails today because our boot differs) -> drop the service, script and patch; recovery is ours
 sudo rm -f $MNT/etc/init/vendor_flash_recovery.rc $MNT/bin/install-recovery.sh $MNT/recovery-from-boot.p
 lbl u:object_r:vendor_configs_file:s0 $MNT/etc/init/tvbox.rc
-lbl u:object_r:vendor_configs_file:s0 "$MNT/etc/init/tvbox-voice.rc"
-lbl u:object_r:vendor_file:s0 "$MNT/bin/tvbox-voice-setup.sh"
 lbl u:object_r:vendor_file:s0 $MNT/bin/tvbox-emmc-ro.sh $MNT/bin/tvbox-firstboot.sh $MNT/bin/tvbox-restore-wifi.sh $MNT/bin/tvbox-startup-summary.sh $MNT/bin/tvbox-bootlog.sh $MNT/bin/tvbox-wipecheck.sh $MNT/bin/tvbox-sdboot.sh
 # second-stage fstab (mount_all /vendor/etc/fstab.rk30board) = same patched copy
 cmp -s $MNT/etc/fstab.rk30board $W/fstab.orig || { echo "vendor fstab differs from ramdisk fstab"; exit 1; }

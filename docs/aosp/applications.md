@@ -1,5 +1,5 @@
 # Application compatibility — source audit
-Repository base fb0725c1bbd9e4b6df2a767e000e80a18f4dd91f. All nine checked own APK source manifests declare minSdk=23 and targetSdk=29: antivirus, bootlog, clean, files, installer, iptv, links, power, voicebridge. This permits Android 9–12 at declaration level only. Voicebridge is not yet part of the existing release pipeline. JARs tvboxd/bootscreen, hidden APIs, shared UID and privileged permissions require separate review.
+Repository base fb0725c1bbd9e4b6df2a767e000e80a18f4dd91f. The eight own APKs in the current release contour declare minSdk=23 and targetSdk=29: antivirus, bootlog, clean, files, installer, iptv, links and power. This permits Android 9–12 at declaration level only. The historical VoiceBridge prototype is outside current project goals and release composition. JARs tvboxd/bootscreen, hidden APIs, shared UID and privileged permissions require separate review.
 Important ABI constraint from [pinned third-party inputs](https://github.com/gamesmod/h96max/blob/fb0725c1bbd9e4b6df2a767e000e80a18f4dd91f/tools/third-party-apps.json):
 - Obtainium 1.7.4 is explicitly arm64-v8a release APK.
 - WebView 155.0.8059.39 is from arm64 prebuilt repository and commit 604ad4cbc41d3b894065ee6e83189c76e1ec06a1.
