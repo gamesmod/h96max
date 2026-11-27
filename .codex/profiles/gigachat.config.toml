@@ -1,0 +1,30 @@
+# Источник именованного профиля Codex "gigachat".
+# Установка: $CODEX_HOME/gigachat.config.toml, режим 0600.
+# Секретов нет: GPT2GIGA_API_KEY читается из окружения.
+
+model = "GigaChat-2-Max"
+model_provider = "gigachat"
+model_reasoning_effort = "none"
+web_search = "disabled"
+
+# GigaChat-2-Max: 128 000 токенов контекста (официально).
+# Компакция на 75% оставляет запас на ответ и инструменты.
+model_context_window = 128000
+model_auto_compact_token_limit = 96000
+
+# Безопасный default; для редактирования явно передайте
+# --sandbox workspace-write.
+sandbox_mode = "read-only"
+
+# GigaChat-2 не нужен multi-agent namespace Codex.
+# Это убирает инструмент multi_agent_v1 и 5 вложенных функций из payload.
+[agents]
+enabled = false
+
+[model_providers.gigachat]
+name = "gpt2giga GigaChat"
+base_url = "http://127.0.0.1:8090/v2"
+env_key = "GPT2GIGA_API_KEY"
+wire_api = "responses"
+supports_websockets = false
+requires_openai_auth = false

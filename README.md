@@ -13,6 +13,7 @@
 | IPTV | [источники](#iptv-источники-и-проверка) · [`tools/iptv-sources.txt`](tools/iptv-sources.txt) |
 | Релиз и CI | [GitHub Actions](#публикация-релиза-через-github-actions) · [`docs/release-quality-gate.md`](docs/release-quality-gate.md) |
 | Правила агентов | [`AGENTS.md`](AGENTS.md) · [`docs/LUNA-WORKFLOW.md`](docs/LUNA-WORKFLOW.md) |
+| Codex + GigaChat | [`docs/codex-gigachat.md`](docs/codex-gigachat.md) · [профили](.codex/profiles/) |
 | Компоненты и подписи | [`COMPONENTS.md`](COMPONENTS.md) · [`apps-sources.md`](apps-sources.md) |
 | Архитектура (draw.io) | [`docs/architecture/`](docs/architecture/) · [`panadonik-architecture.drawio`](docs/architecture/panadonik-architecture.drawio) |
 | Репозиторий | [gamesmod/h96max](https://github.com/gamesmod/h96max) · [Releases](https://github.com/gamesmod/h96max/releases) · [Actions](https://github.com/gamesmod/h96max/actions) |

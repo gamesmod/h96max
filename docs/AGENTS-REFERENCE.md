@@ -122,6 +122,13 @@
 - В отчёте пользователю указывать, что часть работы выполнил Manus (`task_url`), что именно подтверждено самостоятельно, а что осталось непроверенным.
 - **Ключ и настройка:** `MANUS_API_KEY` (Manus → Settings → Developers → Create API Key) задаётся только в окружении пользователя, из которого запускается Codex или Cursor. Не записывать его в файлы репозитория, `~/.codex/config.toml`, историю команд, журналы и ответы; в `.codex/config.toml` и `.cursor/mcp.json` хранится только имя переменной. Проектный `.codex/config.toml` Codex читает для доверенного проекта; проверка подключения — `/mcp` в Codex или список MCP-серверов в настройках Cursor; требуется Node.js 18 или новее. Если сервер недоступен или ключа нет, сообщить пользователю и продолжить без Manus; не обходить сервер прямыми запросами с ключом и не искать ключ в файловой системе.
 - Изменения `tools/manus-mcp/` проверять `node --check tools/manus-mcp/server.mjs` и `python3 -B -m unittest tests.test_manus_mcp -v` (тест работает на локальном имитаторе API, без сети и ключей).
+
+## Codex CLI + GigaChat (отдельный именованный профиль)
+- Источники профилей: `.codex/profiles/gigachat.config.toml` и `.codex/profiles/gigachat-notools.config.toml`. Codex читает их только после `tools/codex-gigachat.sh install` из `$CODEX_HOME/<name>.config.toml`; `.codex/profiles/` не является местом чтения.
+- Проектный `.codex/config.toml` остаётся MCP-only. `tools/codex-gigachat.sh check-project` проверяет, что в нём нет `model`, `model_provider`, `model_providers`, `profile`, `profiles`; `model` в проектном файле перекрывает модель профиля.
+- `GPT2GIGA_API_KEY` и `GIGACHAT_CREDENTIALS` передаются только через окружение и никогда не коммитятся. `gigachat-notools` — безопасный fallback без shell/goals/apps/plugins/subagents, но не «ноль инструментов».
+- Реальный E2E с GigaChat не выполнен; до прохождения L3 (streaming + tool loop) интеграция считается chat-only. Подробности и критерии: `docs/codex-gigachat.md`, `docs/manus-research/2026-11-28-codex-gigachat.md`.
+
 ## Начало задачи и защита совместного дерева
 
 Перед новой задачей:
@@ -162,6 +169,7 @@ rg --files --hidden --no-ignore -g AGENTS.md -g '!sdk/**' -g '!dl/**' -g '!build
 | OTA и формат метаданных | `tools/release-ota.sh`, `tools/mkota.py`, `ota/`, installer/tvboxd |
 | Триггеры CI, срок хранения, публикация | `.github/workflows/release.yml` |
 | Делегирование в Manus, MCP | `AGENTS.md` («Делегирование задач в Manus»), `tools/manus-mcp/server.mjs`, `.codex/config.toml`, `.cursor/mcp.json` |
+| Codex CLI + GigaChat | `docs/codex-gigachat.md`, `tools/codex-gigachat.sh`, `.codex/profiles/`, `docs/manus-research/2026-11-28-codex-gigachat.md` |
 | Аппаратная приёмка | `docs/release-quality-gate.md`, `docs/release-qa/<версия>.md` и `.json` |
 | История решений | Git, `GOALS.md`, `REMAINING-GOALS.md`, `SESSION-HANDOFF.md`, `BUILD-AND-STATE.md` |
 
