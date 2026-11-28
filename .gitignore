@@ -24,7 +24,6 @@ release/notes/*
 /dl/apk/
 /dl/webview/
 /dl/torrserver/
-/dl/dicio/
 /dl/rustore/
 /dl/fw/
 # В dl/a12 держим только очищенные стоковые входы CI; остальное игнорируем
