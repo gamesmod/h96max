@@ -14,6 +14,7 @@ Usage:
   tools/codex-gigachat.sh check-project [path]
   tools/codex-gigachat.sh run [codex args...]
   tools/codex-gigachat.sh notools [codex args...]
+  tools/codex-gigachat.sh delegate < sanitized-task.txt
 
 Profiles:
   gigachat           full tools, read-only by default
@@ -115,6 +116,24 @@ run_profile() {
   "$codex_bin" "${args[@]}" "$@"
 }
 
+delegate_task() (
+  if [[ -t 0 ]]; then
+    echo "delegate requires a sanitized task on stdin" >&2
+    exit 64
+  fi
+
+  local delegate_workspace
+  delegate_workspace="$(mktemp -d "${TMPDIR:-/tmp}/codex-gigachat-delegate.XXXXXX")"
+  trap 'rmdir -- "$delegate_workspace" 2>/dev/null || true' EXIT
+
+  run_profile "gigachat-notools" exec \
+    --cd "$delegate_workspace" \
+    --skip-git-repo-check \
+    --sandbox read-only \
+    --ephemeral \
+    -
+)
+
 cmd="${1:-}"
 if [[ -z "$cmd" ]]; then
   usage
@@ -150,6 +169,10 @@ case "$cmd" in
     ;;
   notools)
     run_profile "gigachat-notools" "$@"
+    ;;
+  delegate)
+    [[ "$#" -eq 0 ]] || { usage >&2; exit 64; }
+    delegate_task
     ;;
   *)
     usage
