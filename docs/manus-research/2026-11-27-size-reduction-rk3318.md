@@ -1,18 +1,46 @@
 # Уменьшение Android 12 TV-образа для RK3318/RK3328 на 200 МБ без смены формата и компрессии
 
-> **Статус:** делегированное исследование Manus, Task ID `bK8a759an4NHRyMrAcXK2o` (https://manus.im/app/bK8a759an4NHRyMrAcXK2o), завершено 27.11.2026. Результат независимо не проверен и не является доказательством для release gate. Измерения относятся к публичным эталонным образам; размеры OEM-компонентов RK3318 не измерены и помечены как оценки.
+> **Статус:** делегированное исследование Manus, Task ID `bK8a759an4NHRyMrAcXK2o` (https://manus.im/app/bK8a759an4NHRyMrAcXK2o), завершено 27.11.2026. **Обновлено 28.11.2026 после фактического разбора публичной прошивки H96 Max V12:** образ скачан, разделы извлечены, package list и размеры OEM-компонентов измерены. Результат независимо не проверен и не является доказательством для release gate. Runtime-использование OEM-приложений на приставке не проверялось; это отмечено отдельно. Размеры H96 — статические измерения `du -sb` на извлечённых ext4-разделах, а не замер прироста после пересборки.
 
-Дата исследования: 27 ноября 2026 года. Все URL открывались 27.11.2026. Диапазоны размеров — ориентировочные, в МиБ; 1 МиБ = 1,048576 МБ, поэтому в строгих мегабайтах значения примерно на 5% больше. Измерения выполнялись по `du -sb` на официальных образах ADT-3 Android 12 TV и AOSP Android 12 GSI.
+Дата исследования: 27 ноября 2026 года. Все URL открывались 27.11.2026. Диапазоны размеров — ориентировочные, в МиБ; 1 МиБ = 1,048576 МБ, поэтому в строгих мегабайтах значения примерно на 5% больше. Измерения выполнялись по `du -sb` на официальных образах ADT-3 Android 12 TV, AOSP Android 12 GSI и публичной прошивке H96 Max V12; H96-измерения добавлены 28.11.2026.
 
 ## Главный вывод
 
 На «чистой» Android TV-базе AOSP (`atv_base.mk`) почти нет телефонных приложений: ATV-база уже содержит `TvProvider`, `TvSettings`, `TvFrameworkOverlay`, `TvWifiOverlay`, `tv_input.default`, `TvFrameworkPackageStubs`, `SystemUI`, `Bluetooth` и минимум медиа-компонентов [1] [2] [3]. IME зависит от конкретного продукта, но CDD требует software keyboard, поэтому его нельзя просто удалить. Одними phone-only/touch-only удалениями на такой образ трудно получить 200 МБ: реалистичный выигрыш там составляет примерно 0–30 МБ, а не 200 МБ.
 
-Другая картина на OEM-образе, собранном из телефонного `full_base.mk` или из Pixel-подобного продукта. Публичная прошивка H96 Max V12 для RK3318 Android 12 имеет build fingerprint `google/redfin/redfin:12/...`, то есть это кандидат на телефонную базу, а не на `atv_base.mk` [24] [25]. На такой базе телефонный пакет приложений и телефонный `Settings` могут дать 150–230 МБ, а OEM-прелоады в ODM — ещё 10–200 МБ. Это единственный реалистичный путь к 200 МБ без удаления WebView, кодеков, HAL, firmware и recovery-зависимостей.
+Другая картина на OEM-образе, собранном из телефонного `full_base.mk` или из Pixel-подобного продукта. Публичная прошивка H96 Max V12 для RK3318 Android 12 имеет build fingerprint `google/redfin/redfin:12/...`, то есть это действительно phone-derived база, а не `atv_base.mk` [24] [25]. Но фактический разбор показал важную поправку: телефонный набор приложений на H96 вычищен. `Dialer`, `Contacts`, `Messaging`, `Telecom`, `TeleService`, `TelephonyProvider`, `MmsService`, `Stk`, `CellBroadcast`, `EmergencyInfo` и `CallLog` в package list отсутствуют; из phone-наследия остались `ContactsProvider`, `GoogleContactsSyncAdapter`, телефонный `Settings` и phone-фичи в `tv_core_hardware.xml`. Поэтому прежняя арифметика «phone-only 70–95 МБ + phone media 50–70 МБ + Settings 50–65 МБ» для H96 не подтверждается. На этом образе 200 МБ достигаются другими группами: OEM-прелоады `system/system/preinstall` (323,5 МиБ) и OEM-тест/сервисные приложения (55,0 МиБ), а телефонный `Settings` — отдельный условный кандидат, а не гарантированная экономия.
 
 Отдельно есть build-гигиена: перевод userdebug в user, отключение debug-ART, минимизация Java debug info и ограничение dexpreopt могут дать 100–300 МБ, но это не удаление функций, а изменение профиля сборки и компромисс по производительности/отладке. Эти меры нельзя смешивать с «удалением phone-only» в одну сумму: группы пересекаются.
 
 Критическое ограничение: если размеры разделов (`BOARD_SYSTEMIMAGE_PARTITION_SIZE`, `BOARD_PRODUCTIMAGE_PARTITION_SIZE`, `BOARD_SUPER_PARTITION_SIZE` или `parameter.txt`) не уменьшены, удаление файлов уменьшает только занятое место, но не размер образа. Образ ext4/super может остаться прежнего размера с свободным местом. Уменьшение раздела — это не смена файловой системы и не компрессия, но это изменение размера раздела/супер-раздела, которое нужно отдельно проверить на OTA, AVB и recovery [11] [20].
+
+### Фактическая проверка H96 Max V12 (обновление 28.11.2026)
+
+Прошивка получена по официальной ссылке [24], размер 2 579 812 824 байта (2,4 ГиБ), SHA-256 `e93ccc90e5a41fbc430c1f9b3f4621989945ff5a6e9685de6d228f5e7cc5ad58`. Контейнер RKFW, внутри RKAF; модель `H96_Max_V12`. `parameter.txt` описывает `rk3328_box`, GPT, `FIRMWARE_VER: 12.0`, `super 0x00614000@0x001e1000`. В `super.img` семь динамических разделов; после `simg2img` и извлечения ext4 получены размеры: system 1 483 124 736 байт, system_ext 158 318 592, vendor 182 923 264, vendor_dlkm 17 465 344, odm 688 128, odm_dlkm 262 144, product 660 127 744. Все разделы заполнены на 100%, поэтому удаление файлов без уменьшения `BOARD_SUPER_PARTITION_SIZE`/`parameter.txt` не уменьшит образ.
+
+Ключевые свойства: `ro.build.version.sdk=32`, `ro.build.version.release=12`, `ro.build.type=userdebug`, fingerprint `google/redfin/redfin:12/SP1A.210812.015/7679548:user/release-keys__2021-10-05`; в product — `ro.build.characteristics=tv`; в vendor — `ro.board.platform=rk3328`. То есть это phone-derived GSI с TV-продуктовым слоем, а не чистый ATV. `tv_core_hardware.xml` объявляет `android.software.leanback`, `android.hardware.television`, `android.software.live_tv`, `android.software.picture_in_picture`, но также `android.hardware.touchscreen`, `android.hardware.nfc` и `com.google.android.apps.dialer.SUPPORTED`; telephony-фичи закомментированы. Эти объявления нельзя игнорировать при удалении touch/NFC-компонентов.
+
+| Группа H96 | Путь | Измерено `du -sb` | В МиБ | Комментарий |
+|---|---|---:|---:|---|
+| OEM-прелоады | `system/system/preinstall` | 339 183 959 | 323,5 | 8 APK: NetFlix 87,4; KDMC2 59,0; AirScreen64 57,6; Amazon Prime Video 51,4; TikTok 28,8; emotnstore 15,9; APKPure 12,0; aptoidetv 11,4 МиБ |
+| Телефонный Settings | `system_ext/priv-app/Settings` | 90 771 914 | 86,6 | `Settings.apk` 69 182 750 байт (66,0 МиБ) + oat/vdex; рядом есть `TvSettings` |
+| TV Settings | `system_ext/priv-app/TvSettings` | 24 863 927 | 23,7 | `TvSettings.apk` 24 683 827 байт (23,5 МиБ); не удалять |
+| OEM-тест/отладка | ShowDebug + ProductTest + RKHcyDeviceTest + StressTest | 57 663 008 | 55,0 | ShowDebug 27,6; ProductTest 13,0; RKHcyDeviceTest 9,3; StressTest 5,1 МиБ (с oat) |
+| OTA/обновление | `system/system/app/RKHcyUpdate` | 26 958 882 | 25,7 | `android.rockchip.update.service`; не удалять без отказа от OTA |
+| Медиацентр | `system/system/priv-app/MediaCenter` | 20 637 696 | 19,7 | `com.rockchips.mediacenter` |
+| TV-IME | `system/system/app/BoxLatinIME` | 19 835 923 | 18,9 | `com.android.inputmethod.latin`; IME, не удалять без замены |
+| Setup | `system/system/app/SkySetupWizard` | 10 779 168 | 10,3 | `com.mbx.settingsmbox`; проверить первый запуск |
+| Launcher | `system/system/app/33118V12` | 4 941 351 | 4,7 | `com.droidlogic.mboxlauncher`; это launcher, не тест |
+| Калькулятор | `system/system/app/ExactCalculator` | 2 361 119 | 2,3 | малый выигрыш |
+| DLNA | `system/system/priv-app/DLNA` | 1 509 210 | 1,4 | `com.rockchips.dlna` |
+| Pinyin IME | `system/system/app/PinyinIME` | 1 455 415 | 1,4 | зависит от языков/ввода |
+| Simple launcher | `system/system/app/SimpleAllApp` | 747 524 | 0,7 | `com.hkw.simplelauncher`; проверить, не является ли резервным launcher |
+| Файловый менеджер | `system/system/priv-app/FileExploresky` | 698 677 | 0,7 | package name не извлечён |
+| Wi-Fi Display | `system/system/app/WifiDisplay` | 366 123 | 0,3 | `com.rockchip.wfd`; может быть нужен для screen cast |
+
+Проверка phone-only и phone-media по каталогам: `Dialer`, `Contacts`, `Messaging`, `Telecom`, `TeleService`, `TelephonyProvider`, `MmsService`, `Stk`, `CellBroadcast`, `EmergencyInfo`, `CallLog`, `Camera2`, `Gallery2`, `DeskClock`, `Music`, `Browser2`, `Launcher3QuickStep` не найдены. Найдены только `ContactsProvider`, `GoogleContactsSyncAdapter`, `SettingsIntelligence` (2,1 МиБ), `CalendarProvider` и `BasicDreams`/`WallpaperBackup` из touch/demo-группы. Это означает, что phone-only таблица к H96 почти неприменима: удалять там нечего, кроме условного телефонного `Settings`. Нельзя считать fingerprint `redfin` доказательством полного телефонного package list.
+
+Ограничение измерения: `du` по каталогу включает APK, `oat/arm64/*.odex`, `*.vdex` и другие файлы, но не равен изменению `super` после пересборки. Для release-решения нужен rebuild с уменьшенным `BOARD_SUPER_PARTITION_SIZE`, новый `super.img`, `parameter.txt` и повторное измерение. Статический package list не доказывает, что приложение не запускается: для этого нужны `pm path`, `dumpsys package`, `dumpsys usagestats`, `logcat` и `cmd package resolve-activity` на живой приставке.
 
 ## Границы и что исключено
 
@@ -47,6 +75,23 @@
 | 14 | OEM-калькулятор/запись звука/обои/датчики: `ExactCalculator`, `SoundRecorder`, `NoiseField`, `PhaseBeam`, `libjni_pinyinime`, `abc`, `akmd`, `Camera360`, `DisplayAdjust` | system, product, vendor | 5–30 (оценка) | `device.mk` Rockchip перечисляет `ExactCalculator`, `SoundRecorder`, `NoiseField`, `PhaseBeam`, `libjni_pinyinime`, `abc`, `akmd`; `DisplayAdjust`/`Camera360` — OEM-приложения [14]. `akmd` — daemon датчиков, не HAL; если датчиков нет, можно проверить, но удаление daemon может затронуть sensor HAL. `DisplayAdjust` может быть нужен TV-настройкам. Проверка: `pm path`, `dumpsys package`, `dumpsys sensorservice`, `dumpsys display`, `dumpsys activity`, `logcat`, `strace` | Boot, sensors, display/HDR, camera (если есть), запись звука, обои, `TvSettings`; `CtsTvTestCases`; `CtsCameraTestCases`; `CtsSensorTestCases` | Средний: `DisplayAdjust`/`akmd` могут быть скрытыми зависимостями; `Camera360` — только если камера не нужна (но CDD USB-камера) |
 | 15 | GMS/Google TV прелоады (если образ сертифицирован) | product | 300–500 (измерено на ADT-3, не RK3318) | На ADT-3 product APK sum 497,9 МБ; крупнейшие `AndroidMediaShell` 90,8 МБ, `Tubesky` 70,3 МБ, `PrebuiltGmsCorePano` 62,7 МБ, `Katniss` 49,3 МБ, `GoogleTTS` 46,2 МБ, `SetupWraith` 40,8 МБ, `YouTubeLeanback` 40,8 МБ [21]. Это не OEM-компоненты и не безопасный кандидат: удаление ломает Play/YouTube/лицензии/сертификацию. В таблицу включено только чтобы показать, почему «200 МБ» на GMS-образе легко получить неправильным путём. Не удалять на сертифицированном устройстве | Play Store, YouTube, Google TV launcher, setup, аккаунты, DRM, GMS update, CTS/GTS | Высокий/недопустимый для сертифицированного Android TV; юридические и продуктовые риски |
 
+### H96: поправки к таблицам 1–2
+
+| Строка | Что показала проверка H96 | Вывод для H96 |
+|---|---|---|
+| 1, телефонный набор | `Dialer`, `Contacts`, `Messaging`, `Telecom`, `TeleService`, `TelephonyProvider`, `MmsService`, `Stk`, `CellBroadcast`, `EmergencyInfo`, `CallLog` не найдены; остаются `ContactsProvider` и `GoogleContactsSyncAdapter` | 0 МиБ, удалять нечего; не переносить оценки с полного phone-derived образа |
+| 2, телефонные медиа | `Camera2`, `Gallery2`, `DeskClock`, `Music`, `Browser2`, `QuickSearchBox`, `Launcher3QuickStep` не найдены; `SettingsIntelligence` 2,1 МиБ есть | 0 МиБ, кроме условного `SettingsIntelligence`; он связан с phone Settings |
+| 3, телефонный Settings | `Settings` 86,6 МиБ (с oat; APK 66,0) и `TvSettings` 23,7 МиБ (APK 23,5) существуют одновременно | Потенциально до 86,6 МиБ, но только после `resolve-activity` и runtime-доказательства, что phone Settings не используется |
+| 5, touch-only | `android.hardware.touchscreen` объявлен в `tv_core_hardware.xml`; touch-приложения не найдены | Не удалять overlays/фичу без `pm list features`, `dumpsys input` и `getevent`; объявление фичи может быть ложным |
+| 6, NFC | `android.hardware.nfc` объявлен; `SecureElement` 0,2 МиБ есть, `NfcNci` не найден | Не удалять без проверки `/dev/nfc*`, `dumpsys nfc` и фактического железа |
+| 9, debug/demo/wallpaper | `BasicDreams`, `WallpaperBackup` есть; `Traceur`, `EasterEgg`, `LiveWallpapersPicker`, `PhotoTable` не найдены | Малый выигрыш; `BasicDreams` может быть screensaver |
+| 11, прелоады | 323,5 МиБ в `system/system/preinstall`, а не в ODM; 8 APK | Это главный подтверждённый источник 200 МБ; удаление — продуктовое/лицензионное решение |
+| 13, OEM-медиа | `MediaCenter` 19,7 МиБ (`com.rockchips.mediacenter`), `DLNA` 1,4 МиБ (`com.rockchips.dlna`) | 21,1 МиБ; проверить, что `MediaCenter` не единственный видеоплеер |
+| 14, OEM-калькулятор/IME/утилиты | `ExactCalculator` 2,3; `PinyinIME` 1,4; `SimpleAllApp` 0,7; `FileExploresky` 0,7; `WifiDisplay` 0,3 МиБ; `33118V12` 4,7 — это `com.droidlogic.mboxlauncher`, launcher | Малые утилиты дают около 5 МиБ; `33118V12` не удалять без замены launcher; `BoxLatinIME` 18,9 — IME, не удалять без замены |
+| 15, GMS/Google TV | `GmsCore` 105,2; `WebViewGoogle` 98,1; `chrome_hcy` 95,0; `YouTube` 41,1; `PhoneskyTv` 32,7; `katniss` 34,0 МиБ | Не кандидаты: ломают Play/YouTube/WebView/лицензии; включены только как граница |
+
+Эти поправки не отменяют общие оценки таблиц для других phone-derived образов: H96 — пример phone-derived базы, которую OEM уже частично вычистил. Нельзя переносить его package list на другой RK3318/RK3328 образ и наоборот.
+
 ## Таблица 3. Build-system кандидаты (не удаление функций)
 
 | № | Кандидат | Раздел | Ожидаемо, МБ (оценка) | Доказательство и зависимости | Регрессионные тесты | Риск |
@@ -63,16 +108,18 @@
 
 ## Ожидаемая сумма и честный сценарий 200 МБ
 
-На phone-derived OEM-образе, подобном H96 (build fingerprint `redfin`), арифметика может выглядеть так: телефонный набор 70–95 МБ + телефонные медиа 50–70 МБ + телефонный `Settings` 50–65 МБ = 170–230 МБ. На GSI измерены 91,7 МБ, 65,4 МБ и 64,0 МБ соответственно; ADT-3 `TvSettings` — 19,6 МБ, то есть замена phone Settings на TV Settings даёт около 44,4 МБ, а не 64 МБ. Добавьте NFC/print/debug/wallpaper 10–30 МБ и OEM-прелоады 10–100 МБ. Это уже больше 200 МБ, но только если телефонный `Settings` действительно дублируется `TvSettings`, а OEM-прелоады не являются бизнес-критичными.
+На H96 измеренная арифметика отличается от первоначальной гипотезы. Phone-only и phone-media пакеты отсутствуют, поэтому строки 1–2 таблицы 1 дают 0. Телефонный `Settings` измерен как 86,6 МиБ (каталог с oat; APK 66,0), `TvSettings` — 23,7 МиБ; экономия от удаления phone Settings возможна только после `cmd package resolve-activity` и runtime-доказательства, что он не используется. OEM-preinstall — 323,5 МиБ, OEM-тест — 55,0 МиБ. Уже один preinstall превышает 200 МиБ, но это продуктовое/лицензионное решение, а не техническая оптимизация.
 
-
-| Сценарий | Что уменьшается | Реалистичный диапазон | Шанс получить 200 МБ |
+| Сценарий | Что уменьшается | Измерено/оценка | Шанс получить 200 МБ |
 |---|---|---|---|
 | Чистый `atv_base.mk`, только phone-only/touch-only | Телефонных пакетов почти нет; максимум debug/demo и лишние IME/overlays | 0–30 МБ | Низкий |
-| Чистый `atv_base.mk` + OEM-прелоады + build-гигиена | ODM-прелоады, debug-ART, Java debug info, dexpreopt, user-сборка | 80–250 МБ | Средний; зависит от OEM |
-| Phone-derived OEM + замена phone Settings на TvSettings + OEM-прелоады | Телефония, phone media, phone Settings, NFC/print/debug, ODM | 200–350 МБ | Высокий, если всё подтверждено |
+| Phone-derived OEM с полным phone-набором (не H96) | Телефония + phone media + phone Settings | 170–230 МБ | Высокий, если пакеты действительно есть; на H96 не применимо |
+| H96: все OEM-preinstall | 8 APK из `system/system/preinstall` | 323,5 МиБ измерено | Высокий технически, но это продуктовое/лицензионное решение |
+| H96: preinstall-подмножество + OEM-тест + медиа + утилиты + setup | TikTok+emotnstore+APKPure+aptoidetv (68,1) + OEM-тест (55,0) + MediaCenter/DLNA (21,1) + ExactCalculator/PinyinIME (3,7) + WifiDisplay/FileExploresky (1,0) + SkySetupWizard (10,3) | 159,2 МиБ | Низкий: до 200 МБ не хватает около 41 МиБ |
+| H96: OEM-тест + phone Settings + медиа + setup + утилиты | 55,0 + 86,6 + 21,1 + 10,3 + 4,7 | 177,7 МиБ | Низкий–средний: до 200 МБ не хватает около 22 МиБ; `BoxLatinIME` (18,9) добавит только до 196,6 и требует замены IME |
+| H96: phone Settings + все preinstall | 86,6 + 323,5 | 410,1 МиБ | Высокий технически, но требует двух продуктовых решений и runtime-доказательства |
 
-Эти диапазоны — не сумма строк таблиц: сценарии пересекаются, а build-гигиена может изменить размер тех же APK, которые вы удаляете. Для отчёта перед заказчиком лучше дать три числа: измеренный baseline, измеренный результат после одной группы удалений и результат после сжатия раздела.
+Эти числа — статические суммы каталогов, а не гарантированный прирост после пересборки: сценарии пересекаются, а build-гигиена может изменить размер тех же APK, которые вы удаляете. Для отчёта перед заказчиком лучше дать три числа: измеренный baseline, измеренный результат после одной группы удалений и результат после сжатия раздела. Для H96 вывод такой: без OEM-preinstall или без удаления phone Settings цель 200 МБ не достигается безопасными техническими мерами; комбинация «OEM-тест + phone Settings + медиа + setup + утилиты» даёт только 177,7 МиБ, а добавление IME опасно.
 
 На чистом `atv_base.mk` те же строки дают почти ноль: телефонных приложений там нет, телефонного `Settings` нет, `LatinIME` может отсутствовать, а `PrintSpooler`/`CalendarProvider` уже часть ATV-базы. Остаются OEM-прелоады, build-гигиена и, возможно, 10–30 МБ debug/demo-мусора. Поэтому обещать 200 МБ «удалением phone-only» на любом Android 12 TV-образе нельзя. Нужно сначала определить, какая база использована: `atv_base.mk` или `full_base.mk`/`generic_no_telephony.mk`.
 
@@ -82,7 +129,7 @@
 
 1. **Зафиксировать базу и метрики.** Записать `ro.build.fingerprint`, `ro.build.type`, `ro.build.characteristics`, `ro.product.device`, `ro.board.platform`, `ro.build.version.release`, `ro.build.version.sdk`. Снять `lsblk`, `cat /proc/partitions`, `df -h`, `du -x -d1 /system /product /vendor /odm`, `pm list packages -f`, `pm list features`, `dumpsys package`, `dumpsys usagestats`. Это исходная точка; без неё любые «экономии» недоказуемы.
 
-2. **Определить, ATV это или телефонная база.** Проверить наличие `TvProvider`, `TvSettings`, `TvFrameworkOverlay`, `TvWifiOverlay`, `tv_input.default`, `TvFrameworkPackageStubs` и `ro.build.characteristics=tv`. Сравнить с `atv_system.mk`, `atv_system_ext.mk`, `atv_product.mk`, `atv_vendor.mk` [1] [2] [3]. Если база `full_base.mk`, сначала составить список phone-only пакетов; если `atv_base.mk`, телефонные кандидаты почти отсутствуют.
+2. **Определить, ATV это или телефонная база.** Проверить наличие `TvProvider`, `TvSettings`, `TvFrameworkOverlay`, `TvWifiOverlay`, `tv_input.default`, `TvFrameworkPackageStubs` и `ro.build.characteristics=tv`. Сравнить с `atv_system.mk`, `atv_system_ext.mk`, `atv_product.mk`, `atv_vendor.mk` [1] [2] [3]. Если база `full_base.mk`, сначала составить список phone-only пакетов; если `atv_base.mk`, телефонные кандидаты почти отсутствуют. **H96 — отдельный случай:** fingerprint phone-derived (`redfin`), `ro.build.characteristics=tv`, есть и `TvSettings`, и phone `Settings`, но phone-only пакеты вычищены. Нельзя удалять phone `Settings` только потому, что рядом есть `TvSettings`: сначала `cmd package resolve-activity -a android.settings.SETTINGS`, `dumpsys package com.android.settings` и runtime-проверка всех intent. Также `tv_core_hardware.xml` H96 объявляет `android.hardware.touchscreen` и `android.hardware.nfc`, поэтому проверка фич обязательна до удаления touch/NFC-компонентов.
 
 3. **Построить карту установки.** Собрать `m module-info.json` и `m installed-file-list`; проверить `out/target/product/<device>/module-info.json` и `installed-files.txt` [18] [19]. Для каждого кандидата найти `installed`, `path`, `dependencies`, `LOCAL_MODULE_PATH` (system/product/system_ext/vendor/odm). Это покажет, где реально лежит пакет и какие модули его требуют. `PRODUCT_PACKAGES` filter-out не гарантирует удаление: `expand-required-modules` рекурсивно добавляет `LOCAL_REQUIRED_MODULES` других пакетов [7].
 
@@ -106,11 +153,11 @@
 
 ## Ограничения исследования
 
-Публичного полного BSP Android 12 именно для RK3328/RK3318 нет: `rockchip-android/device-rockchip-rk3328` содержит ветку `rk3328-box-7.1`, а не Android 12. Публичный `device/rockchip/common/device.mk` Android 12 RKR14 — зеркало для RK3588/Radxa, поэтому его ATV-ветка, `preinstall.mk`, `optimize.mk`, `rktoolbox.mk` — релевантные, но не гарантированно идентичные RK3318. Точные имена OEM-пакетов и их размеры нужно измерять на конкретном образе; строки, помеченные «не подтверждено», — кандидаты, а не факты.
+Публичного полного BSP Android 12 именно для RK3328/RK3318 нет: `rockchip-android/device-rockchip-rk3328` содержит ветку `rk3328-box-7.1`, а не Android 12. Публичный `device/rockchip/common/device.mk` Android 12 RKR14 — зеркало для RK3588/Radxa, поэтому его ATV-ветка, `preinstall.mk`, `optimize.mk`, `rktoolbox.mk` — релевантные, но не гарантированно идентичные RK3318. Точные имена OEM-пакетов и их размеры нужно измерять на конкретном образе; строки, помеченные «не подтверждено», — кандидаты, а не факты. Для H96 такие измерения уже сделаны (см. раздел «Фактическая проверка H96»); для других образов это по-прежнему кандидаты.
 
-Официальный ADT-3 Android 12 TV образ — Amlogic с GMS; он использован только для калибровки размеров TV-пакетов, не как образец Rockchip. AOSP GSI — телефонный образ; он использован только для измерения phone-only приложений. H96 Max V12 — официальная страница производителя с версией `RK3318_userdebug_H96_Max_V12_12_20221117.1447`; CGR сообщает build fingerprint `google/redfin/redfin:12`, но саму прошивку скачать не удалось (Google Drive/Mega недоступны), поэтому её package list не проверен. Это помечено как кандидат/вторичное свидетельство, а не как доказанный состав.
+Официальный ADT-3 Android 12 TV образ — Amlogic с GMS; он использован только для калибровки размеров TV-пакетов, не как образец Rockchip. AOSP GSI — телефонный образ; он использован только для измерения phone-only приложений. H96 Max V12 — официальная страница производителя с версией `RK3318_userdebug_H96_Max_V12_12_20221117.1447`; CGR сообщает build fingerprint `google/redfin/redfin:12`. **Обновление 28.11.2026:** прошивка скачана по официальной ссылке [24], размер 2 579 812 824 байта, SHA-256 `e93ccc90e5a41fbc430c1f9b3f4621989945ff5a6e9685de6d228f5e7cc5ad58`; RKFW/RKAF разобран, семь ext4-разделов извлечены, package list и размеры каталогов проверены статически. Runtime-использование приложений, реальный default Settings/launcher/IME, наличие touchscreen и NFC-железа не проверялись — для этого нужна приставка. Поэтому H96-строки этого отчёта — измеренный package list, но не runtime-доказательство.
 
-Даты версий источников: AOSP-тег `android-12.0.0_r1` — Android 12, 2021 год; CDD 12 — версия Android 12, 2021 год; ADT-3 build `STT1.211025.001` — 25.10.2021; AOSP GSI build `SQ3A.220705.003.A1` — 05.07.2022; H96 firmware `20221117.1447` — 17.11.2022; Rockchip Parameter File Format Ver1.3 — 15.04.2013 (старый документ, не Android 12); публичное зеркало Rockchip Android 12 RKR14 — без даты публикации, доступ 27.11.2026. Все страницы открывались 27.11.2026; это дата проверки, а не дата публикации источника.
+Даты версий источников: AOSP-тег `android-12.0.0_r1` — Android 12, 2021 год; CDD 12 — версия Android 12, 2021 год; ADT-3 build `STT1.211025.001` — 25.10.2021; AOSP GSI build `SQ3A.220705.003.A1` — 05.07.2022; H96 firmware `20221117.1447` — 17.11.2022; Rockchip Parameter File Format Ver1.3 — 15.04.2013 (старый документ, не Android 12); публичное зеркало Rockchip Android 12 RKR14 — без даты публикации, доступ 27.11.2026. Все страницы открывались 27.11.2026; это дата проверки, а не дата публикации источника. H96-прошивка скачана и разобрана 28.11.2026.
 
 ## Источники
 
@@ -152,3 +199,5 @@
 [36]: https://android.googlesource.com/platform/build/+/refs/tags/android-12.0.0_r1/target/product/full_base.mk "AOSP Android 12 full_base.mk"
 [37]: https://android.googlesource.com/platform/build/+/refs/tags/android-12.0.0_r1/target/product/languages_full.mk "AOSP Android 12 languages_full.mk"
 [38]: https://appteka.store/app/8aer6757 "MediaCenter APK candidate (forum/app catalog, not a firmware dump)"
+
+Локальный артефакт H96-разбора: `/home/ubuntu/research/rk3318/h96_mega`, 2 579 812 824 байта, SHA-256 `e93ccc90e5a41fbc430c1f9b3f4621989945ff5a6e9685de6d228f5e7cc5ad58`; извлечённые разделы — `/home/ubuntu/research/rk3318/h96_parts/`. Это доказательство измерения для этой задачи, а не публичный источник; для воспроизведения нужна прошивка по ссылке [24].
