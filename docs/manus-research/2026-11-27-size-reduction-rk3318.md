@@ -34,8 +34,8 @@
 | Калькулятор | `system/system/app/ExactCalculator` | 2 361 119 | 2,3 | малый выигрыш |
 | DLNA | `system/system/priv-app/DLNA` | 1 509 210 | 1,4 | `com.rockchips.dlna` |
 | Pinyin IME | `system/system/app/PinyinIME` | 1 455 415 | 1,4 | зависит от языков/ввода |
-| Simple launcher | `system/system/app/SimpleAllApp` | 747 524 | 0,7 | `com.hkw.simplelauncher`; проверить, не является ли резервным launcher |
-| Файловый менеджер | `system/system/priv-app/FileExploresky` | 698 677 | 0,7 | package name не извлечён |
+| SimpleAllApp | `system/system/app/SimpleAllApp` | 747 524 | 0,7 | `com.hkw.simplelauncher`; по manifest нет activity и разрешений — вероятно resource/overlay, не launcher |
+| Файловый менеджер | `system/system/priv-app/FileExploresky` | 698 677 | 0,7 | `com.droidlogic.FileBrower`; launcher, system UID, file browser |
 | Wi-Fi Display | `system/system/app/WifiDisplay` | 366 123 | 0,3 | `com.rockchip.wfd`; может быть нужен для screen cast |
 
 Проверка phone-only и phone-media по каталогам: `Dialer`, `Contacts`, `Messaging`, `Telecom`, `TeleService`, `TelephonyProvider`, `MmsService`, `Stk`, `CellBroadcast`, `EmergencyInfo`, `CallLog`, `Camera2`, `Gallery2`, `DeskClock`, `Music`, `Browser2`, `Launcher3QuickStep` не найдены. Найдены только `ContactsProvider`, `GoogleContactsSyncAdapter`, `SettingsIntelligence` (2,1 МиБ), `CalendarProvider` и `BasicDreams`/`WallpaperBackup` из touch/demo-группы. Это означает, что phone-only таблица к H96 почти неприменима: удалять там нечего, кроме условного телефонного `Settings`. Нельзя считать fingerprint `redfin` доказательством полного телефонного package list.
@@ -92,6 +92,30 @@
 
 Эти поправки не отменяют общие оценки таблиц для других phone-derived образов: H96 — пример phone-derived базы, которую OEM уже частично вычистил. Нельзя переносить его package list на другой RK3318/RK3328 образ и наоборот.
 
+### Статический manifest-аудит OEM-компонентов (28.11.2026)
+
+Дополнительно к `du` выполнен `aapt dump badging` и `aapt dump xmltree` по OEM-APK и preinstall. Машиночитаемая таблица: [2026-11-28-h96-oem-static-audit.csv](2026-11-28-h96-oem-static-audit.csv). Она содержит package name, путь, размер APK и каталога, launchable activity, признаки HOME/IME/BOOT/system UID, число разрешений и список потенциально опасных разрешений.
+
+| Package | Размер | Компоненты и роль | Разрешения | Вывод |
+|---|---:|---|---|---|
+| `com.droidlogic.mboxlauncher` (`33118V12`) | 4,7 МиБ | activity `com.droidlogic.mboxlauncher.Launcher`, MAIN + HOME; system UID | 12, 3 потенциально опасных | Реальный HOME-launcher, не тест; не удалять без замены |
+| `com.android.tv.settings` (`TvSettings`) | 23,5 МиБ | `MainSettings` + `FallbackHome` с priority `-1000`; system UID | 44, 6 | Основной TV Settings и fallback-home; не удалять |
+| `com.android.settings` (phone `Settings`) | 66,0 МиБ | phone Settings, `android.settings.SETTINGS`; system UID | 103, 11 | Условный кандидат только после runtime-проверки default Settings |
+| `com.android.show` (`ShowDebug`) | 27,6 МиБ | boot receiver `com.android.sdk.BootReceiver`, job services `JobCheckService`/`JobUpInfoService`; system UID | 24, 7 | Заводской debug-инструмент; сильный кандидат на production-удаление, но проверить factory debug |
+| `com.example.a` (`ProductTest`) | 13,0 МиБ | launcher activity, system UID | 13, 0 | Заводской ProductTest; кандидат, но может использоваться на линии |
+| `com.rockchip.devicetest` (`RKHcyDeviceTest`) | 9,3 МиБ | boot receiver, launcher, `TestService` и `WatchdogService`; system UID | 25, 8 | Заводской DeviceTest; кандидат при отказе от factory test |
+| `com.cghs.stresstest` (`StressTest`) | 5,1 МиБ | boot receiver `RebootReceiver`, camera/video/recovery/stress-сервисы; system UID | 15, 7 | Заводской StressTest; кандидат при отказе от стресс-тестов |
+| `com.rockchips.mediacenter` (`MediaCenter`) | 19,7 МиБ | boot receiver, media UI, `ACCESS_SUPERUSER`, install/delete packages; system UID | 28, 10 | Медиафункция с широкими правами; не удалять без замены плеера и проверки USB/сети |
+| `android.rockchip.update.service` (`RKHcyUpdate`) | 25,7 МиБ | boot, OTA UI; system UID | 15, 4 | OTA; не удалять без отказа от обновлений |
+| `com.android.inputmethod.latin` (`BoxLatinIME`) | 18,9 МиБ | реальный IME (`android.view.InputMethod`), boot | 15, 1 | Оставить как минимум один IME; удаление только с заменой |
+| `com.hkw.simplelauncher` (`SimpleAllApp`) | 0,7 МиБ | нет activity, нет uses-permission | 0, 0 | Вероятно resource/overlay, не launcher; низкий приоритет |
+| `com.droidlogic.FileBrower` (`FileExploresky`) | 0,7 МиБ | launcher, file browser; system UID | 6, 3 | Нужен для USB/файлового сценария; проверить перед удалением |
+| OEM-preinstall, 8 APK | 323,5 МиБ | Netflix, Kodi, AirScreen, Prime Video, TikTok, Emotn, APKPure, Aptoide TV | 10–37 на APK | Главный источник 200 МБ; удаление — продуктовое/лицензионное решение. У Netflix/Kodi/AirScreen/Prime/APKPure есть boot receivers |
+
+Главный статический вывод: группа `ShowDebug` + `ProductTest` + `RKHcyDeviceTest` + `StressTest` (55,0 МиБ) — самый обоснованный технический кандидат, если заводские тесты и калибровка не нужны. Эти приложения работают с system UID, а `StressTest` запрашивает `INJECT_EVENTS` и `WRITE_SECURE_SETTINGS`, `ShowDebug` — `SHUTDOWN`, `REQUEST_INSTALL_PACKAGES` и `MOUNT_UNMOUNT_FILESYSTEMS`. Удаление уменьшает не только размер, но и поверхность атаки. Однако manifest не доказывает, что заводская линия или сервисный сценарий их не вызывает: это остаётся runtime/factory-риском.
+
+`33118V12` нельзя считать «тестовым» только по имени: manifest подтверждает HOME-launcher. `TvSettings` содержит `FallbackHome`, но с priority `-1000`, то есть это резервный home, а не основной launcher. `SimpleAllApp` не является launcher по manifest: у него нет activity и разрешений, поэтому его 0,7 МиБ — низкий приоритет.
+
 ## Таблица 3. Build-system кандидаты (не удаление функций)
 
 | № | Кандидат | Раздел | Ожидаемо, МБ (оценка) | Доказательство и зависимости | Регрессионные тесты | Риск |
@@ -108,7 +132,7 @@
 
 ## Ожидаемая сумма и честный сценарий 200 МБ
 
-На H96 измеренная арифметика отличается от первоначальной гипотезы. Phone-only и phone-media пакеты отсутствуют, поэтому строки 1–2 таблицы 1 дают 0. Телефонный `Settings` измерен как 86,6 МиБ (каталог с oat; APK 66,0), `TvSettings` — 23,7 МиБ; экономия от удаления phone Settings возможна только после `cmd package resolve-activity` и runtime-доказательства, что он не используется. OEM-preinstall — 323,5 МиБ, OEM-тест — 55,0 МиБ. Уже один preinstall превышает 200 МиБ, но это продуктовое/лицензионное решение, а не техническая оптимизация.
+На H96 измеренная арифметика отличается от первоначальной гипотезы. Phone-only и phone-media пакеты отсутствуют, поэтому строки 1–2 таблицы 1 дают 0. Телефонный `Settings` измерен как 86,6 МиБ (каталог с oat; APK 66,0), `TvSettings` — 23,7 МиБ; экономия от удаления phone Settings возможна только после `cmd package resolve-activity` и runtime-доказательства, что он не используется. OEM-preinstall — 323,5 МиБ, OEM-тест — 55,0 МиБ. Уже один preinstall превышает 200 МиБ, но это продуктовое/лицензионное решение, а не техническая оптимизация. Статический manifest-аудит подтвердил, что `33118V12` — основной HOME-launcher, `TvSettings` — TV Settings с резервным `FallbackHome`, а группа из четырёх OEM-тестов (55,0 МиБ) действительно состоит из system-UID приложений с boot/launcher-компонентами; это усиливает оценку риска, но не заменяет runtime-проверку.
 
 | Сценарий | Что уменьшается | Измерено/оценка | Шанс получить 200 МБ |
 |---|---|---|---|
@@ -155,7 +179,7 @@
 
 Публичного полного BSP Android 12 именно для RK3328/RK3318 нет: `rockchip-android/device-rockchip-rk3328` содержит ветку `rk3328-box-7.1`, а не Android 12. Публичный `device/rockchip/common/device.mk` Android 12 RKR14 — зеркало для RK3588/Radxa, поэтому его ATV-ветка, `preinstall.mk`, `optimize.mk`, `rktoolbox.mk` — релевантные, но не гарантированно идентичные RK3318. Точные имена OEM-пакетов и их размеры нужно измерять на конкретном образе; строки, помеченные «не подтверждено», — кандидаты, а не факты. Для H96 такие измерения уже сделаны (см. раздел «Фактическая проверка H96»); для других образов это по-прежнему кандидаты.
 
-Официальный ADT-3 Android 12 TV образ — Amlogic с GMS; он использован только для калибровки размеров TV-пакетов, не как образец Rockchip. AOSP GSI — телефонный образ; он использован только для измерения phone-only приложений. H96 Max V12 — официальная страница производителя с версией `RK3318_userdebug_H96_Max_V12_12_20221117.1447`; CGR сообщает build fingerprint `google/redfin/redfin:12`. **Обновление 28.11.2026:** прошивка скачана по официальной ссылке [24], размер 2 579 812 824 байта, SHA-256 `e93ccc90e5a41fbc430c1f9b3f4621989945ff5a6e9685de6d228f5e7cc5ad58`; RKFW/RKAF разобран, семь ext4-разделов извлечены, package list и размеры каталогов проверены статически. Runtime-использование приложений, реальный default Settings/launcher/IME, наличие touchscreen и NFC-железа не проверялись — для этого нужна приставка. Поэтому H96-строки этого отчёта — измеренный package list, но не runtime-доказательство.
+Официальный ADT-3 Android 12 TV образ — Amlogic с GMS; он использован только для калибровки размеров TV-пакетов, не как образец Rockchip. AOSP GSI — телефонный образ; он использован только для измерения phone-only приложений. H96 Max V12 — официальная страница производителя с версией `RK3318_userdebug_H96_Max_V12_12_20221117.1447`; CGR сообщает build fingerprint `google/redfin/redfin:12`. **Обновление 28.11.2026:** прошивка скачана по официальной ссылке [24], размер 2 579 812 824 байта, SHA-256 `e93ccc90e5a41fbc430c1f9b3f4621989945ff5a6e9685de6d228f5e7cc5ad58`; RKFW/RKAF разобран, семь ext4-разделов извлечены, package list и размеры каталогов проверены статически; для 23 OEM/preinstall-записей выполнен `aapt dump badging/xmltree` (CSV приложен к отчёту). Runtime-использование приложений, реальный default Settings/launcher/IME, наличие touchscreen и NFC-железа не проверялись — для этого нужна приставка. Попытка подключиться к `adb connect 10.12.54.42:5555` из песочницы 28.11.2026 завершилась ошибкой TCP, поэтому runtime-аудит (resolve-activity, `dumpsys`, logcat, реальные вызовы OEM-тестов) не выполнен. Поэтому H96-строки этого отчёта — измеренный package list и статический manifest-анализ, но не runtime-доказательство.
 
 Даты версий источников: AOSP-тег `android-12.0.0_r1` — Android 12, 2021 год; CDD 12 — версия Android 12, 2021 год; ADT-3 build `STT1.211025.001` — 25.10.2021; AOSP GSI build `SQ3A.220705.003.A1` — 05.07.2022; H96 firmware `20221117.1447` — 17.11.2022; Rockchip Parameter File Format Ver1.3 — 15.04.2013 (старый документ, не Android 12); публичное зеркало Rockchip Android 12 RKR14 — без даты публикации, доступ 27.11.2026. Все страницы открывались 27.11.2026; это дата проверки, а не дата публикации источника. H96-прошивка скачана и разобрана 28.11.2026.
 
