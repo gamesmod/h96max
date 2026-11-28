@@ -114,6 +114,7 @@ for name in "${TVBOX_REQUIRED_APKS[@]}"; do
     [[ "$name" == com.tvlauncher.apk ]] && continue
     sudo install -m 0644 "$R/dl/apk/$name" "$MNT/tvbox/apk/"
 done
+sudo install -m 0644 "$R/apps/panadonik-tube/out/org.tvbox.panadoniktube.apk" "$MNT/tvbox/apk/org.tvbox.panadoniktube.apk"
 # TV Launcher is a system app (no native libs): installing it at first boot made the system start HOME while the
 # package was still frozen by the installer ("Package com.tvlauncher is currently frozen!" x52, ~3 s black screen)
 sudo mkdir -p $MNT/app/TvLauncher

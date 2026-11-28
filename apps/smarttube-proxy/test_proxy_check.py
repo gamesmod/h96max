@@ -11,6 +11,16 @@ class ProxyTests(unittest.TestCase):
     def test_json(self):
         self.assertEqual(p.parse(b'{"data":[{"ip":"8.8.8.8","port":1080,"protocols":["socks5"]}]}',"socks5","geonode"),
                          {("socks5","8.8.8.8",1080)})
+        self.assertEqual(p.parse(b'{"proxies":[{"ip":"8.8.4.4","port":443,"protocol":"https"}]}',"https","json"),
+                         {("https","8.8.4.4",443)})
+    def test_csv_and_html(self):
+        self.assertEqual(p.parse(b'protocol,ip,port\nhttp,8.8.8.8,8080\n',"http","csv"),
+                         {("http","8.8.8.8",8080)})
+        self.assertEqual(p.parse(b'<table><tr><td>8.8.4.4</td><td>3128</td></tr></table>',"http","html"),
+                         {("http","8.8.4.4",3128)})
+    def test_redaction(self):
+        value=p.redact("failed https://user:secret@8.8.8.8:443 and socks5://1.1.1.1:1080")
+        self.assertNotIn("secret",value); self.assertNotIn("8.8.8.8",value); self.assertNotIn("1.1.1.1",value)
     def test_media_url(self):
         self.assertTrue(p.media_valid("https://r1.googlevideo.com/videoplayback?x=1"))
         self.assertFalse(p.media_valid("https://googlevideo.com/"))

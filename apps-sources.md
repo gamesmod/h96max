@@ -1,5 +1,9 @@
 # Сторонние APK в образе: источники и подписи (контрольные суммы сверены с конфигурацией сборки 2026-11-24)
 
+## Panadonik Tube / SmartTube-CN из исходников
+
+`org.tvbox.panadoniktube` собирается из MIT-исходников `https://github.com/jinran3/SmartTube-CN.git` на commit из `apps/panadonik-tube/source.lock.json`. Готовый APK релиза не используется как вход образа и потому отсутствует в `tools/third-party-apps.json`. Патчер отказывает при несовпадении commit, submodule или контекста; артефакт сохраняет lock, оба patch-файла, ревизии submodule, лицензию и SHA-256. Подпись выполняется прежним сертификатом Panadonik после завершения upstream Gradle. Встроенный updater отключён, собственный пакет не регистрируется в Obtainium.
+
 ## Штатный файловый менеджер из A12-образа платы — 2026-11-23
 
 Единственный бинарник vendor-образа среди исходников приложений: `prebuilt/stock-filemanager/FileExploresky.apk`.

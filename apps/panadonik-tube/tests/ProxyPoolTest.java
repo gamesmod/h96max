@@ -5,6 +5,7 @@ public final class ProxyPoolTest {
         ProxyPool p=new ProxyPool();
         Gateway.Upstream a=new Gateway.Upstream("socks5","8.8.8.8",1080);
         Gateway.Upstream b=new Gateway.Upstream("http","1.1.1.1",8080);
+        Gateway.Upstream c=new Gateway.Upstream("socks4","9.9.9.9",1080);
         long now=1000;
         require(p.choose(now)==null);
         p.offer(b,now,200);p.offer(a,now,100);
@@ -22,6 +23,10 @@ public final class ProxyPoolTest {
         require(!Gateway.publicV4("192.168.1.1"));
         require(Gateway.permitted("rr1.googlevideo.com"));
         require(!Gateway.permitted("googlevideo.com.evil.example"));
+        require(c.protocol.equals("socks4"));
+        require(Gateway.authorized("token","Panadonik token"));
+        require(!Gateway.authorized("token","Panadonik wrong"));
+        require(!Gateway.authorized("token",null));
         System.out.println("ProxyPool failover, cooldown, expiry and allowlist: PASS");
     }
 }

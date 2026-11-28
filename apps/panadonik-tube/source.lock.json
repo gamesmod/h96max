@@ -1,7 +1,7 @@
 {
-  "repository": "https://github.com/yuliskov/SmartTube.git",
-  "commit": "b6a1c8221fa395f91786d29202454b864df2a91e",
-  "upstreamVersion": "32.83",
+  "repository": "https://github.com/jinran3/SmartTube-CN.git",
+  "commit": "f8d3c09659ecf66b7a3d52ba533bf5f2c00af2cc",
+  "upstreamVersion": "32.63-cn-20261008-r101",
   "variant": "stfdroidRelease",
   "applicationId": "org.tvbox.panadoniktube",
   "abis": [

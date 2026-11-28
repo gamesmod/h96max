@@ -24,6 +24,8 @@
 Совпадение VLC, TorrServe и TV Launcher с F-Droid проверено по sha256 против **подписанного**
 индекса https://f-droid.org/repo/index-v1.jar (подпись JAR проверена, ключ репозитория `43238d51…9c9ccab`).
 
+SmartTube-CN не используется как готовый сторонний APK. `apps/panadonik-tube/source.lock.json` фиксирует MIT-репозиторий, commit, variant и ABI; `patch_source.py` применяет проверяемый patch к основному дереву и закреплённому `SharedModules`, а `build.sh`/`sign.sh` собирают и подписывают результат прежним ключом Panadonik. Собственный пакет не добавляется в Obtainium.
+
 ### Параметры лаунчера и плиток
 
 - Домашнее приложение: `com.tvlauncher/.MainActivity` (TV Launcher 1.6.2 из F-Droid).
@@ -52,6 +54,7 @@
 | Плитка / компонент | Пакет / файл | Исходник | Что делает |
 |---|---|---|---|
 | ТВ-каналы | `org.tvbox.iptv` | `apps/iptv` | категории с пиктограммами → каналы с логотипами, качеством и EPG ID → только выбранный поток в VLC; однократная индексация M3U при старте с прогрессом/ETA и локальным кэшем |
+| Panadonik Tube (SmartTube-CN) | `org.tvbox.panadoniktube` | `apps/panadonik-tube` + зафиксированный SmartTube-CN | YouTube-клиент с автопрокси только для разрешённых YouTube API/CDN-доменов, первичной проверкой, ротацией и прямым аварийным маршрутом |
 | Установка и обновление | `org.tvbox.installer` | `apps/installer` | установка на eMMC, обновления (флешка/SD/сеть), резервная копия; активный этап и журнал операции с временными метками |
 | Антивирус | `org.tvbox.antivirus` | `apps/antivirus` | проверка по требованию через Hypatia, базы, защита в реальном времени |
 | Питание | `org.tvbox.power` | `apps/power` | выключение, сон, перезагрузка и переход в recovery; значок выключения рисуется приложением, не зависит от шрифта |

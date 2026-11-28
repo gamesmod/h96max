@@ -193,7 +193,7 @@ L=/data/data/com.tvlauncher/shared_prefs/selected_apps.xml
 if pm path com.tvlauncher >/dev/null 2>&1 && [ ! -e "$D/launcher-tiles.initialized" ]; then
     # Атомарно записать настройки до остановки HOME; особенности запуска описаны в HANDOFF.md.
     OLD=$(sed -n 's:.*<string name="apps_order">\([^<]*\)</string>.*:\1:p' "$L" 2>/dev/null | head -n 1)
-    ALLOWED="org.tvbox.iptv ru.yourok.torrserve org.tvbox.files org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
+    ALLOWED="org.tvbox.iptv org.tvbox.panadoniktube ru.yourok.torrserve org.tvbox.files org.tvbox.links org.tvbox.installer com.android.tv.settings org.tvbox.clean org.tvbox.antivirus org.tvbox.power"
     T=""; EXTRA=""; N=0
     # Сохранить установленные функции и их порядок; удалить дубли и устаревшие плитки.
     for p in $(printf '%s' "$OLD" | sed 's/\&\#30;/ /g'); do

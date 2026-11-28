@@ -3,6 +3,7 @@
 Требуются Python 3.10+ и curl с поддержкой SOCKS5/HTTPS.
 """
 import argparse
+import csv
 import concurrent.futures
 import ipaddress
 import json
@@ -15,9 +16,10 @@ import subprocess
 import tempfile
 import urllib.parse
 import urllib.request
+from html.parser import HTMLParser
 
 ROOT = Path(__file__).resolve().parent
-PROTOCOLS = ("socks5", "http")
+PROTOCOLS = ("http", "https", "socks4", "socks5")
 MAX_SOURCE = 2 * 1024 * 1024
 MEDIA_BYTES = 256 * 1024
 OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
@@ -48,9 +50,47 @@ def parse(data, protocol, fmt):
                  if protocol in x.get("protocols", [])]
     elif fmt == "txt":
         lines = data.decode("utf-8-sig").splitlines()
+    elif fmt == "json":
+        root = json.loads(data)
+        entries = root if isinstance(root, list) else root.get("proxies", root.get("data", []))
+        lines = []
+        for item in entries:
+            if isinstance(item, str):
+                lines.append(item)
+                continue
+            protocols = item.get("protocols", [item.get("protocol", item.get("type", protocol))])
+            if protocol in [str(x).lower() for x in protocols]:
+                lines.append(f'{item.get("ip", item.get("host", ""))}:{item.get("port", "")}')
+    elif fmt == "csv":
+        rows = csv.DictReader(data.decode("utf-8-sig").splitlines())
+        lines = []
+        for item in rows:
+            kind = (item.get("protocol") or item.get("type") or item.get("ptype") or protocol).lower()
+            if kind != protocol:
+                continue
+            lines.append(item.get("proxy") or f'{item.get("ip", item.get("host", ""))}:{item.get("port", "")}')
+    elif fmt == "html":
+        parser = ProxyTableParser(); parser.feed(data.decode("utf-8", "replace")); lines = parser.lines
     else:
         raise ValueError("unknown source format")
     return {p for line in lines if (p := normalize(line, protocol)) is not None}
+
+class ProxyTableParser(HTMLParser):
+    def __init__(self):
+        super().__init__(); self.row=[]; self.cell=None; self.lines=[]
+    def handle_starttag(self, tag, attrs):
+        if tag.lower()=="tr": self.row=[]
+        if tag.lower() in ("td","th"): self.cell=[]
+    def handle_data(self, data):
+        if self.cell is not None: self.cell.append(data)
+    def handle_endtag(self, tag):
+        if tag.lower() in ("td","th") and self.cell is not None:
+            self.row.append("".join(self.cell).strip()); self.cell=None
+        if tag.lower()=="tr" and len(self.row)>=2 and re.fullmatch(r"[0-9.]+",self.row[0]) and self.row[1].isdigit():
+            self.lines.append(self.row[0]+":"+self.row[1])
+
+def redact(value):
+    return re.sub(r"(?i)(https?|socks[45])://(?:[^@/]+@)?[^\s/]+", r"\1://<redacted>", value)
 
 def fetch(url):
     if urllib.parse.urlsplit(url).scheme != "https":
@@ -100,7 +140,8 @@ def media_valid(url):
 def proxy_url(proxy):
     protocol, ip, port = proxy
     host = "[" + ip + "]" if ":" in ip else ip
-    return ("socks5h" if protocol == "socks5" else "http") + "://" + host + ":" + str(port)
+    scheme = "socks5h" if protocol == "socks5" else "socks4a" if protocol == "socks4" else "http"
+    return scheme + "://" + host + ":" + str(port)
 
 def request(proxy, url, media=False, connect_timeout=5, timeout=15):
     # URL в stdin curl, не в аргументах процесса; не выводим тело/ошибки.
@@ -184,7 +225,8 @@ def main():
     candidates = set()
     source_results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=min(args.workers, 8)) as pool:
-        jobs = [(s["id"], p, pool.submit(collect_one,s,p,args.cache)) for s in config for p in PROTOCOLS]
+        jobs = [(s["id"], p, pool.submit(collect_one,s,p,args.cache)) for s in config if s.get("enabled",True)
+                for p in PROTOCOLS if p in s.get("protocols",PROTOCOLS)]
         for source, protocol, future in jobs:
             try:
                 items, state = future.result()
