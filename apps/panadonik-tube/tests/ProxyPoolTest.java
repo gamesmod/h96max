@@ -24,6 +24,9 @@ public final class ProxyPoolTest {
         require(Gateway.permitted("rr1.googlevideo.com"));
         require(!Gateway.permitted("googlevideo.com.evil.example"));
         require(c.protocol.equals("socks4"));
+        require(Gateway.authorized("token","Panadonik token"));
+        require(!Gateway.authorized("token","Panadonik wrong"));
+        require(!Gateway.authorized("token",null));
         System.out.println("ProxyPool failover, cooldown, expiry and allowlist: PASS");
     }
 }

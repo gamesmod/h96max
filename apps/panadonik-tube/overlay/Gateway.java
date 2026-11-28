@@ -5,18 +5,29 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.security.SecureRandom;
 
 /** CONNECT only; TLS is end-to-end. New tunnels use new upstream; existing tunnels are not migrated. */
 public final class Gateway implements Closeable {
     public static final int PORT = 18765;
+    private final String token=createToken();
+    private static String createToken(){
+        byte[] bytes=new byte[24];new SecureRandom().nextBytes(bytes);StringBuilder out=new StringBuilder();
+        for(byte value:bytes)out.append(String.format(java.util.Locale.ROOT,"%02x",value&255));return out.toString();
+    }
+    public String token(){return token;}
     public static final class Upstream {
         public final String protocol, ip;
         public final int port;
         public Upstream(String protocol, String ip, int port) {
-            if (!(protocol.equals("http") || protocol.equals("https") || protocol.equals("socks4") || protocol.equals("socks5")) || !publicV4(ip) || port < 1 || port > 65535)
+            this(protocol,ip,port,false);
+        }
+        private Upstream(String protocol,String ip,int port,boolean testLoopback){
+            if (!(protocol.equals("http") || protocol.equals("https") || protocol.equals("socks4") || protocol.equals("socks5")) || (!publicV4(ip)&&!(testLoopback&&ip.equals("127.0.0.1"))) || port < 1 || port > 65535)
                 throw new IllegalArgumentException("Invalid upstream");
             this.protocol=protocol; this.ip=ip; this.port=port;
         }
+        static Upstream forTest(String protocol,String ip,int port){return new Upstream(protocol,ip,port,true);}
         @Override public String toString() { return protocol+"://"+ip+":"+port; }
     }
     // Intentionally IPv4 only; never resolve source-provided hostnames or private IPs.
@@ -47,8 +58,13 @@ public final class Gateway implements Closeable {
         }
         throw new IOException("header line too long");
     }
-    static void headers(InputStream in) throws IOException {
-        for(int i=0;i<64;i++)if(line(in).isEmpty())return;
+    static String headers(InputStream in) throws IOException {
+        String authorization=null;
+        for(int i=0;i<64;i++){
+            String value=line(in);if(value.isEmpty())return authorization;
+            int at=value.indexOf(':');
+            if(at>0&&value.substring(0,at).trim().equalsIgnoreCase("Proxy-Authorization"))authorization=value.substring(at+1).trim();
+        }
         throw new IOException("too many headers");
     }
     static void write(OutputStream out,String text) throws IOException {
@@ -134,7 +150,10 @@ public final class Gateway implements Closeable {
         try(Socket c=client){
             c.setSoTimeout(15000);
             String[] request=line(c.getInputStream()).split(" ");
-            headers(c.getInputStream());
+            String authorization=headers(c.getInputStream());
+            if(!authorized(token,authorization)){
+                write(c.getOutputStream(),"HTTP/1.1 407 Proxy Authentication Required\r\nProxy-Authenticate: Panadonik\r\nConnection: close\r\n\r\n");return;
+            }
             if(request.length!=3||!request[0].equals("CONNECT")||!request[1].endsWith(":443")){
                 write(c.getOutputStream(),"HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n");return;
             }
@@ -155,6 +174,14 @@ public final class Gateway implements Closeable {
             }finally{sockets.remove(remote);}
         }catch(IOException|RuntimeException ignored){}
     }
+    private static boolean constantTimeEquals(String expected,String actual){
+        if(actual==null)return false;int diff=expected.length()^actual.length();
+        for(int i=0;i<Math.max(expected.length(),actual.length());i++){
+            char a=i<expected.length()?expected.charAt(i):0,b=i<actual.length()?actual.charAt(i):0;diff|=a^b;
+        }
+        return diff==0;
+    }
+    static boolean authorized(String token,String actual){return constantTimeEquals("Panadonik "+token,actual);}
     private static void copy(Socket from,Socket to){
         try{
             byte[] bytes=new byte[16384];int n;

@@ -31,8 +31,9 @@ jobs:
         working-directory: apps/panadonik-tube
         run: |
           mkdir -p /tmp/panadonik-test
-          javac --release 8 -d /tmp/panadonik-test overlay/Gateway.java overlay/ProxyPool.java tests/ProxyPoolTest.java
+          javac --release 8 -d /tmp/panadonik-test overlay/Gateway.java overlay/ProxyPool.java tests/ProxyPoolTest.java tests/GatewayIntegrationTest.java
           java -cp /tmp/panadonik-test org.tvbox.panadonikproxy.ProxyPoolTest
+          java -cp /tmp/panadonik-test org.tvbox.panadonikproxy.GatewayIntegrationTest
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools platforms;android-34 build-tools;30.0.3 ndk;21.0.6113669'
@@ -92,7 +93,8 @@ jobs:
             "$bt/zipalign" -c -p 4 "$output"
           done
           (cd signed && sha256sum *.apk > SHA256SUMS)
-          cp unsigned/source.lock.json unsigned/SUBMODULES.txt unsigned/PANADONIK.patch unsigned/LICENSE.smarttube signed/
+          cp unsigned/source.lock.json unsigned/SUBMODULES.txt unsigned/PANADONIK.patch unsigned/LICENSE.smarttube \
+            unsigned/BUILD-PATCHER.py unsigned/SMARTTUBE-CN-SHAREDMODULES.patch signed/
       - uses: actions/upload-artifact@v4
         with:
           name: panadonik-tube-signed-unaccepted

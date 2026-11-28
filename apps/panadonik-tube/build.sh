@@ -24,5 +24,7 @@ git -C "$W" submodule status --recursive > out/SUBMODULES.txt
 git -C "$W" diff --binary > out/PANADONIK.patch
 cp "$W/LICENSE" out/LICENSE.smarttube
 cp source.lock.json out/source.lock.json
+cp patch_source.py out/BUILD-PATCHER.py
+cp "$W/patches/04-okhttp-media-client-sharedutils.patch" out/SMARTTUBE-CN-SHAREDMODULES.patch
 (cd "$W" && bash gradlew :smarttubetv:assembleStfdroidRelease --no-daemon --console=plain --max-workers=2)
 python3 "$ROOT/verify_apks.py" "$W/smarttubetv/build/outputs/apk/stfdroid/release" "$ROOT/out" "$SDK/build-tools/30.0.3"

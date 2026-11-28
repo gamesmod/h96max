@@ -39,6 +39,7 @@ public final class AutoProxy {
         state = new ProxyState(context);
         int port = 1;
         try { gateway.start(); port = gateway.port(); } catch (Exception e) { Log.e(TAG, "Local gateway unavailable"); }
+        System.setProperty("panadonik.proxyToken",gateway.token());
         final Proxy local = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", port));
         for (String key : new String[]{"http.proxyHost","http.proxyPort","https.proxyHost","https.proxyPort",
                 "socksProxyHost","socksProxyPort","http.proxyUser","http.proxyPassword",

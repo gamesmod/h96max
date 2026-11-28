@@ -159,6 +159,29 @@ def apply(root):
         raise ValueError("Неожиданная версия SmartTube: " + sha)
     if subprocess.check_output(["git","-C",str(root),"status","--porcelain"],text=True).strip():
         raise ValueError("Требуется чистое дерево исходников")
+    shared = root / "SharedModules"
+    shared_patch = root / "patches/04-okhttp-media-client-sharedutils.patch"
+    subprocess.run(["git","-C",str(shared),"apply","--ignore-space-change","--check",str(shared_patch)],check=True)
+    subprocess.run(["git","-C",str(shared),"apply","--ignore-space-change",str(shared_patch)],check=True)
+    manager = shared / "sharedutils/src/main/java/com/liskovsoft/sharedutils/okhttp/OkHttpManager.java"
+    manager_text = manager.read_text()
+    manager_text = replace_once(manager_text,
+        "mMediaClient = OkHttpCommons.setupMediaBuilder(new OkHttpClient.Builder()).build();",
+        "mMediaClient = panadonikProxy(OkHttpCommons.setupMediaBuilder(new OkHttpClient.Builder())).build();")
+    manager_text = replace_once(manager_text,
+        "mClient = OkHttpCommons.setupBuilder(new OkHttpClient.Builder()).build();",
+        "mClient = panadonikProxy(OkHttpCommons.setupBuilder(new OkHttpClient.Builder())).build();")
+    anchor = "    public static long getConnectTimeoutMs() {"
+    helper = """    private static OkHttpClient.Builder panadonikProxy(OkHttpClient.Builder builder) {
+        String token = System.getProperty("panadonik.proxyToken");
+        if (token == null || token.isEmpty()) return builder;
+        return builder.proxy(null).proxySelector(java.net.ProxySelector.getDefault())
+                .proxyAuthenticator((route, response) -> response.request().newBuilder()
+                        .header("Proxy-Authorization", "Panadonik " + token).build());
+    }
+
+"""
+    manager.write_text(replace_once(manager_text,anchor,helper+anchor))
     changes = {}
     for name in PATHS:
         file = root / name
