@@ -101,9 +101,9 @@
 | `com.droidlogic.mboxlauncher` (`33118V12`) | 4,7 МиБ | activity `com.droidlogic.mboxlauncher.Launcher`, MAIN + HOME; system UID | 12, 3 потенциально опасных | Реальный HOME-launcher, не тест; не удалять без замены |
 | `com.android.tv.settings` (`TvSettings`) | 23,5 МиБ | `MainSettings` + `FallbackHome` с priority `-1000`; system UID | 44, 6 | Основной TV Settings и fallback-home; не удалять |
 | `com.android.settings` (phone `Settings`) | 66,0 МиБ | phone Settings, `android.settings.SETTINGS`; system UID | 103, 11 | Условный кандидат только после runtime-проверки default Settings |
-| `com.android.show` (`ShowDebug`) | 27,6 МиБ | boot receiver `com.android.sdk.BootReceiver`, job services `JobCheckService`/`JobUpInfoService`; system UID | 24, 7 | Заводской debug-инструмент; сильный кандидат на production-удаление, но проверить factory debug |
+| `com.android.show` (`ShowDebug`) | 27,6 МиБ | boot receiver `com.android.sdk.BootReceiver`, job services `JobCheckService`/`JobUpInfoService`, license check и uploadinfo; system UID | 24, 7 | Debug/лицензия/телеметрия; сильный кандидат на production-удаление, но проверить factory debug и бизнес-процесс |
 | `com.example.a` (`ProductTest`) | 13,0 МиБ | launcher activity, system UID | 13, 0 | Заводской ProductTest; кандидат, но может использоваться на линии |
-| `com.rockchip.devicetest` (`RKHcyDeviceTest`) | 9,3 МиБ | boot receiver, launcher, `TestService` и `WatchdogService`; system UID | 25, 8 | Заводской DeviceTest; кандидат при отказе от factory test |
+| `com.rockchip.devicetest` (`RKHcyDeviceTest`) | 9,3 МиБ | boot receiver, `TestService`, `WatchdogService`, `IndexActivity`/`AgingTestActivity` без launcher; system UID | 25, 8 | Заводской DeviceTest; кандидат при отказе от factory test |
 | `com.cghs.stresstest` (`StressTest`) | 5,1 МиБ | boot receiver `RebootReceiver`, camera/video/recovery/stress-сервисы; system UID | 15, 7 | Заводской StressTest; кандидат при отказе от стресс-тестов |
 | `com.rockchips.mediacenter` (`MediaCenter`) | 19,7 МиБ | boot receiver, media UI, `ACCESS_SUPERUSER`, install/delete packages; system UID | 28, 10 | Медиафункция с широкими правами; не удалять без замены плеера и проверки USB/сети |
 | `android.rockchip.update.service` (`RKHcyUpdate`) | 25,7 МиБ | boot, OTA UI; system UID | 15, 4 | OTA; не удалять без отказа от обновлений |
@@ -115,6 +115,8 @@
 Главный статический вывод: группа `ShowDebug` + `ProductTest` + `RKHcyDeviceTest` + `StressTest` (55,0 МиБ) — самый обоснованный технический кандидат, если заводские тесты и калибровка не нужны. Эти приложения работают с system UID, а `StressTest` запрашивает `INJECT_EVENTS` и `WRITE_SECURE_SETTINGS`, `ShowDebug` — `SHUTDOWN`, `REQUEST_INSTALL_PACKAGES` и `MOUNT_UNMOUNT_FILESYSTEMS`. Удаление уменьшает не только размер, но и поверхность атаки. Однако manifest не доказывает, что заводская линия или сервисный сценарий их не вызывает: это остаётся runtime/factory-риском.
 
 `33118V12` нельзя считать «тестовым» только по имени: manifest подтверждает HOME-launcher. `TvSettings` содержит `FallbackHome`, но с priority `-1000`, то есть это резервный home, а не основной launcher. `SimpleAllApp` не является launcher по manifest: у него нет activity и разрешений, поэтому его 0,7 МиБ — низкий приоритет.
+
+Практический порядок удаления этой группы, включая обратимый runtime-тест, заводскую приёмку, калибровочный snapshot, пересборку ext4/super и критерии остановки, вынесен в отдельный документ: [2026-11-28-oem-test-removal-plan.md](2026-11-28-oem-test-removal-plan.md). Он не отменяет ограничений этого отчёта: runtime-проверка на H96 не выполнена, а статический анализ не доказывает отсутствие внешней заводской калибровки.
 
 ## Таблица 3. Build-system кандидаты (не удаление функций)
 
