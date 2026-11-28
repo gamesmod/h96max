@@ -4,6 +4,7 @@
   "build_start_commit": "c84eb05c42035a218fdccb3ed595de3d72841510",
   "integrated_master_commit": "90edc8638f1b077b41b30946ac12bbfc1299afe1",
   "source_state": "local candidate; a test-only file changed concurrently; no device installation or publication",
+  "superseded_note": "historical candidate contained Dicio/Vosk inputs; Dicio and VoiceBridge are excluded from current sources and goals; do not promote this artifact",
   "candidate": {
     "ota_path": "release/updates/emmc/tvbox-update-0.4.12-emmc.zip",
     "ota_size_bytes": 984254454,
